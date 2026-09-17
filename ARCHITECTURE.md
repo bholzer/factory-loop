@@ -124,8 +124,8 @@ reached through the card's history, not by a link from the card.
 
 ## Known rough edges
 
-- Template ↔ live correspondence is maintained by hand; no check enforces the
-  counterpart existence, the structural subsequence, or the byte identity
-  above. The mechanism is specified in
-  `docs/capabilities/template-live-drift.md` and its absence is tracked as
-  `D1` in `docs/DEBT.md`.
+- The correspondence rules above are decided by `./tools/verify`, but two
+  questions around them are not decidable from text at all: whether a pair
+  that corresponds structurally is about the same subject, and whether a
+  live-only file should have had a counterpart. Both are tracked as `D9` in
+  `docs/DEBT.md` and read by hand.

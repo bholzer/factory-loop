@@ -4,7 +4,6 @@
 
 | ID | Item | Where | Why deferred | Trigger to pay it down |
 | --- | --- | --- | --- | --- |
-| D1 | Template ↔ live correspondence is checked by hand | `template/` against the repository root | The live tree only came into existence with the correspondence rule, and writing the checker in the same session would have traded the milestone's content for its enforcement | The first commit that lands a generic change in one half only — a `template/` edit whose live counterpart wants the same change, or the reverse |
 | D2 | The scaffolding check cannot tell a quoted marker from a real slot | `tools/checks/scaffolding-markers` | No file in the checked set needs to quote a marker, so keeping the marker definition to one owner is currently enough | The first live artifact in the checked set that has to quote a marker in its prose |
 | D3 | The payload's generic capability cards are not instantiated for this project | `docs/capabilities/` against `template/docs/capabilities/` | Writing the starter set plus this project's own three cards was one unit of work; instantiating four more registers here would have doubled it while nothing enforces any card in either half | Fired at v1 close: the reference sweep found a dangling reference that `doc-integrity` decides. Overdue — see Details |
 | D4 | The installed procedures sit outside every harness's auto-discovery root | `skills/` against a harness's own skills location | The file shape is portable and `AGENTS.md`'s map makes each procedure reachable by path, so an agent can always read one; only automatic surfacing is missing, and where to put the files is a per-harness configuration question that a live trial answers better than a guess | The first harness whose configuration cannot reach `skills/`, or the live trial specced in `docs/capabilities/blueprint-eval.md` |
@@ -12,25 +11,9 @@
 | D6 | `boundary-lint` has no retrofit path for an existing codebase | `template/docs/capabilities/boundary-lint.md` against a brownfield target | Greenfield-first was the v1 scope choice in `GOALS.md`; a codebase that already violates its own layer map needs a baseline-and-ratchet story that no card here carries | The first bootstrap of this payload into a codebase whose declared layer map is already violated |
 | D7 | The blueprint has never been run; evaluation is paper-only | `docs/capabilities/blueprint-eval.md` | The owners scoped v1 to paper verification. A trial needs a target project, two or more harnesses, and one feature driven through the loop end to end — its own unit of work, not a milestone tail | Any of: a project bootstrapped from this payload for real, a harness whose configuration cannot reach `skills/` (`D4`), or a payload change whose effect reading cannot predict |
 | D8 | The only gate is skippable, and absent in a fresh clone | `tools/hooks/pre-commit` against a clone that has not run the install line | A hook is the strongest enforcement point a repository with no remote has; making it unskippable needs a place to run that the committer does not control, and there is none yet | The first remote or continuous-integration system this repository gets |
+| D9 | Two of the correspondence questions have no mechanism and stay a reading job | `docs/capabilities/template-live-drift.md`, read during the doc-garden pass | Neither question is decidable from text, so there is nothing to build: a heading list cannot tell whether two files discuss the same subject, and no comparison of what the payload ships can reveal what it failed to ship | A pair found structurally corresponding while saying different things, or a live-only artifact that a target project would have needed the payload to carry |
 
 ## Details
-
-### D1 — Hand-checked template ↔ live correspondence
-
-`ARCHITECTURE.md` declares the correspondence rules under its cross-cutting
-invariants, and `docs/capabilities/template-live-drift.md` specifies the check
-that would decide them, including the exclusions a naive walk gets wrong and
-the failing cases that promote it to `built`. Nothing enforces either. This
-row is the debt — no check exists — and not a third copy of the rules.
-
-Every pass so far was by hand: the file set discovered with `find` under
-`template/`, byte identity with `cmp`, counterpart existence with `test -e`,
-and structure by comparing heading sequences.
-
-Two things such a command still would not catch, and which stay a reading
-job after it is built: whether a live file's content is actually about the
-same subject as its template counterpart, and whether a live-only file ought
-to have had a template counterpart at all.
 
 ### D2 — Marker mention versus marker use
 
@@ -138,3 +121,19 @@ requires a gating card to be `enforced` with no run in which the check was
 disabled or skipped, and a flag that silently turns the gate off makes that
 run unobservable. No rung may be claimed on this gate until the check also
 runs somewhere the committer does not control.
+
+### D9 — The part of correspondence a heading list cannot see
+
+`tools/checks/template-live-drift` now decides the three comparisons its card
+states, and the card's Invariant section names the two questions it leaves
+open. Neither is a missing implementation. The first asks about meaning, and
+the check reads only structure; the second asks about an absence, and the
+check enumerates the payload rather than judging it.
+
+So the owner is a person: `skills/doc-garden/SKILL.md` is the pass where the
+two halves get read against each other, and this row exists so that the pass
+has a written reason to do it rather than trusting the green check to mean
+more than it does. Paying it down is not writing a checker. It is either
+finding a case the reading catches — which is evidence for what a mechanism
+would have to decide — or concluding that the reading has caught nothing over
+enough passes to retire the row.

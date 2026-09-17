@@ -44,10 +44,6 @@ here is decided by one command.
 - `git config core.hooksPath tools/hooks` — once per clone. After it,
   `tools/hooks/pre-commit` refuses any commit that `./tools/verify` rejects.
 
-The wider template ↔ live structural walk is hand-run and unmechanized.
-`docs/DEBT.md` `D1` carries the hand procedure, its blind spots, and the
-capability card that specifies a mechanism.
-
 ## Working rules
 
 - Multi-file or multi-session work requires an ExecPlan per `plans/PLANS.md`.

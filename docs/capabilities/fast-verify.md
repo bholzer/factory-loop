@@ -37,9 +37,11 @@ there is only one definition to keep true.
 ## Acceptance
 
 Passing case: from a clean checkout, run `./tools/verify` with no arguments.
-It exits zero, prints one line per check naming what that check examined with
-a count greater than zero, ends with its own summary line, and the observed
-wall-clock time is inside five seconds. Record the observed time — if it
+It exits zero, streams each check's own report naming what that check
+examined with counts greater than zero, ends with its own summary line, and
+the observed wall-clock time is inside five seconds. A check whose card
+requires per-unit reporting prints several such lines, which is why the
+aggregator streams rather than summarizes. Record the observed time — if it
 exceeds the budget, the card is not `built`, and either the budget or the
 command's contents must change.
 
@@ -54,7 +56,7 @@ that the hook lets through while the violation stands.
 ## Remediation message
 
     fast-verify: 1 of 2 checks failed.
-      plans-md-identity: template/plans/PLANS.md and plans/PLANS.md differ,
+      template-live-drift: template/plans/PLANS.md and plans/PLANS.md differ,
       first at line 175. These two files are byte-identical by construction.
       Copy the intended version over the other and re-run.
     Fix the violations reported above and re-run ./tools/verify.

@@ -27,13 +27,26 @@ The check runs template to live only. Live-only files — `docs/decisions/`
 records, files in `plans/active/`, and cards this project wrote for itself —
 are not drift, and the reverse comparison does not exist.
 
+Two things this card deliberately does not decide, both of which stay a
+reading job and are tracked as `D9` in `docs/DEBT.md`. Whether a live file's
+content is actually about the same subject as its template counterpart is not
+decidable from headings: a live file can carry every heading its counterpart
+declares and say something unrelated under each one. Whether a live-only file
+ought to have had a template counterpart at all is a question about what the
+payload should ship, which no comparison of what it does ship can answer. The
+doc-garden pass is where both get read.
+
 ## Enforcement point
 
-The cheap verification command under Commands in `AGENTS.md`, where it
-replaces the single `cmp` line that covers only the byte-identity case today,
-and the same command in continuous integration. Failure refuses the change.
-The commit that makes the check real also deletes the hand-walk instructions
-from `docs/DEBT.md`, since the debt is the absence of this check.
+`./tools/verify` from the repository root, and the versioned hook
+`tools/hooks/pre-commit`, which runs that same command and refuses the commit
+when it exits nonzero. There is no continuous integration to name: this
+repository has no remote, and the gate's skippability is `docs/DEBT.md` `D8`.
+
+The byte-identity comparison here subsumes the standalone `cmp` check that
+`./tools/verify` carried before this card was built; that check was deleted in
+the commit that wired this one in, because two mechanisms for one invariant
+leave a reader guessing which is authoritative.
 
 ## Acceptance
 

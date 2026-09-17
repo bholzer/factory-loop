@@ -14,7 +14,7 @@ invariant holding here too.
 
 | Card | Status | Enforced at |
 | --- | --- | --- |
-| `template-live-drift` | specced | — |
+| `template-live-drift` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
 | `blueprint-eval` | specced | — |
 | `loop-runner` | specced | — |
 | `fast-verify` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |

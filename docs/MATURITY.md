@@ -2,22 +2,21 @@
 
 ## Current rung
 
-L0 — human-gated. Two things are now mechanical: `./tools/verify` decides the
-byte identity of the two copies of `plans/PLANS.md` and the absence of
-authoring scaffolding in the live artifacts, and the hook at
+L0 — human-gated. Two checks are now mechanical: `./tools/verify` decides the
+absence of authoring scaffolding in the live artifacts and the whole
+correspondence between `template/` and the live tree — counterpart existence,
+byte identity, and heading subsequence — and the hook at
 `tools/hooks/pre-commit` refuses a commit it rejects. Everything else here is
 still enforced by a human reading, and a human reads every change before it
 lands.
 
-The rung stays L0, because a claim on L1 needs more than one enforced gate:
-every card in an L1 row of the Gating capabilities table below must read
-`enforced` in `docs/capabilities/index.md`, and the promotion rule adds twenty
-consecutive green landed changes on top of that. `template-live-drift` is the
-gate still missing — it is the invariant a check can decide today, and
-building it retires the hand walk between `template/` and the live tree that
-`docs/DEBT.md` records as `D1`. `blueprint-eval` needs a live trial this
-project has deliberately parked, and `loop-runner` gates a rung two steps
-away.
+The rung stays L0 although both L1 rows in the Gating capabilities table below
+now read `enforced` in `docs/capabilities/index.md`. Two things are missing on
+top of that status: the twenty consecutive green landed changes the promotion
+rule requires, and a gate the committer cannot switch off, which
+`docs/DEBT.md` `D8` records this one as not being. `blueprint-eval` needs a
+live trial this project has deliberately parked, and `loop-runner` gates a
+rung two steps away.
 
 ## Rungs
 
