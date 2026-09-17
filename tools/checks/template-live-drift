@@ -1,0 +1,147 @@
+#!/bin/sh
+# template-live-drift — the payload half and the live half correspond.
+#
+# docs/capabilities/template-live-drift.md is the card. It states three
+# comparisons, and this script decides all three, template to live only:
+# counterpart existence for every file under template/, byte identity for the
+# one zero-tolerance pair, and heading subsequence for every other pair. Two
+# exclusions the card names — card files under template/docs/capabilities/ and
+# .gitkeep placeholders — are reported as excluded rather than skipped, because
+# a silent skip is how an exclusion list grows until the check covers nothing.
+#
+# Exit 0 holds, exit 1 is a violation, exit 2 means undecidable.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+LC_ALL=C
+export LC_ALL
+
+if [ ! -d template ]; then
+	echo "template-live-drift: cannot run — template/ does not exist."
+	echo "Restore the payload half from git history, or correct the path in tools/checks/template-live-drift."
+	exit 2
+fi
+
+files=$(find template -type f | sort)
+if [ -z "$files" ]; then
+	echo "template-live-drift: cannot run — no files found under template/."
+	echo "The payload half cannot be empty; restore it from git history."
+	exit 2
+fi
+
+identical=0
+structural=0
+headings=0
+excluded=0
+total=0
+violations=0
+
+# The byte-identical pair. The card names exactly one; it is written here
+# rather than derived, because "which files are one file stored twice" is a
+# decision the architecture makes and not a property of the tree.
+BYTE_IDENTICAL="plans/PLANS.md"
+
+for tpl in $files; do
+	total=$((total + 1))
+	rel=${tpl#template/}
+	live=$rel
+	base=${tpl##*/}
+
+	# Exclusions, decided by path and reported by name.
+	if [ "$base" = ".gitkeep" ]; then
+		excluded=$((excluded + 1))
+		echo "template-live-drift: $rel — excluded (directory placeholder)."
+		continue
+	fi
+	case "$tpl" in
+	template/docs/capabilities/*)
+		case "$base" in
+		index.md | *_FORMAT.md) ;;
+		*)
+			excluded=$((excluded + 1))
+			echo "template-live-drift: $rel — excluded (card file: the payload ships a starter register and a project keeps its own)."
+			continue
+			;;
+		esac
+		;;
+	esac
+
+	if [ ! -e "$live" ]; then
+		violations=$((violations + 1))
+		echo "template-live-drift: $tpl has no live counterpart at $live. Either instantiate it for this project, or — if it is a card file or a directory placeholder — check it against the exclusions in docs/capabilities/template-live-drift.md."
+		continue
+	fi
+
+	if [ "$rel" = "$BYTE_IDENTICAL" ]; then
+		identical=$((identical + 1))
+		if cmp -s "$tpl" "$live"; then
+			echo "template-live-drift: $rel — byte-identical."
+			continue
+		fi
+		# cmp decides identity but reports a line number only when both files
+		# reach the differing byte; when one is a prefix of the other it prints
+		# an EOF notice instead, so the location is derived here.
+		line=$(awk '
+			FNR == NR { a[FNR] = $0; na = FNR; next }
+			{
+				nb = FNR
+				if (FNR > na || $0 != a[FNR]) { print FNR; found = 1; exit }
+			}
+			END { if (!found && na > nb) print nb + 1 }
+		' "$tpl" "$live")
+		if [ -n "$line" ]; then
+			where="first at line $line"
+		else
+			where="identical line for line but not byte for byte"
+		fi
+		violations=$((violations + 1))
+		echo "template-live-drift: $tpl and $live differ, $where. These two files are byte-identical by construction. Copy the intended version over the other and re-run."
+		continue
+	fi
+
+	# Structural correspondence: the template's headings, minus those carrying
+	# a fill slot, must appear in the live file in the same order. Extra live
+	# headings are expected — filled content adds them.
+	structural=$((structural + 1))
+	verdict=$(awk '
+		FNR == NR {
+			if ($0 ~ /^```/) { tfence = !tfence; next }
+			if (!tfence && $0 ~ /^#+ [^ ]/ && $0 !~ /\{\{FILL/) { th[++nt] = $0 }
+			next
+		}
+		{
+			if ($0 ~ /^```/) { lfence = !lfence; next }
+			if (!lfence && $0 ~ /^#+ [^ ]/) { lh[++nl] = $0 }
+		}
+		END {
+			i = 1
+			for (j = 1; j <= nl && i <= nt; j++) {
+				if (lh[j] == th[i]) { i++ }
+			}
+			if (i <= nt) { print "missing\t" nt "\t" th[i] } else { print "ok\t" nt }
+		}
+	' "$tpl" "$live")
+	verdict_kind=${verdict%%	*}
+	verdict_rest=${verdict#*	}
+	count=${verdict_rest%%	*}
+	headings=$((headings + count))
+	if [ "$verdict_kind" = "ok" ]; then
+		hnoun="headings"
+		[ "$count" -eq 1 ] && hnoun="heading"
+		echo "template-live-drift: $rel — subsequence, $count $hnoun."
+		continue
+	fi
+	missing=${verdict_rest#*	}
+	violations=$((violations + 1))
+	echo "template-live-drift: $live is missing the heading \`$missing\`, which $tpl declares. Add the heading to the live file, or remove it from the template if the section is genuinely gone — a generic change belongs in both halves."
+done
+
+if [ "$violations" -eq 0 ]; then
+	echo "template-live-drift: ok — $total files under template/: $identical byte-identical, $structural by heading subsequence over $headings headings, $excluded excluded."
+	exit 0
+fi
+
+noun="violations"
+[ "$violations" -eq 1 ] && noun="violation"
+echo "template-live-drift: $violations $noun in $total files under template/."
+exit 1
