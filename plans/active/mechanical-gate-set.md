@@ -142,6 +142,22 @@ Three things were measured while authoring, and each one changed a milestone's c
   Rationale: the same reason as M1's enforcement-point decision — there is no continuous integration here to name — plus the old text described the pre-M1 state, "replaces the single `cmp` line that covers only the byte-identity case today", which this milestone makes false twice over.
   Date/Author: 2026-09-17, M2 session.
 
+- Decision: (post-M2 review, routed to M7 rather than acted on) The two
+  format documents are checked by subsequence where their class implies byte
+  identity. `CARD_FORMAT.md` and `DECISION_FORMAT.md` are shipped-verbatim —
+  a target project never edits a format it conforms to, and this repository's
+  live copies are copies — yet the drift check compares each pair by heading
+  subsequence, so prose drift between the copies of a format document is
+  undetectable. Both pairs are byte-identical today, verified with `cmp`
+  during review. The fix is one line per pair in `BYTE_IDENTICAL` plus the
+  matching sentence in `docs/capabilities/template-live-drift.md`'s
+  Invariant and in `ARCHITECTURE.md`'s correspondence invariant, but it
+  changes the invariant of an `enforced` card, which requires its own
+  failing-case demonstration — real work, not a review edit. M7 either does
+  it under its close-out or records it as debt with the next free
+  identifier.
+  Date/Author: 2026-09-17, reviewer.
+
 ## Outcomes & Retrospective
 
 M1 and M2 are executed; the remaining five milestones are not, so this section stays unwritten until M7. What M1 fixes for that comparison: the budget published in `AGENTS.md` is 5 seconds against an observed clean run of 0.5 seconds, and the one defect found while building was in the check rather than in the tree — `cmp`'s missing line number on a prefix difference, recorded in Surprises. What M2 adds: the hand walk between the halves is gone from `docs/DEBT.md`, and building it found no defect in the tree at all — the authoring tally was confirmed rather than corrected, which is the first milestone here to report that. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
@@ -516,3 +532,9 @@ These contracts are what a later session cannot rediscover, so they are fixed he
   resolve in writing rather than silently. Milestone boundaries and
   acceptance counts are unchanged; the one contract that changed is named
   above with its rationale in the `Decision Log`.
+- 2026-09-17 (post-M2 review): added one routed finding to the Decision
+  Log — format-doc pairs are byte-copies by class but subsequence-checked
+  by the drift card; M7 strengthens or debts it. Reason: an invariant
+  weaker than its class's own rule is drift the check cannot see, and the
+  decision to widen `BYTE_IDENTICAL` belongs to the artifact owners, not to
+  a review.
