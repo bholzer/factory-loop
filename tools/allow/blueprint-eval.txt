@@ -1,0 +1,10 @@
+# blueprint-eval allowlist — references a copy of the payload deliberately
+# does not resolve.
+#
+# One entry per line: the key the references part prints in its remediation
+# message, two spaces, a # and a one-line reason. The key is
+# <citing-path-in-the-copy>:<reference>. An entry that matches nothing is
+# counted as stale in the passing summary, so an exception that a payload edit
+# or a pruned card retired decays visibly instead of silently.
+
+docs/capabilities/doc-integrity.md:docs/NOPE.md  # that card's own failing case tells a builder to create this path and delete it again, so a copy must not contain it

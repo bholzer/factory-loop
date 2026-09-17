@@ -1,0 +1,542 @@
+#!/bin/sh
+# blueprint-eval — build a trial repository from the payload, and decide the
+# parts of the live trial a machine can decide.
+#
+# docs/capabilities/blueprint-eval.md is the card. Its invariant is that a
+# plain recursive copy of template/, plus the procedures in skills/, is enough
+# to carry one feature with no access to this repository. Three of its
+# questions are scriptable and are the three parts below: the procedures
+# arrived in the layout every supported harness requires (layout), no
+# authoring scaffolding survived the bootstrap (fill), and every path
+# reference inside the copy resolves inside the copy (references). The rest of
+# the card is a person invoking a harness and reading what came back.
+#
+# This is deliberately not one of the executables under tools/checks/, and
+# tools/verify does not run it. Those decide a property of this repository on
+# every edit inside a five-second budget; the subject here is a filled copy of
+# the payload, a state that exists only while a trial is running and never in
+# a commit to this tree.
+#
+# docs/capabilities/doc-integrity.md owns the definition of a path reference.
+# The references part below reimplements that definition instead of sharing
+# one implementation with tools/checks/doc-integrity: the walk here runs
+# against a different root over a different checked set, and
+# tools/checks/boundary-lint already carries a third variant with a
+# deliberately different definition, so a shared extractor would unify two of
+# the three and read as an oversight.
+#
+# Usage:
+#   ./tools/blueprint-eval new <label>
+#   ./tools/blueprint-eval check <repo-dir> [layout] [fill] [references]
+#
+# Exit 0 holds, exit 1 is a violation, exit 2 means it cannot decide.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+LC_ALL=C
+export LC_ALL
+
+ROOT=$PWD
+ALLOW=tools/allow/blueprint-eval.txt
+OUTSIDE="A trial runs outside this tree, so that a reference to an ancestor path fails loudly instead of resolving by accident. Build one with ./tools/blueprint-eval new <label>, and check the repo/ directory it prints."
+FIXHERE="Fix this in this repository — in template/ and its live counterpart, or in skills/, whichever owns the defect — and never in the copy: the copy is a scratch artifact and the next trial rebuilds it."
+
+usage() {
+	echo "usage: ./tools/blueprint-eval new <label>"
+	echo "       ./tools/blueprint-eval check <repo-dir> [layout] [fill] [references]"
+}
+
+# Resolve a path that need not exist yet: the deepest existing ancestor is
+# resolved with cd, and the components below it are appended unchanged. This
+# is what makes the refusal below decide the real destination rather than the
+# spelling of the argument.
+abs_path() {
+	p=$1
+	case $p in
+	/*) ;;
+	*) p=$PWD/$p ;;
+	esac
+	tail=
+	while [ ! -d "$p" ]; do
+		parent=${p%/*}
+		[ -n "$parent" ] || parent=/
+		[ "$parent" != "$p" ] || break
+		base=${p##*/}
+		tail=$base${tail:+/}$tail
+		p=$parent
+	done
+	head=$(cd "$p" 2>/dev/null && pwd -P) || return 1
+	if [ -n "$tail" ]; then
+		printf '%s/%s\n' "${head%/}" "$tail"
+	else
+		printf '%s\n' "$head"
+	fi
+}
+
+inside_worktree() {
+	case "$1" in
+	"$ROOT" | "$ROOT"/*) return 0 ;;
+	esac
+	return 1
+}
+
+cmd_new() {
+	label=$1
+	if [ -z "$label" ] || [ "$#" -ne 1 ]; then
+		echo "blueprint-eval: cannot run — new takes exactly one label."
+		usage
+		exit 2
+	fi
+	case $label in
+	*/* | .* | -*)
+		echo "blueprint-eval: cannot run — the label \"$label\" is not a single directory name."
+		echo "A label becomes one directory under the trial root; pass a plain name such as claude-code."
+		exit 2
+		;;
+	esac
+
+	absent=0
+	for d in template skills; do
+		if [ ! -d "$d" ]; then
+			echo "blueprint-eval: cannot run — $d/ is missing from this checkout."
+			absent=$((absent + 1))
+		fi
+	done
+	if [ "$absent" -ne 0 ]; then
+		echo "A trial repository is both halves together: the payload and the procedures. Restore the directory before building one."
+		exit 2
+	fi
+
+	trial=$(abs_path "${BLUEPRINT_TRIAL_ROOT:-$HOME/blueprint-trials}/$label-$(date +%Y%m%d-%H%M%S)") || {
+		echo "blueprint-eval: cannot run — the trial root ${BLUEPRINT_TRIAL_ROOT:-$HOME/blueprint-trials} cannot be resolved."
+		exit 2
+	}
+	if inside_worktree "$trial"; then
+		echo "blueprint-eval: cannot run — $trial is inside this repository's worktree."
+		echo "$OUTSIDE Set BLUEPRINT_TRIAL_ROOT to a directory outside this checkout."
+		exit 2
+	fi
+	if [ -e "$trial" ]; then
+		echo "blueprint-eval: cannot run — $trial already exists."
+		echo "A trial directory is never reused: abandon the one that went wrong and build the next one from a clean copy."
+		exit 2
+	fi
+
+	mkdir -p "$trial/repo" "$trial/logs" || exit 2
+	cp -R template/. "$trial/repo/" || exit 2
+	cp -R skills "$trial/repo/skills" || exit 2
+
+	if ! git -C "$trial/repo" init -q ||
+		! git -C "$trial/repo" add -A ||
+		! git -C "$trial/repo" commit -q -m 'Receive the payload'; then
+		echo "blueprint-eval: cannot run — git would not make the first commit in $trial/repo."
+		echo "Configure a git identity (git config --global user.email), delete that trial directory, and build another one."
+		exit 2
+	fi
+
+	payload=0
+	for f in $(find template -type f | sort); do
+		payload=$((payload + 1))
+	done
+	procedures=0
+	for f in skills/*/SKILL.md; do
+		[ -f "$f" ] && procedures=$((procedures + 1))
+	done
+	copied=0
+	for f in $(find "$trial/repo" -type f -not -path '*/.git/*' | sort); do
+		copied=$((copied + 1))
+	done
+
+	echo "blueprint-eval: trial at $trial"
+	echo "blueprint-eval:   repo  $trial/repo"
+	echo "blueprint-eval:   logs  $trial/logs"
+	echo "blueprint-eval: copied $copied files — $payload payload files and $procedures procedures — committed as \"Receive the payload\"."
+	exit 0
+}
+
+# The copy's markdown files, relative to the copy, in a stable order.
+copy_markdown() {
+	(cd "$1" && find . -type f -name '*.md' | sed 's|^\./||' | sort)
+}
+
+part_layout() {
+	copy=$1
+	expected=0
+	found=0
+	violations=0
+	for d in skills/*/; do
+		[ -d "$d" ] || continue
+		name=${d%/}
+		name=${name##*/}
+		expected=$((expected + 1))
+		file=$copy/skills/$name/SKILL.md
+		if [ ! -f "$file" ]; then
+			violations=$((violations + 1))
+			echo "blueprint-eval layout: skills/$name/SKILL.md is missing from the copy."
+			if [ -d "$copy/skills/$name" ]; then
+				for g in "$copy/skills/$name"/* "$copy/skills/$name"/.*; do
+					case "${g##*/}" in . | .. | '*' | '.*') continue ;;
+					esac
+					[ -e "$g" ] || continue
+					echo "  found skills/$name/${g##*/} instead."
+				done
+			else
+				echo "  the copy has no skills/$name/ directory at all."
+			fi
+			echo "  Every supported harness reads the same entry-point filename, so the layout is fixed by all of them at once: restore the name in this repository rather than adapting one harness."
+			echo "  $FIXHERE"
+			continue
+		fi
+		if [ "$(sed -n 1p "$file")" != "---" ]; then
+			violations=$((violations + 1))
+			echo "blueprint-eval layout: skills/$name/SKILL.md:1 does not open a frontmatter block."
+			echo "  A harness reads the name and the description from a --- block on the first line; without it the procedure is an untitled document."
+			echo "  $FIXHERE"
+			continue
+		fi
+		front=$(awk 'NR == 1 { next } $0 == "---" { exit } { print FNR "\t" $0 }' "$file")
+		declared=$(printf '%s\n' "$front" | sed -n 's/^\([0-9]*\)	name:[ 	]*/\1	/p' | sed -n 1p)
+		described=$(printf '%s\n' "$front" | sed -n 's/^\([0-9]*\)	description:[ 	]*/\1	/p' | sed -n 1p)
+		declared_line=${declared%%	*}
+		declared_name=${declared#*	}
+		described_line=${described%%	*}
+		described_text=${described#*	}
+		if [ -z "$declared" ] || [ "$declared_name" != "$name" ]; then
+			violations=$((violations + 1))
+			if [ -z "$declared" ]; then
+				echo "blueprint-eval layout: skills/$name/SKILL.md:1 declares no frontmatter name."
+			else
+				echo "blueprint-eval layout: skills/$name/SKILL.md:$declared_line declares the name \"$declared_name\", but the procedure lives in skills/$name/."
+			fi
+			echo "  A harness addresses a procedure by its declared name and finds it by its directory; when the two disagree, one of the two routes misses."
+			echo "  $FIXHERE"
+			continue
+		fi
+		if [ -z "$described" ] || [ -z "$described_text" ]; then
+			violations=$((violations + 1))
+			echo "blueprint-eval layout: skills/$name/SKILL.md:${described_line:-1} carries no description."
+			echo "  The description is what a harness shows when it decides whether this procedure fits the task at hand; empty, it is never chosen."
+			echo "  $FIXHERE"
+			continue
+		fi
+		found=$((found + 1))
+	done
+
+	if [ "$expected" -eq 0 ]; then
+		echo "blueprint-eval layout: cannot decide — this checkout has no procedures under skills/ to require of the copy."
+		echo "Restore them: a layout part with nothing to require passes forever."
+		return 2
+	fi
+	if [ "$violations" -eq 0 ]; then
+		echo "blueprint-eval layout: ok — $expected procedures, each with SKILL.md and matching frontmatter name."
+		return 0
+	fi
+	echo "blueprint-eval layout: the copy carries $found of $expected procedures in the layout every supported harness requires."
+	return 1
+}
+
+part_fill() {
+	copy=$1
+	files=$(copy_markdown "$copy")
+	if [ -z "$files" ]; then
+		echo "blueprint-eval fill: cannot decide — the copy at $copy holds no markdown files."
+		echo "Check that the trial was built by ./tools/blueprint-eval new; a fill part over an empty copy passes forever."
+		return 2
+	fi
+	scanned=0
+	for f in $files; do
+		scanned=$((scanned + 1))
+	done
+
+	# The pattern writes the final letter of each marker word in brackets, the
+	# trick tools/checks/scaffolding-markers uses, so that this file cannot
+	# match itself. D2 in docs/DEBT.md holds the known limit of matching the
+	# words anywhere.
+	hits=$(cd "$copy" && grep -nE '\{\{FIL[L]|GUIDANC[E]' $files)
+	if [ -z "$hits" ]; then
+		echo "blueprint-eval fill: ok — no authoring scaffolding in $scanned markdown files of the copy."
+		return 0
+	fi
+
+	previous=
+	printf '%s\n' "$hits" | while IFS= read -r hit; do
+		file=${hit%%:*}
+		rest=${hit#*:}
+		lineno=${rest%%:*}
+		echo "blueprint-eval fill: $file:$lineno still carries authoring scaffolding."
+		if [ "$file" != "$previous" ]; then
+			echo "  A fill slot or a guidance block survived the bootstrap, so this artifact is a skeleton the project has not answered yet. Replace the slot with this project's own content, or delete the guidance block."
+			previous=$file
+		fi
+	done
+	marked=$(printf '%s\n' "$hits" | wc -l | tr -d ' ')
+	dirty=$(printf '%s\n' "$hits" | sed 's/:.*//' | sort -u | wc -l | tr -d ' ')
+	noun="marker lines"
+	[ "$marked" -eq 1 ] && noun="marker line"
+	echo "blueprint-eval fill: $marked $noun in $dirty of $scanned markdown files."
+	return 1
+}
+
+part_references() {
+	copy=$1
+	if [ ! -f "$ALLOW" ]; then
+		echo "blueprint-eval references: cannot decide — the allowlist $ALLOW does not exist."
+		echo "Restore it from git history, or create it empty if no deliberate mention of a missing path remains in the payload."
+		return 2
+	fi
+
+	# The checked set: every markdown file in the copy, minus the format
+	# documents whose illustrative filenames are examples rather than
+	# references, and minus plan files, which name paths before they exist and
+	# after they are deleted. The plan convention itself stays in scope: it is
+	# the contract, not work in flight.
+	files=
+	scanned=0
+	formats=0
+	plans=0
+	for f in $(copy_markdown "$copy"); do
+		case "${f##*/}" in
+		*_FORMAT.md)
+			formats=$((formats + 1))
+			continue
+			;;
+		esac
+		case "$f" in
+		plans/active/* | plans/completed/*)
+			plans=$((plans + 1))
+			continue
+			;;
+		esac
+		files="$files $f"
+		scanned=$((scanned + 1))
+	done
+	if [ "$scanned" -eq 0 ]; then
+		echo "blueprint-eval references: cannot decide — no citing file in the copy at $copy."
+		echo "Check that the trial was built by ./tools/blueprint-eval new; a reference walk over an empty set passes forever."
+		return 2
+	fi
+
+	# A reference is a backticked span or a markdown link target containing a
+	# slash and none of space, tab, asterisk, angle bracket, brace or colon.
+	# The colon keeps a file:line locator and a URL out of the set, neither of
+	# which is a path inside the copy. Fenced and indented blocks are quoted
+	# material: a remediation transcript names the file its own failing case
+	# creates, which must not exist.
+	refs=$(cd "$copy" && awk '
+		function consider(t) {
+			if (t == "") { return }
+			if (t !~ /\//) { return }
+			if (t ~ /[ \t*<>{}:]/) { return }
+			print FILENAME "\t" FNR "\t" t
+		}
+		FNR == 1 { fence = 0 }
+		{
+			if ($0 ~ /^[ \t]*```/) { fence = !fence; next }
+			if (fence) { next }
+			if ($0 ~ /^(    |\t)/) { next }
+			n = split($0, p, "`")
+			for (i = 2; i <= n; i += 2) { consider(p[i]) }
+			s = $0
+			while (match(s, /\]\([^()]+\)/)) {
+				consider(substr(s, RSTART + 2, RLENGTH - 3))
+				s = substr(s, RSTART + RLENGTH)
+			}
+		}
+	' $files)
+
+	keys=$(awk '
+		/^[ \t]*$/ { next }
+		/^[ \t]*#/ { next }
+		{
+			if ($0 !~ /  #/) { print "BAD\t" FNR "\t" $0; next }
+			i = index($0, "  #")
+			print "KEY\t" FNR "\t" substr($0, 1, i - 1)
+		}
+	' "$ALLOW")
+	bad=$(printf '%s\n' "$keys" | awk -F'\t' '$1 == "BAD" { print $2 }')
+	if [ -n "$bad" ]; then
+		for n in $bad; do
+			echo "blueprint-eval references: cannot decide — $ALLOW line $n has no reason."
+		done
+		echo "Every entry is one key, two spaces, a # and a one-line reason; an exception nobody justified is an exception nobody can review."
+		return 2
+	fi
+
+	total=0
+	resolved=0
+	unresolved=""
+	oldifs=$IFS
+	IFS='
+'
+	for rec in $refs; do
+		file=${rec%%	*}
+		rest=${rec#*	}
+		lineno=${rest%%	*}
+		ref=${rest#*	}
+		total=$((total + 1))
+		# Strict resolution: the path exists in the copy, or beside the citing
+		# file. There is no parent-directory allowance — the question this part
+		# decides is whether the copy contains what it cites, and an allowance
+		# for the parent would let a dangling map entry resolve.
+		if [ -e "$copy/$ref" ]; then
+			resolved=$((resolved + 1))
+			continue
+		fi
+		dir=${file%/*}
+		if [ "$dir" = "$file" ]; then
+			dir="."
+		fi
+		if [ -e "$copy/$dir/$ref" ]; then
+			resolved=$((resolved + 1))
+			continue
+		fi
+		unresolved="$unresolved$file	$lineno	$ref
+"
+	done
+	IFS=$oldifs
+
+	if [ "$total" -eq 0 ]; then
+		echo "blueprint-eval references: cannot decide — no reference was extracted from $scanned markdown files."
+		echo "Correct the extraction in tools/blueprint-eval; a walk with nothing to resolve passes forever."
+		return 2
+	fi
+
+	allowed_keys=""
+	applied=0
+	stale=0
+	oldifs=$IFS
+	IFS='
+'
+	for rec in $keys; do
+		kind=${rec%%	*}
+		[ "$kind" = "KEY" ] || continue
+		rest=${rec#*	}
+		key=${rest#*	}
+		hit=no
+		for u in $unresolved; do
+			ufile=${u%%	*}
+			urest=${u#*	}
+			uref=${urest#*	}
+			if [ "$ufile:$uref" = "$key" ]; then
+				hit=yes
+				break
+			fi
+		done
+		if [ "$hit" = yes ]; then
+			applied=$((applied + 1))
+			allowed_keys="$allowed_keys$key
+"
+		else
+			stale=$((stale + 1))
+		fi
+	done
+
+	violations=0
+	for rec in $unresolved; do
+		file=${rec%%	*}
+		rest=${rec#*	}
+		lineno=${rest%%	*}
+		ref=${rest#*	}
+		case "$allowed_keys" in
+		*"$file:$ref
+"*)
+			continue
+			;;
+		esac
+		violations=$((violations + 1))
+		echo "blueprint-eval references: the copy cites $ref, which the copy does not contain (cited by $file:$lineno)."
+		echo "  $FIXHERE"
+		echo "  If the mention is deliberate, add the key $file:$ref to $ALLOW with a reason."
+	done
+	IFS=$oldifs
+
+	if [ "$violations" -eq 0 ]; then
+		noun="entries"
+		[ "$applied" -eq 1 ] && noun="entry"
+		echo "blueprint-eval references: ok — $resolved of $total references resolved inside the copy, $applied allowlist $noun applied, $stale stale."
+		return 0
+	fi
+	noun="references"
+	[ "$violations" -eq 1 ] && noun="reference"
+	echo "blueprint-eval references: $violations dangling $noun in $total examined across $scanned markdown files of the copy."
+	return 1
+}
+
+cmd_check() {
+	dir=$1
+	if [ -z "$dir" ]; then
+		echo "blueprint-eval: cannot decide — check takes a copy to read."
+		usage
+		exit 2
+	fi
+	shift
+
+	parts=$*
+	if [ -z "$parts" ]; then
+		parts="layout fill references"
+	fi
+	for p in $parts; do
+		case $p in
+		layout | fill | references) ;;
+		*)
+			echo "blueprint-eval: cannot decide — \"$p\" is not a part of this trial."
+			echo "The parts are layout, fill and references; naming none of them runs all three."
+			exit 2
+			;;
+		esac
+	done
+
+	copy=$(abs_path "$dir") || {
+		echo "blueprint-eval: cannot decide — $dir cannot be resolved."
+		exit 2
+	}
+	if inside_worktree "$copy"; then
+		echo "blueprint-eval: cannot decide — $copy is inside this repository's worktree."
+		echo "$OUTSIDE"
+		exit 2
+	fi
+	if [ ! -d "$copy" ]; then
+		echo "blueprint-eval: cannot decide — $copy is not a directory."
+		echo "$OUTSIDE"
+		exit 2
+	fi
+	if [ ! -r "$copy" ]; then
+		echo "blueprint-eval: cannot decide — $copy cannot be read."
+		echo "Fix its permissions, or build another trial with ./tools/blueprint-eval new."
+		exit 2
+	fi
+
+	status=0
+	for p in $parts; do
+		case $p in
+		layout) part_layout "$copy" ;;
+		fill) part_fill "$copy" ;;
+		references) part_references "$copy" ;;
+		esac
+		outcome=$?
+		if [ "$outcome" -eq 2 ]; then
+			status=2
+		elif [ "$outcome" -ne 0 ] && [ "$status" -ne 2 ]; then
+			status=1
+		fi
+	done
+	exit "$status"
+}
+
+case $1 in
+new)
+	shift
+	cmd_new "$@"
+	;;
+check)
+	shift
+	cmd_check "$@"
+	;;
+*)
+	if [ -n "$1" ]; then
+		echo "blueprint-eval: cannot run — \"$1\" is not a subcommand."
+	fi
+	usage
+	exit 2
+	;;
+esac
