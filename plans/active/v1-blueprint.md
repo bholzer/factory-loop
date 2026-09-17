@@ -67,7 +67,16 @@ from repo content alone.
   is stated as a sweep of whatever structural correspondence
   `ARCHITECTURE.md` declares, because the skill layer's reference rule
   forbids a skill body from naming `template/`.
-- [ ] M9: Skill — harness-init + portability glue.
+- [x] (2026-09-17 05:38Z) M9: Skill — harness-init + portability glue.
+  `skills/harness-init/SKILL.md` written with an explicit right-sizing
+  section, root `CLAUDE.md` added holding exactly `@AGENTS.md`,
+  `ARCHITECTURE.md` reconciled (six skills; how the bootstrap procedure
+  resolves the two things it may not name), `AGENTS.md` given the shim's map
+  line, and the portability check set run over all six skills. Acceptance met
+  without carve-out. The milestone's own verification step produced one
+  finding beyond its acceptance — the installed procedures are outside every
+  harness's auto-discovery root — registered as `D4` and covered by the
+  skill's step 9 rather than left in the plan.
 - [ ] M10: Paper verification, first retro, close plan.
 
 ## Decision Log
@@ -502,6 +511,50 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   or the sweep could defer to "whatever the register's built cards decide"
   the way the correspondence sweep defers to `ARCHITECTURE.md`.
   2026-09-17/reviewer.
+- Decision: M9 settles the payload-naming conflict by parameterization, not
+  by exemption: `harness-init` resolves the payload directory through the
+  `AGENTS.md` map of the checkout it was invoked from, and resolves the
+  native-entry-point filename through the environment it is running in.
+  `ARCHITECTURE.md` now states this as a consequence of the existing rule
+  rather than as a carve-out from it.
+  Rationale: the two shapes M8 recorded were an `ARCHITECTURE.md` exemption
+  and a phrasing that never writes the path. Exemption loses on two counts.
+  It is a carve-out the portability check set would have to carry as an
+  allowlist entry — the same cost the M4 format-file decision refused when
+  it chose prose over an exception list — and it would ship a literal path
+  that resolves in exactly one checkout, which is the defect the rule
+  exists to prevent, not an exception to it. Parameterization also reuses
+  the M8 shape for project-specific facts inside portable skills: name the
+  artifact that declares the fact, not the fact. Not graduated to
+  `docs/decisions/`: the rule and its one-sentence reason now live in
+  `ARCHITECTURE.md`, which owns dependency rules, so a record would be a
+  second owner. Next free record number stays `0016`. 2026-09-17.
+- Decision: The harness entry-point shim stays out of the payload;
+  `harness-init` writes it, and this repository's own `CLAUDE.md` is a
+  live-only file with no template counterpart.
+  Rationale: which filename a harness reads natively, and whether one is
+  needed at all, is a property of the environment running the session, not
+  of the project being bootstrapped — a payload copy would install one
+  harness's entry point into every project unconditionally, including
+  projects whose agent reads `AGENTS.md` directly. Correspondence runs
+  template → live only, so a live-only root file is not drift. The cost is
+  that the payload cannot be verified to contain a working shim; that is
+  acceptable because the shim's content is one reference line and step 9 of
+  the procedure states it. 2026-09-17.
+- Decision: The auto-discovery finding is registered as `D4` and covered by
+  a step in `harness-init`, rather than being fixed by moving the canonical
+  skill location or superseding
+  `docs/decisions/0008-portability-lowest-common-denominator.md`.
+  Rationale: what was verified is that the file shape is the intersection of
+  the three harnesses' conventions; what was falsified is only that the
+  *location* is. Reading a procedure by its mapped path works in every
+  harness today, so nothing is broken — only automatic surfacing is absent.
+  Moving the location or adding per-harness configuration are both changes
+  to what the payload installs, and choosing between them from documentation
+  alone is the kind of guess the paper-only verification scope was accepted
+  to defer; `blueprint-eval` is where it gets answered. `0008` is not
+  superseded because its decision is about file shape and content, which
+  held. 2026-09-17.
 
 ## Surprises & Discoveries
 
@@ -757,6 +810,44 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   to 150 lines with no correlation to their procedure's shape.
   Evidence: `grep -c ''` over the five bodies → `capability-build` 126,
   `doc-garden` 145, `plan-author` 136, `plan-execute` 111, `retro` 150.
+- Observation: The portability check set came up clean on the first run for
+  the sixth skill — including the two checks most at risk from its subject
+  matter, since a procedure about installing a payload wrote zero mentions
+  of `template/` and a procedure about a harness entry point wrote zero
+  harness vocabulary. The parameterized phrasing is what made both possible.
+  Evidence: frontmatter keys `name,description` with `name` equal to the
+  directory for all six; `Never` and `Stop condition` present in all six;
+  fourteen distinct backticked paths in `harness-init`, `unresolved: []`
+  against the repository root, and every non-skill path among them also
+  present under `template/`; `template/` mentions `0`, blueprint mentions
+  `0`, harness-vocabulary matches `[]`; shingle overlap against
+  `plans/PLANS.md` `0` at n=6, 7 and 8, and `0` for all 15 sibling pairs at
+  n=8.
+- Observation: The verification step of a milestone about portability found
+  that the thing being made portable is not discoverable. Every harness that
+  loads procedures automatically reads them from a root it picks itself; a
+  repository-root `skills/` is not one of those roots, and reaching it takes
+  configuration. The blueprint's layout claim is therefore half true: the
+  file shape is the intersection of the conventions, the location is not.
+  Evidence: the documented discovery layout is one level under a skills root
+  (`<skills-root>/<skill-name>/SKILL.md`) with `name` defaulting to the
+  directory and `description` required, which all six files satisfy; but the
+  project-level scan is `<ancestor>/.omp/skills/*/SKILL.md` plus
+  `~/.omp/agent/skills/*/SKILL.md`, with anything else reached only through
+  a configured extra directory. The corresponding roots for the other two
+  harnesses are not stated in the documentation reachable from this session,
+  so this observation is one harness observed and two inferred — recorded as
+  `D4`, whose trigger is the live trial rather than another reading.
+- Observation: A misaimed edit inside the new skill deleted two lines of one
+  step while inserting text meant for another, and the repair was visible
+  only because the surrounding step stopped parsing as prose. Worth
+  recording as the failure mode it is: an edit anchored by remembered line
+  numbers after the file had already been rewritten once in the same
+  session.
+  Evidence: step 5's opening two lines were replaced by step 2's new
+  sentence, leaving "merging it is a decision, not a step." followed by
+  "somebody will otherwise propose them"; both steps were restored from the
+  written content and the file now reads 182 lines, the largest of the six.
 
 ## Outcomes & Retrospective
 
@@ -768,12 +859,13 @@ This repository now holds its own live instantiation. `GOALS.md` (project
 boundaries — read it first), `AGENTS.md` (entry-point map, with the two cheap
 verification commands under Commands), `ARCHITECTURE.md` (components and the
 layer map), `docs/` (`PRINCIPLES.md`, the filled `MATURITY.md`, `DEBT.md`
-with three register rows, `decisions/0001`–`0015` plus `DECISION_FORMAT.md`,
+with four register rows, `decisions/0001`–`0015` plus `DECISION_FORMAT.md`,
 `specs/index.md`, `capabilities/index.md` plus `CARD_FORMAT.md` and this
 project's three cards), `plans/PLANS.md` and this plan, the `template/`
-payload with its five generic cards, and `skills/` holding `plan-author`,
-`plan-execute`, `doc-garden`, `retro` and `capability-build`. What does not
-exist yet: the `harness-init` skill and the `CLAUDE.md` shim.
+payload with its five generic cards, `skills/` holding all six procedures —
+`harness-init`, `plan-author`, `plan-execute`, `doc-garden`, `retro` and
+`capability-build` — and the root `CLAUDE.md` shim. What does not exist yet:
+nothing the milestones below create except M10's closing work.
 
 Terms used below:
 
@@ -887,9 +979,10 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   skeleton-derived artifact adds it to that list; M6 added cards, which
   carry no markers, so the set is unchanged and both checks are now silent
   on a clean tree.
-- **Next free identifiers** (M6): decision records run `0001`–`0015`, so
-  the next is `0016` and numbers are never reused. Debt items run `D1`–`D3`,
-  so the next is `D4`. M10's deferred-work entries continue that sequence.
+- **Next free identifiers** (M9, supersedes the M6 count): decision records
+  run `0001`–`0015`, so the next is `0016` and numbers are never reused; M9
+  graduated none. Debt items run `D1`–`D4`, so the next is `D5`. M10's
+  deferred-work entries continue that sequence.
 - **Live-only files** (M5): correspondence runs template → live only.
   `docs/decisions/NNNN-*.md` and `plans/active/*` are project content with
   no template counterpart, and that is not drift; the reverse check does
@@ -977,6 +1070,39 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   this repository's template ↔ live rules get swept by a body that cannot
   name `template/`. M9 and M10 reuse this shape wherever a procedure needs a
   fact that lives in a project's own artifacts.
+- **Skill set complete** (M9): six procedures exist — `harness-init`,
+  `plan-author`, `plan-execute`, `doc-garden`, `retro`, `capability-build`.
+  All six pass the M8 portability check set, including the `template/` and
+  harness-vocabulary clauses, with no exemption anywhere; `ARCHITECTURE.md`
+  names six and states how the bootstrap procedure resolves the payload
+  directory and the native entry-point filename at run time instead of
+  naming either. Nothing further may be added to the roster in v1:
+  `docs/decisions/0009` fixes it at six.
+- **Right-sizing rules** (M9, settles the M7 question): stated in
+  `skills/harness-init/SKILL.md` under its own heading. Structure never
+  shrinks, because every mapped artifact is named by some procedure; what
+  shrinks is the starter card set, and omitting a card deletes three things
+  together — the card file, its register row, and any gating row in
+  `docs/MATURITY.md`. Empty headings inside a kept file are deleted rather
+  than left open. An artifact omitted by the owners' choice also loses its
+  map line, and the omission plus the procedure reference it breaks is
+  recorded in `GOALS.md` under scope. The procedures themselves are never
+  pruned.
+- **Harness entry point** (M9): root `CLAUDE.md` holds exactly `@AGENTS.md`
+  and eleven bytes; it is live-only, with no counterpart in the payload,
+  because which filename a harness reads natively is a property of the
+  environment rather than of the project. `AGENTS.md`'s map carries its
+  one-line entry. M10's reference sweep should expect `CLAUDE.md` to
+  resolve now, where M5's classification listed it as a deliberate mention
+  of a file that did not yet exist.
+- **Skill discovery is not automatic** (M9): the six procedures conform to
+  the universal skill layout — one directory each, one `SKILL.md`, `name`
+  equal to the directory, a one-line `description` — but a repository-root
+  `skills/` is not an auto-discovery root for the harnesses, which read from
+  roots of their own. Reading a procedure by its mapped path is the whole
+  mechanism today, and it works everywhere. Registered as `D4` in
+  `docs/DEBT.md` with the live trial as its trigger; `harness-init` step 9
+  tells a bootstrapping agent to bridge it in the environment it is in.
 
 ## Milestones
 
@@ -1233,3 +1359,18 @@ plan alone per `plans/PLANS.md`.
   project) and logged the skill-vs-card conceptual duplication for M10
   retro routing. Reason: portable skill claims must hold outside this
   repository.
+- 2026-09-17: M9 executed. Added four Interfaces & Dependencies contracts
+  (skill set complete, the right-sizing rules, the harness entry point,
+  skill discovery is not automatic), superseded the identifier count with
+  `D4` spent, added three Decision Log entries and three Surprises
+  observations, and refreshed Context & Orientation. Reason: M10 walks the
+  bootstrap flow on paper against exactly these rules, and two of them
+  answer questions earlier milestones left open — the payload-naming
+  conflict M8 recorded is settled by parameterization rather than by an
+  exemption, and the right-sizing scope M7 asked about is settled as "cards
+  only". The third is new: verifying the layout against harness discovery
+  conventions showed that a repository-root `skills/` is not an
+  auto-discovery root anywhere, which is registered as `D4` rather than
+  fixed, because the fix is a payload change and the evidence for choosing
+  one belongs to the live trial. M9's written acceptance is met without
+  substitution; no milestone scope changed and no decision graduated.
