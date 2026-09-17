@@ -50,7 +50,12 @@ from repo content alone.
   `ARCHITECTURE.md`, `docs/DEBT.md` (`D1` retargeted, `D3` added) and
   `AGENTS.md` reconciled; decisions `0014`–`0015` graduated. Acceptance met
   without carve-out.
-- [ ] M7: Skills — plan-author, plan-execute.
+- [x] (2026-09-17 05:06Z) M7: Skills — plan-author, plan-execute.
+  `skills/plan-author/SKILL.md` and `skills/plan-execute/SKILL.md` written,
+  `skills/.gitkeep` deleted, and the two live artifacts that claimed the
+  skill layer was empty reconciled — `ARCHITECTURE.md`'s Skill layer entry
+  and a new `skills/` line in `AGENTS.md`'s map. Acceptance met without
+  carve-out.
 - [ ] M8: Skills — doc-garden, retro, capability-build.
 - [ ] M9: Skill — harness-init + portability glue.
 - [ ] M10: Paper verification, first retro, close plan.
@@ -383,6 +388,47 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   were forced by `CARD_FORMAT.md`: "an unattended outer loop" and "a live
   trial" are wishes, and a card whose Invariant section is a wish cannot
   have an acceptance that gates promotion. 2026-09-17.
+- Decision: A skill body carries only what a procedure needs — when to
+  invoke, what to read, the steps, an explicit refusal list, and a stop
+  condition — and non-duplication against `plans/PLANS.md` is checked
+  mechanically by word-shingle overlap rather than by reading.
+  Rationale: M7's acceptance forbids duplicating rule text, and "did I
+  restate a rule?" is exactly the judgement a tired author gets wrong. The
+  check found the failure it was built for on the first run: the refusal
+  bullet against nested plans had reproduced the convention's own sentence
+  verbatim across ten overlapping six-word windows, and the rewrite states
+  the refusal while pointing at the convention for the alternative. The
+  refusal and stop sections are the part a skill genuinely owns — the
+  convention says what a plan must be, and the skill says what the agent
+  running the procedure must not do. Not graduated: the practice is a
+  verification technique with no reader beyond the sessions writing skills,
+  and M8 is the next one. 2026-09-17.
+- Decision: Skills name payload-provided artifacts and directories, never a
+  project-specific file inside them; the layer rule in `ARCHITECTURE.md` was
+  sharpened to say so.
+  Rationale: the rule as written allowed `docs/**`, which reads as
+  permission to cite a decision record — and `plan-author`'s revision
+  section wanted to cite the record that owns the convention-change audit.
+  That citation would resolve here and dangle in every target project, which
+  is the same defect the payload's outward-reference ban exists to prevent,
+  one layer over. The sharpening belongs in `ARCHITECTURE.md` rather than in
+  a decision record because the file already owns the skill layer's
+  dependency rule and a second home for it would be the drift this project
+  keeps writing rules against. 2026-09-17.
+- Decision: `plan-author` describes how a convention-change audit is
+  recorded and explicitly disclaims owning its trigger.
+  Rationale: the trigger is already owned — `doc-garden` performs the check —
+  so restating it in a skill would put one rule in two files, while omitting
+  the procedure entirely would leave the auditing session inventing where to
+  write the outcome. Splitting on trigger-versus-procedure keeps both facts
+  single-owner, and the disclaimer is what stops a future reader from
+  treating the silence as an oversight and "fixing" it. 2026-09-17.
+- Decision: `skills/.gitkeep` was deleted in the same commit that added the
+  first skill.
+  Rationale: a placeholder's only job is to keep an empty directory in git,
+  and this repository already wrote that rule down twice — as the
+  `.gitkeep` exclusion in the drift card and as the principle that content
+  with no reader left is removed rather than annotated. 2026-09-17.
 
 ## Surprises & Discoveries
 
@@ -543,6 +589,53 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   the agent harness the blueprint is about; it was reworded to "test suite".
   Evidence: `grep -rniE 'harness|claude|codex' template/docs/capabilities/`
   returned that single line, and returns nothing after the edit.
+- Observation: The rule-duplication ban is only checkable mechanically, and
+  the check caught a real violation immediately. Comparing six-, seven- and
+  eight-word windows of each skill body against `plans/PLANS.md` reported
+  ten, eight and six shared windows for `plan-author` — all one sentence,
+  the convention's own statement about plans that outgrow one file, which
+  the refusal list had reproduced verbatim while I believed I was
+  paraphrasing.
+  Evidence: the first run printed `n=6 overlaps: 10` including
+  `'file is two plans the first'` and `'plans the first naming its
+  successor'` for `plan-author` and `0` at every window size for
+  `plan-execute`; after rewriting the bullet to state the refusal and point
+  at the convention, both files report `0` at n=6, 7 and 8.
+- Observation: The skill layer's dependency rule was too permissive as
+  written, and writing the first skill is what exposed it. `ARCHITECTURE.md`
+  allowed skills to name `docs/**`, and the procedure wanted to cite
+  `docs/decisions/0013-convention-change-triggers-plan-audit.md` — a path
+  that resolves in this repository and in no other, so the reference would
+  have shipped broken to every bootstrapped project.
+  Evidence: resolving the backticked paths in both skill bodies from the
+  repository root reported `unresolved: []` across fourteen distinct paths
+  (nine in `plan-author`, five in `plan-execute`) and zero mentions of
+  `template/`, but only after the citation was replaced by a disclaimer;
+  the rule now names directories and bans the project-specific files inside
+  them.
+- Observation: A skill body is a third size class in this repository. The
+  two files are 136 and 111 lines — larger than any docs artifact except
+  `MATURITY.md` — and the reason is that a procedure has to carry its steps,
+  its refusals and its stop condition, none of which another file can own.
+  The `AGENTS.md` context-tax cap does not apply, because a skill is read
+  only by the session that invokes it, not at every session start.
+  Evidence: `wc -l` over the two `SKILL.md` files against 111 for
+  `ARCHITECTURE.md`, 69 for `AGENTS.md`, and 36 for `docs/PRINCIPLES.md`.
+- Observation: This milestone was executed by following `plan-execute`'s own
+  procedure, which is the only trial the skill has had, and one step of it
+  failed on the first attempt: the cheap verification commands were run
+  after the edits rather than before them, so the session has no observation
+  of the pre-edit state to distinguish a failure it caused from one it
+  inherited. Both checks pass now, and the gap is recorded rather than
+  papered over — the skill says to observe the starting state first for
+  exactly this reason.
+  Evidence: `cmp template/plans/PLANS.md plans/PLANS.md` silent and the
+  marker grep exiting 1 with no output, both observed after
+  `AGENTS.md`/`ARCHITECTURE.md` were already edited; the correspondence walk
+  over all 18 template files reported `fails: 0`, with seven excluded — the
+  five generic card files and the two `.gitkeep` placeholders under
+  `template/plans/` — and the eleven remaining pairs passing by subsequence
+  or, for `plans/PLANS.md`, by byte identity.
 
 ## Outcomes & Retrospective
 
@@ -553,12 +646,13 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
 This repository now holds its own live instantiation. `GOALS.md` (project
 boundaries — read it first), `AGENTS.md` (entry-point map, with the two cheap
 verification commands under Commands), `ARCHITECTURE.md` (components and the
-layer map), `docs/` (`PRINCIPLES.md`, `MATURITY.md` — still an unfilled
-skeleton copy until M6 — `DEBT.md`, `decisions/0001`–`0013` plus
-`DECISION_FORMAT.md`, `specs/index.md`, `capabilities/index.md` plus
-`CARD_FORMAT.md`), `plans/PLANS.md` and this plan, the `template/` payload,
-and an empty `skills/`. What does not exist yet: any skill file, any
-capability card, `MATURITY.md` content, and the `CLAUDE.md` shim.
+layer map), `docs/` (`PRINCIPLES.md`, the filled `MATURITY.md`, `DEBT.md`
+with three register rows, `decisions/0001`–`0015` plus `DECISION_FORMAT.md`,
+`specs/index.md`, `capabilities/index.md` plus `CARD_FORMAT.md` and this
+project's three cards), `plans/PLANS.md` and this plan, the `template/`
+payload with its five generic cards, and `skills/` holding `plan-author` and
+`plan-execute`. What does not exist yet: the `doc-garden`, `retro`,
+`capability-build` and `harness-init` skills, and the `CLAUDE.md` shim.
 
 Terms used below:
 
@@ -695,6 +789,37 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   with its owner. M8's `capability-build` inherits this: a card whose
   Invariant is a capability rather than a property has no acceptance that
   can gate promotion, and is a card to rewrite before building.
+- **Skill body shape** (M7): a `SKILL.md` body carries five kinds of section
+  and nothing else — when to invoke (including when not to), what to read
+  before acting, the numbered or narrated procedure, an explicit `Never`
+  list, and a `Stop condition`. The refusal list and the stop condition are
+  the part a skill owns outright: the convention says what a plan must be,
+  and the skill says what the agent running the procedure must not do. Rules
+  that belong to an artifact are referenced by path, never restated. M8's
+  three skills and M9's `harness-init` conform to this shape.
+- **Skill non-duplication check** (M7): the ban on copying rule text out of
+  `plans/PLANS.md` is verified mechanically, by intersecting the word
+  n-gram windows of a skill body with those of the convention. Both M7
+  skills report zero shared windows at n = 6, 7 and 8 after one fix. The
+  check is twenty lines of throwaway script — normalize to lowercase words,
+  build the shingle sets, intersect — and finding a real violation on its
+  first run is the reason M8 runs it too rather than trusting a reading.
+- **Skill reference scope** (M7, amends the M5 layer map): a skill may name
+  payload-provided artifacts and the `docs/` and `plans/` directories, but
+  not a project-specific file inside them — no decision record, spec, card,
+  or plan file — because such a path resolves only in the project that wrote
+  it. `ARCHITECTURE.md` now states this. Two consequences for M9: the
+  artifacts skills name are the part of the payload right-sizing may not
+  prune, or else `harness-init` must rewrite the referring skill when it
+  prunes one, and the right-sizing rules have to say which.
+- **Cross-skill handoffs** (M7): `plan-author` and `plan-execute` each name
+  the other by path as the boundary of their own authority — authoring hands
+  off to execution, execution hands a defective plan back to authoring.
+  `plan-author` additionally describes how a convention-change audit is
+  recorded while explicitly disclaiming ownership of its trigger, so M8's
+  `doc-garden` must state that trigger; if it does not, the rule that
+  `docs/decisions/0013-convention-change-triggers-plan-audit.md` graduated
+  has no procedure carrying it.
 
 ## Milestones
 
@@ -914,3 +1039,16 @@ plan alone per `plans/PLANS.md`.
   without exclusions that the tree now requires, and the MATURITY.md
   contract said M6 "replaces the slots", which would have put a project's
   rung into the payload.
+- 2026-09-17: M7 executed. Added four Interfaces & Dependencies contracts
+  (skill body shape, the non-duplication shingle check, skill reference
+  scope, cross-skill handoffs), four Decision Log entries and four Surprises
+  observations, and refreshed the Context & Orientation paragraph, which had
+  gone stale at M6 by still claiming no card and no `MATURITY.md` content
+  existed. Reason: M8 writes three more skills and M9 a sixth, all against a
+  shape and a reference rule this milestone discovered rather than inherited
+  — the layer map's `docs/**` permission turned out to allow a citation that
+  dangles in every target project, and the duplication ban turned out to be
+  uncheckable by reading. No milestone scope changed; no decision graduated,
+  because the sharpened reference rule is now content in `ARCHITECTURE.md`
+  and a second copy in `docs/decisions/` would be the drift this repository
+  keeps legislating against.

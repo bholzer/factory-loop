@@ -43,9 +43,10 @@ about the payload.
 
 ### Skill layer
 
-- Lives in: `skills/<name>/SKILL.md`. No such files exist yet; the component
-  is declared here so the first one lands inside the boundary rather than
-  beside it.
+- Lives in: `skills/<name>/SKILL.md`. Two exist —
+  `skills/plan-author/SKILL.md` and `skills/plan-execute/SKILL.md`; the
+  bootstrap, capability-building, doc-gardening, and retrospection
+  procedures the next entry names do not exist yet.
 - Owns: the reusable procedures an agent invokes — bootstrap, plan authoring,
   plan execution, capability building, doc gardening, retrospection.
 - Does not: carry rules that belong to an artifact. A skill references
@@ -64,10 +65,15 @@ outward reference is a dangling reference by construction.
 
 Nothing under `skills/` may name a path that the payload does not provide.
 The allowed targets are the artifacts a bootstrapped project has —
-`AGENTS.md`, `GOALS.md`, `ARCHITECTURE.md`, `docs/**`, `plans/**` — plus
-sibling skills by `skills/<name>/SKILL.md`. Skill bodies may not name
-`template/`, because a target project does not receive it, and may not name a
-harness-specific tool, because the same file must work in every harness.
+`AGENTS.md`, `GOALS.md`, `ARCHITECTURE.md`, `docs/PRINCIPLES.md`,
+`docs/MATURITY.md`, `docs/DEBT.md`, the three `docs/` directories and their
+format documents, `plans/PLANS.md`, `plans/active/`, `plans/completed/` —
+plus sibling skills by `skills/<name>/SKILL.md`. Directories are namable;
+the project-specific files inside them are not, because a decision record,
+a spec, a card, or a plan file exists only in the project that wrote it.
+Skill bodies may not name `template/`, because a target project does not
+receive it, and may not name a harness-specific tool, because the same file
+must work in every harness.
 
 The live root artifacts may name `template/` freely: the payload is this
 project's subject matter. This is the asymmetry that the first two rules

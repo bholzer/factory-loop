@@ -27,6 +27,8 @@ and a reference from `template/` outward is a bug.
 - `plans/PLANS.md` — the plan convention. All multi-file or multi-session
   work follows it.
 - `plans/active/` — work in flight. `plans/completed/` — done.
+- `skills/<name>/SKILL.md` — the portable procedures an agent invokes; each
+  one references the artifacts above rather than restating them.
 - `template/` — the payload copied into a target project and filled in there.
 
 ## Commands
