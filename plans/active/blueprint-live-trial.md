@@ -16,7 +16,7 @@ The observation that makes this plan worth its cost is the one nobody can make f
 
 ## Progress
 
-- [ ] M1 — Make the trial runnable: build `tools/blueprint-eval` with its `new` and `check` subcommands, demonstrate both of the card's scriptable failing cases, state on the card how the discovery observation is judged, and publish the command in `AGENTS.md` and `ARCHITECTURE.md`.
+- [x] (2026-09-17 20:19Z) M1 — Make the trial runnable: `tools/blueprint-eval` built with its `new` and `check` subcommands, both scriptable failing cases demonstrated, the discovery criterion stated on the card, and the command published in `AGENTS.md` and `ARCHITECTURE.md`. All seven acceptance checks observed; commits `7361958` (driver and allowlist) and `1187484` (card, map, layer entry). Trial directories used and left in place for inspection: `smoke-20260917-151702`, `dangling-map-20260917-151721`, `dangling-restored-20260917-151726`, `missing-skill-20260917-151730`, `layout-restored-20260917-151735`, all under `$HOME/blueprint-trials`.
 - [ ] M2 — Claude Code, first half: bootstrap the trial repository from the payload and record observations 1 through 3 with the harness version and date.
 - [ ] M3 — Claude Code, second half: author the target's first plan and execute its first milestone in a fresh session; record observations 4 and 5 and the harness's overall outcome.
 - [ ] M4 — omp, whole trial in one session: all five observations, the discovery record, and the overall outcome.
@@ -24,11 +24,11 @@ The observation that makes this plan worth its cost is the one nobody can make f
 - [ ] M6 — The discovery failing case: rename the bootstrap procedure's file, observe one harness fail to find it, restore, and set `blueprint-eval`'s status in `docs/capabilities/index.md` to what the four preceding milestones actually observed.
 - [ ] M7 — Close out: delete `D7`, rewrite `D4` with the observed discovery facts, update `GOALS.md`, `docs/MATURITY.md` and `docs/specs/`, graduate the durable decisions, and move this file to `plans/completed/`.
 
-Use timestamps to measure rates of progress. Nothing has been executed yet; every entry above is open, and the first session to execute a milestone adds the observation time to its entry in the shape `- [x] (YYYY-MM-DD HH:MMZ)`.
+Use timestamps to measure rates of progress. M1 is executed; M2 through M7 are open. The first session to execute one of them adds the observation time to its entry in the shape `- [x] (YYYY-MM-DD HH:MMZ)`.
 
 ## Surprises & Discoveries
 
-Everything below was observed while authoring this plan, on 2026-09-17, by running the command named in each entry. None of it is a prediction.
+Everything below was observed by running the command named in each entry, never predicted. The entries down to the empty-count one were observed while authoring this plan, on 2026-09-17; the entries below the marker line were observed by the session that executed M1, the same day.
 
 - Observation: all three harnesses `GOALS.md` names are installed on this machine and all three can be driven non-interactively, so the trial's harness-driven half does not have to be typed by a person.
   Evidence: `claude --version` printed `2.1.274 (Claude Code)`, `codex --version` printed `codex-cli 0.150.1`, `omp --version` printed `omp/18.1.14`. `claude --help` documents `-p/--print` for non-interactive output, `--dangerously-skip-permissions`, and `--permission-mode`; `codex exec --help` documents `-C/--cd`, `-s/--sandbox` with `workspace-write`, and `--approve-for-me`; `omp --help` documents `-p/--print`, `--cwd`, `--auto-approve`, and — relevant to `D4` — `--no-skills` and `--skills=<glob>`.
@@ -56,6 +56,23 @@ Everything below was observed while authoring this plan, on 2026-09-17, by runni
 
 - Observation: `tools/checks/evidence-check` prints an empty number where a plan has no completed Progress entry yet, which is what this plan produces on the day it lands.
   Evidence: `./tools/verify` with this file in `plans/active/` printed `evidence-check: plans/active/blueprint-live-trial.md — Progress, Surprises & Discoveries, Decision Log and Outcomes & Retrospective all present and non-empty;  of 7 Progress entries complete, every one timestamped.` — two spaces and no zero, because the awk counter is never assigned when nothing is ticked. The check's decision is right and its exit status is right; only the summary line is wrong. It is not this plan's work, and M7 routes it rather than letting it evaporate.
+
+Observed during M1 execution, 2026-09-17, in commits `7361958` and `1187484`. Everything above the marker predates the driver.
+
+- Observation: the driver's counts came out identical to the numbers the authoring measurement predicted, in every one of the three parts, on the first run.
+  Evidence: `./tools/blueprint-eval new smoke` printed `copied 25 files — 19 payload files and 6 procedures — committed as "Receive the payload".`; `check <trial>/repo layout references` printed `layout: ok — 6 procedures, each with SKILL.md and matching frontmatter name.` and `references: ok — 144 of 146 references resolved inside the copy, 1 allowlist entry applied, 0 stale.`; `check <trial>/repo fill` exited 1 and ended `fill: 117 marker lines in 8 of 23 markdown files.` The seeded allowlist entry was the only one needed: nothing else in a fresh copy dangles, so the payload half of the trial starts from a clean copy rather than from a backlog.
+
+- Observation: one deleted payload file produces ten dangling references, not one, and the map entry M1's acceptance names is only the first of them. The failing case is therefore stronger than the acceptance clause that describes it.
+  Evidence: with `template/docs/PRINCIPLES.md` deleted, `check <trial>/repo references` exited 1 with ten blocks — `AGENTS.md:49`, `GOALS.md:90`, `docs/MATURITY.md:58`, `docs/capabilities/prose-duplication.md:30` and `:79`, `skills/doc-garden/SKILL.md:50`, `skills/harness-init/SKILL.md:90`, `skills/plan-author/SKILL.md:38`, `skills/retro/SKILL.md:36` and `:88` — and the summary `references: 10 dangling references in 143 examined across 20 markdown files of the copy.` The same run's `new` line read `copied 24 files — 18 payload files and 6 procedures`, so the count line reports the deletion too. After `git checkout -- template/docs/PRINCIPLES.md` and a fresh copy, the part printed `ok — 144 of 146` again.
+
+- Observation: the reference definition `docs/capabilities/doc-integrity.md` owns treats a backticked path rooted in an environment variable as a path to resolve, so a `AGENTS.md` line naming the default trial root in backticks is reported as a broken reference.
+  Evidence: the first draft of the `AGENTS.md` Commands entry wrote the trial root as a backticked absolute path beginning with a shell variable; that span contains a slash and none of the excluded characters, so `tools/checks/doc-integrity` would have extracted it and failed to resolve it. The line was rewritten to say "outside this tree" and to leave the default root to the driver and its card, which is where it belongs; `./tools/verify` then reported `doc-integrity: ok — 372 of 375 references resolved in 47 artifacts`, up five resolved references from 367 of 370 with no new allowlist entry. No payload or check change was made: the definition is the card's, and naming an absolute path in a map entry was the mistake.
+
+- Observation: the layout part's violation block can say what arrived instead of the expected file, which makes the renamed-procedure case readable without opening the copy.
+  Evidence: with `skills/harness-init/SKILL.md` renamed, `check <trial>/repo layout` exited 1 printing `layout: skills/harness-init/SKILL.md is missing from the copy.`, then `found skills/harness-init/README.md instead.`, then the line about the layout being fixed by every supported harness at once, and the summary `layout: the copy carries 5 of 6 procedures in the layout every supported harness requires.` That same `new` run printed `19 payload files and 5 procedures`, because the procedure count in `new` counts entry-point files while the layout part counts the directories this checkout has.
+
+- Observation: ticking M1 confirms the diagnosis of the empty count above — the number appears as soon as one entry is complete.
+  Evidence: after the Progress entry for M1 was written, `./tools/verify` printed `evidence-check: plans/active/blueprint-live-trial.md — … 1 of 7 Progress entries complete, every one timestamped.` The defect is exactly the unticked case, which is the state every plan is in on the day it lands, and it stays routed to M7.
 
 ## Decision Log
 
@@ -98,6 +115,18 @@ Everything below was observed while authoring this plan, on 2026-09-17, by runni
 - Decision: the references part resolves strictly — the file or directory must exist in the copy — and the deliberate exceptions live in `tools/allow/blueprint-eval.txt` in the same key-and-reason format the other allowlists use, seeded with the one key a fresh copy produces. The parent-directory allowance that `tools/checks/boundary-lint` uses is deliberately not adopted.
   Rationale: `boundary-lint` allows a reference whose parent directory exists, because its question is whether a bootstrapped project would have the directory the path lives in. This card's question is the opposite one and its own failing case depends on the difference: deleting `template/docs/PRINCIPLES.md` leaves a map entry whose parent `docs/` still exists, so under the parent allowance the dangling entry resolves and the failing case cannot fail. Strict resolution makes it fail, at the cost of one allowlist entry for the `docs/NOPE.md` mention measured above. An entry that stops matching is reported as stale in the passing summary, the way `tools/allow/doc-integrity.txt` entries are, so a target project that drops the card decays the entry visibly instead of silently.
   Date/Author: 2026-09-17, plan authoring session.
+
+- Decision: the fill part prints one locator line per marker line, and the next-action paragraph once per file rather than once per marker.
+  Rationale: a fresh copy carries 117 marker lines, and a block per marker is 234 lines of identical advice for a state the bootstrap is about to clear. Every violation still names the part, the file and the line, which is what the interface requires; the action is the same for every marker inside one artifact, so it is stated where the reader can act on it — once per artifact — and the summary line carries the counts. Observed output for the whole part on an unfilled copy: 126 lines.
+  Date/Author: 2026-09-17, M1 execution session.
+
+- Decision: `new` refuses a label that is not a single plain directory name, which is a fourth refusal beyond the three the interface lists.
+  Rationale: the label is concatenated into a path under the trial root, so a label containing a slash or starting with a dot or a hyphen writes somewhere other than the directory the command promises, and the destination-exists and inside-the-worktree refusals would both be decided about the wrong path. The guard is one case statement and it fails before anything is created.
+  Date/Author: 2026-09-17, M1 execution session.
+
+- Decision: `AGENTS.md`'s Commands preamble now says two commands exist and describes what separates them, and the driver's entry does not name the default trial root.
+  Rationale: the preamble said a machine's decisions here are made by one command, which the driver made false, and a map entry that contradicts the list under it routes a reader wrong. The root is left to the driver and its card for two reasons: the reference walk over `AGENTS.md` extracts a backticked path rooted in a shell variable and cannot resolve it, as the Surprises entry records, and the default belongs to the command that owns it rather than to the map.
+  Date/Author: 2026-09-17, M1 execution session.
 
 ## Outcomes & Retrospective
 
@@ -236,24 +265,29 @@ One finding from authoring is routed here because this is the milestone that has
 
 ## Concrete Steps
 
-Every command below runs from this repository's root unless a working directory is named. `<trial>` stands for the path `./tools/blueprint-eval new` printed, which the milestone's `Progress` entry records so the next session can find it. Expected transcripts are labelled expected: nothing here has been run.
+Every command below runs from this repository's root unless a working directory is named. `<trial>` stands for the path `./tools/blueprint-eval new` printed, which the milestone's `Progress` entry records so the next session can find it. The driver's two transcripts below were observed on 2026-09-17 during M1 and are labelled observed, with the trial path of that run; the harness invocations further down are still labelled expected, because nothing has driven a harness yet.
 
 Build a trial repository and check it.
 
     ./tools/blueprint-eval new claude-code
-    # expected:
-    # blueprint-eval: trial at /Users/<you>/blueprint-trials/claude-code-20260917-143000
-    # blueprint-eval:   repo  /Users/<you>/blueprint-trials/claude-code-20260917-143000/repo
-    # blueprint-eval:   logs  /Users/<you>/blueprint-trials/claude-code-20260917-143000/logs
+    # observed, with the label smoke, 2026-09-17:
+    # blueprint-eval: trial at /Users/<you>/blueprint-trials/smoke-20260917-151702
+    # blueprint-eval:   repo  /Users/<you>/blueprint-trials/smoke-20260917-151702/repo
+    # blueprint-eval:   logs  /Users/<you>/blueprint-trials/smoke-20260917-151702/logs
     # blueprint-eval: copied 25 files — 19 payload files and 6 procedures — committed as "Receive the payload".
+    # git -C <trial>/repo log --oneline then showed one commit: dbc343a Receive the payload
+    # ls <trial>/repo listed AGENTS.md ARCHITECTURE.md GOALS.md docs plans skills
 
     ./tools/blueprint-eval check <trial>/repo
-    # expected on a fresh, unfilled copy: layout and references pass, fill fails.
+    # observed on that fresh, unfilled copy: layout and references pass, fill fails, so the run exits 1.
     # blueprint-eval layout: ok — 6 procedures, each with SKILL.md and matching frontmatter name.
     # blueprint-eval fill: AGENTS.md:1 still carries authoring scaffolding.
-    #   …
+    #   A fill slot or a guidance block survived the bootstrap, so this artifact is a skeleton the project has not answered yet. …
+    #   … 116 further locator lines, one per marker line, the paragraph above repeated once per artifact …
     # blueprint-eval fill: 117 marker lines in 8 of 23 markdown files.
     # blueprint-eval references: ok — 144 of 146 references resolved inside the copy, 1 allowlist entry applied, 0 stale.
+
+Refusals, both observed: `./tools/blueprint-eval check .` exits 2 with `cannot decide — /…/harness-blueprint is inside this repository's worktree.`, and `check` on a path that is not a directory exits 2 the same way. Each prints the reason a trial runs outside this tree and how to build one.
 
 Run the three driven sessions. Each is a separate process with no resumption, which is what makes "a fresh session" observable. The brief files are written from this plan before the first one runs.
 
@@ -279,15 +313,35 @@ Read the result.
     ls -a <trial>/repo
     grep -rc 'harness-blueprint' <trial>/logs/
 
-Demonstrate the failing cases (M1 for the driver, M6 for the harness), and restore immediately in both directions.
+Demonstrate the failing cases (M1 for the driver, M6 for the harness), and restore immediately in both directions. Both driver cases were run on 2026-09-17 and the results below are observed; M6's harness case has not been run.
 
     rm template/docs/PRINCIPLES.md
     ./tools/blueprint-eval new dangling-map && ./tools/blueprint-eval check <trial>/repo references
+    # observed: new printed "copied 24 files — 18 payload files and 6 procedures", and the
+    # references part exited 1 with ten blocks, the first of them:
+    # blueprint-eval references: the copy cites docs/PRINCIPLES.md, which the copy does not contain (cited by AGENTS.md:49).
+    #   Fix this in this repository — in template/ and its live counterpart, or in skills/, whichever owns the defect — and never in the copy: the copy is a scratch artifact and the next trial rebuilds it.
+    #   If the mention is deliberate, add the key AGENTS.md:docs/PRINCIPLES.md to tools/allow/blueprint-eval.txt with a reason.
+    # blueprint-eval references: 10 dangling references in 143 examined across 20 markdown files of the copy.
     git checkout -- template/docs/PRINCIPLES.md && ./tools/verify
+    # observed: git status clean apart from the two new untracked driver files, a fresh copy
+    # back to "references: ok — 144 of 146", and verify ending in "6 of 6 checks passed".
 
     git mv skills/harness-init/SKILL.md skills/harness-init/README.md
     ./tools/blueprint-eval new missing-skill && ./tools/blueprint-eval check <trial>/repo layout
+    # observed: new printed "copied 25 files — 19 payload files and 5 procedures", and the
+    # layout part exited 1 with:
+    # blueprint-eval layout: skills/harness-init/SKILL.md is missing from the copy.
+    #   found skills/harness-init/README.md instead.
+    #   Every supported harness reads the same entry-point filename, so the layout is fixed by all of them at once: restore the name in this repository rather than adapting one harness.
+    #   Fix this in this repository — in template/ and its live counterpart, or in skills/, whichever owns the defect — and never in the copy: the copy is a scratch artifact and the next trial rebuilds it.
+    # blueprint-eval layout: the copy carries 5 of 6 procedures in the layout every supported harness requires.
     git mv skills/harness-init/README.md skills/harness-init/SKILL.md && ./tools/verify
+    # observed: ls skills/harness-init/ shows SKILL.md alone, a fresh copy is back to
+    # "layout: ok — 6 procedures", and verify ends in "6 of 6 checks passed".
+    # The allowlist entry in tools/allow/doc-integrity.txt naming the README path was
+    # never edited, in either direction, and every verify run in this session reported
+    # "3 allowlist entries applied, 0 stale". Verify was not run while the rename stood.
 
 ## Validation and Acceptance
 
