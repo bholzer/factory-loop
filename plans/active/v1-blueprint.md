@@ -24,7 +24,12 @@ from repo content alone.
   (byte-identical to live), `template/plans/{active,completed}/.gitkeep`.
   Forward references to `docs/` paths in the three skeletons are deliberate
   and resolve at M4; nothing in M3's own outputs is unresolved.
-- [ ] M4: Template payload — docs tree + capability spec-card format.
+- [x] (2026-09-17 04:06Z) M4: Template payload — docs tree + capability
+  spec-card format. `template/docs/{PRINCIPLES,MATURITY,DEBT}.md`,
+  `template/docs/decisions/DECISION_FORMAT.md`,
+  `template/docs/specs/index.md`,
+  `template/docs/capabilities/{index.md,CARD_FORMAT.md}`. `MATURITY.md` is
+  structure-plus-slots as specified; its L0–L3 text is M6's to write.
 - [ ] M5: Instantiate live repo from template.
 - [ ] M6: Capability spec cards + MATURITY.md.
 - [ ] M7: Skills — plan-author, plan-execute.
@@ -169,6 +174,55 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   unauditable. Also from review: use date+time Progress timestamps per the
   skeleton (`2026-09-16 14:00Z`), not bare dates — rates of progress are
   unmeasurable otherwise. 2026-09-16/reviewer.
+- Decision: Format-defining files (`docs/capabilities/CARD_FORMAT.md`,
+  `docs/decisions/DECISION_FORMAT.md`) ship as plain prose with no
+  `{{FILL}}` slots and no GUIDANCE comment blocks; their ownership
+  boundary and anti-pattern are real content under a "What this directory
+  owns" heading.
+  Rationale: First drafts used the skeleton convention, which made both
+  files permanently fail the fill check — `grep -c '{{FILL'` was 1 and
+  `grep -c GUIDANCE` was 5 on files that are never filled in. The options
+  were an exception list or files that need no exception. An exception list
+  has to be carried by the M6 `template-live-drift` card, the M8 doc-garden
+  procedure, and the M9 `harness-init` fill step, so it would be three
+  copies of the same carve-out; prose costs nothing and keeps the fill
+  check total. These files also differ in kind from the skeletons: a target
+  project keeps them verbatim forever, so their guidance has a permanent
+  reader and must not be deleted on fill. 2026-09-17.
+- Decision: Capability card status lives only in
+  `docs/capabilities/index.md`; card files carry no status field, and the
+  failing-case evidence that promotes a card to `built` is recorded in the
+  plan that built it, not in the card.
+  Rationale: Status is the one fact about a card that changes, and a fact
+  with two homes goes stale in one of them — the index is what
+  `MATURITY.md` gates read, so the index wins. Keeping evidence in plans
+  preserves the card as a specification: a card that accumulates
+  observation transcripts stops being a one-page contract an in-project
+  agent can implement cold. 2026-09-17.
+- Decision: `docs/decisions/` gets no index file; records are discovered by
+  their `NNNN-short-slug.md` filenames.
+  Rationale: `capabilities/index.md` and `specs/index.md` exist because
+  they own something the files cannot — mutable status, and behavior
+  routing. A decision record is immutable once written and its filename is
+  its summary, so an index would carry zero facts and one drift surface.
+  2026-09-17.
+- Decision: `PRINCIPLES.md`'s three example principles live inside its
+  GUIDANCE comment block rather than in the body as marked examples.
+  Rationale: M4 asked for examples "marked as examples"; the marker
+  convention already has a mechanism for "not project content", and using
+  it means the examples disappear in the same deletion pass as the rest of
+  the guidance. Examples in the body would need a separate removal step
+  that the fill check cannot see, which is exactly how a template's sample
+  content ends up shipped as a project's real rules. 2026-09-17.
+- Decision: `DEBT.md` is a register table plus an optional per-item
+  Details section, and closing an item deletes its row rather than marking
+  it done.
+  Rationale: A table alone cannot satisfy GOALS.md's "enough context to
+  pick up cold", and prose alone gives no at-a-glance inventory; the split
+  lets cheap items stay one row. Deletion on close keeps the file's reading
+  cost proportional to live debt — a register of resolved entries taxes
+  every future reader identically to real debt, and version control already
+  holds the history. 2026-09-17.
 
 ## Surprises & Discoveries
 
@@ -187,6 +241,41 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   Evidence: `sed '/^<!--$/,/^-->$/d' <file> | grep -c .` → AGENTS.md 34,
   GOALS.md 23, ARCHITECTURE.md 22 non-blank lines; raw files are 96, 108,
   and 104 lines.
+- Observation: The skeleton marker convention does not fit every template
+  file. Files that a target project keeps verbatim (the two format-defining
+  files) are never "filled", so authoring markers in them turn the fill
+  check into a permanent false positive.
+  Evidence: first drafts measured `fill:1 guidance:5` for both
+  `CARD_FORMAT.md` and `DECISION_FORMAT.md` via `grep -c '{{FILL'` /
+  `grep -c GUIDANCE`; after the rewrite both read `fill:0 guidance:0`,
+  while the five skeleton files read `fill:2–14 guidance:6–10`. The
+  template now has two file classes, recorded as a contract in Interfaces &
+  Dependencies.
+- Observation: M4 closed the forward references M3 left open — every map
+  entry in `template/AGENTS.md` now resolves inside the payload.
+  Evidence: extracting the map's backticked paths and testing each with
+  `[ -e ]` from `template/` printed `OK` for all ten captured entries
+  (`GOALS.md`, `ARCHITECTURE.md`, `docs/PRINCIPLES.md`,
+  `docs/MATURITY.md`, `docs/DEBT.md`, `docs/decisions/`, `docs/specs/`,
+  `docs/capabilities/`, `plans/PLANS.md`, `plans/active/`); the regex
+  missed `plans/completed/` because it shares a line with `plans/active/`,
+  and that directory exists with its `.gitkeep`.
+- Observation: The docs skeletons carry no reference to this repository, so
+  no generalization pass was needed for them either.
+  Evidence: `grep -rnoiE "harness-blueprint|blueprint|skills/|template/|
+  v1-blueprint" template/docs` → no matches.
+- Observation: The payload survives a plain recursive copy into an empty
+  directory with the two file classes exactly as contracted — eight
+  skeletons carrying markers, three files carrying none.
+  Evidence: `T=$(mktemp -d) && cp -R template/. "$T/"` then per-file
+  `grep -c '{{FILL'` / `grep -c GUIDANCE` in `$T` →  `AGENTS.md 8/9`,
+  `ARCHITECTURE.md 14/10`, `GOALS.md 13/11`, `docs/DEBT.md 5/8`,
+  `docs/MATURITY.md 14/10`, `docs/PRINCIPLES.md 7/7`,
+  `docs/capabilities/index.md 3/6`, `docs/specs/index.md 2/6`, and `0/0`
+  for `docs/capabilities/CARD_FORMAT.md`,
+  `docs/decisions/DECISION_FORMAT.md`, and `plans/PLANS.md`; thirteen files
+  copied including both `plans/{active,completed}/.gitkeep`, and
+  `cmp "$T/plans/PLANS.md" plans/PLANS.md` was silent.
 
 ## Outcomes & Retrospective
 
@@ -227,8 +316,10 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   Bodies reference `plans/PLANS.md` and other repo files; procedures use
   only files, shell, and git.
 - **Capability card statuses**: `specced` → `built` → `enforced`, recorded in
-  the owning `docs/capabilities/index.md`. A card may not reach `built`
-  without a demonstrated failing case showing its remediation message.
+  the owning `docs/capabilities/index.md` and nowhere else — card files
+  carry no status field. A card may not reach `built` without a
+  demonstrated failing case showing its remediation message; that evidence
+  is recorded in the plan that built it, not in the card (M4).
 - **Card format**: defined by `template/docs/capabilities/CARD_FORMAT.md`
   (M4) with sections Invariant, Enforcement point, Acceptance, Remediation
   message, Per-stack hints. All M6 cards conform to it.
@@ -246,6 +337,43 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   are byte-identical; `diff` between them must be empty. This is the
   zero-tolerance case of template ↔ live correspondence and the simplest
   check the M6 `template-live-drift` card must cover (M3).
+- **Two template file classes** (M4): *skeletons* carry `{{FILL}}` slots and
+  GUIDANCE blocks and are filled on instantiation (`AGENTS.md`, `GOALS.md`,
+  `ARCHITECTURE.md`, `docs/PRINCIPLES.md`, `docs/MATURITY.md`,
+  `docs/DEBT.md`, `docs/specs/index.md`, `docs/capabilities/index.md`);
+  *shipped-verbatim* files carry neither marker and are kept as-is by a
+  target project (`docs/capabilities/CARD_FORMAT.md`,
+  `docs/decisions/DECISION_FORMAT.md`, `plans/PLANS.md`). The fill check in
+  the Skeleton markers contract therefore needs no exception list: a
+  shipped-verbatim file reads zero for both greps from the start. Anything
+  M9's `harness-init` or M8's doc-garden says about filling applies to the
+  skeleton class only.
+- **Card file layout** (M4): one card per file at
+  `docs/capabilities/<card-name>.md`, lowercase-hyphenated, one invariant
+  each, with a matching row in `docs/capabilities/index.md` whose columns
+  are `Card | Status | Enforced at`.
+- **Decision record format** (M4): `docs/decisions/NNNN-short-slug.md`,
+  numbers never reused, exactly four sections — Decision, Rationale, Date,
+  Status — with Status one of `accepted`, `superseded by NNNN`, `reverted`.
+  Records are append-only: superseding edits only the old record's Status.
+  No index file exists in that directory. M5's decision graduation and M8's
+  retro routing depend on this.
+- **Specs reflection rule** (M4): stated in `docs/specs/index.md`. A plan
+  does not move to `plans/completed/` until whatever a caller can now
+  observe is written into a spec file there and listed in that file's
+  index; a plan with a purely internal outcome reflects nothing and says so
+  in its own Outcomes section. Spec files are present-tense and overwritten
+  freely.
+- **MATURITY.md section shape** (M4, filled at M6): headings Current rung;
+  Rungs with `### L0`–`### L3`; Promotion rule; Demotion rule; Gating
+  capabilities as a table with columns `Rung | Gating card | What it must
+  subsume`. M6 replaces the slots and keeps the headings, in both the
+  template and live copies.
+- **DEBT.md shape** (M4): a Register table with columns
+  `ID | Item | Where | Why deferred | Trigger to pay it down`, IDs of the
+  form `D<n>` never reused, plus an optional per-item Details section for
+  anything not pick-up-able from its row. Closing an item deletes its row
+  and section. M10's deferred-work entries use this shape.
 
 ## Milestones
 
@@ -413,3 +541,17 @@ plan alone per `plans/PLANS.md`.
   marker convention and the PLANS.md identity rule are relied on by M4, M6,
   and M9, so they must be readable from the plan alone by a fresh-context
   session. No milestone scope changed.
+- 2026-09-17: M4 executed. Added six Interfaces & Dependencies contracts
+  (two template file classes, card file layout, decision record format,
+  specs reflection rule, MATURITY.md section shape, DEBT.md shape),
+  amended the card-status contract to say status has exactly one home and
+  evidence lives in plans, added five Decision Log entries and three
+  Surprises observations. Reason: M5 fills the live docs tree from these
+  skeletons, M6 writes cards and MATURITY.md content against these shapes,
+  and M8/M9 procedures branch on the skeleton-versus-shipped-verbatim
+  distinction — none of which is recoverable from the template files alone
+  by a fresh-context session. No milestone scope changed. M4's written
+  acceptance is met without carve-out: `CARD_FORMAT.md` states the
+  failing-case and remediation bar for `built`, `specs/index.md` carries
+  the reflection rule under its own heading, and all seven docs files name
+  their owner boundary.
