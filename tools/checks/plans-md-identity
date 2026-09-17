@@ -1,0 +1,46 @@
+#!/bin/sh
+# plans-md-identity — the two copies of the plan convention are byte-identical.
+#
+# template/plans/PLANS.md is the payload's copy and plans/PLANS.md is this
+# project's; the correspondence rule in ARCHITECTURE.md makes them one file
+# stored twice. Exit 0 holds, exit 1 is a violation, exit 2 means undecidable.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+a=template/plans/PLANS.md
+b=plans/PLANS.md
+
+for f in "$a" "$b"; do
+	if [ ! -f "$f" ]; then
+		echo "plans-md-identity: cannot run — $f does not exist."
+		echo "Both halves must carry the plan convention. Restore the missing file from git history, or correct the path in tools/checks/plans-md-identity."
+		exit 2
+	fi
+done
+
+if out=$(cmp "$a" "$b" 2>&1); then
+	echo "plans-md-identity: ok — 1 pair compared byte for byte."
+	exit 0
+fi
+
+# cmp decides byte identity but reports a line number only when both files
+# reach the differing byte; when one is a prefix of the other it prints an EOF
+# notice instead, so the location is derived here rather than parsed out.
+line=$(awk '
+	FNR == NR { a[FNR] = $0; na = FNR; next }
+	{
+		nb = FNR
+		if (FNR > na || $0 != a[FNR]) { print FNR; found = 1; exit }
+	}
+	END { if (!found && na > nb) print nb + 1 }
+' "$a" "$b")
+if [ -n "$line" ]; then
+	where="first at line $line"
+else
+	where="identical line for line but not byte for byte ($out)"
+fi
+
+echo "plans-md-identity: $a and $b differ, $where. These two files are byte-identical by construction."
+echo "Copy the intended version over the other and re-run."
+echo "plans-md-identity: 1 violation in 1 pair compared."
+exit 1

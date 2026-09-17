@@ -1,0 +1,17 @@
+#!/bin/sh
+# pre-commit — refuse a commit that ./tools/verify rejects.
+#
+# Installed once per clone with:  git config core.hooksPath tools/hooks
+# The hook checks the working tree rather than the staged content, so a commit
+# of a subset of a dirty tree is judged on the whole tree; that limit and the
+# --no-verify bypass are D8 in docs/DEBT.md.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+if ./tools/verify; then
+	exit 0
+fi
+
+echo "pre-commit: commit refused — ./tools/verify reported the violations above."
+echo "Fix them and commit again. Do not pass --no-verify: the bypass leaves the violation in history with nothing recording that a gate was skipped."
+exit 1

@@ -1,0 +1,43 @@
+#!/bin/sh
+# verify — the cheap verification command this repository publishes.
+#
+# Runs each check in tools/checks in the fixed order listed below, streaming
+# every child's output unmodified so that a remediation message is never
+# swallowed by a summary. Exits 0 when all of them hold, 1 when any of them
+# reports a violation or cannot decide.
+#
+# The list is literal on purpose: a glob would make the output order depend on
+# the filesystem, and a check nobody wrote into this list would run silently.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+CHECKS="plans-md-identity scaffolding-markers"
+
+start=$(date +%s)
+total=0
+failed=0
+
+for check in $CHECKS; do
+	total=$((total + 1))
+	script="./tools/checks/$check"
+	if [ ! -x "$script" ]; then
+		echo "$check: cannot run — $script is missing or not executable."
+		echo "Restore it with chmod +x, or remove it from the check list in ./tools/verify."
+		failed=$((failed + 1))
+		continue
+	fi
+	if ! "$script"; then
+		failed=$((failed + 1))
+	fi
+done
+
+elapsed=$(($(date +%s) - start))
+
+if [ "$failed" -eq 0 ]; then
+	echo "fast-verify: $total of $total checks passed (${elapsed}s)."
+	exit 0
+fi
+
+echo "fast-verify: $failed of $total checks failed."
+echo "Fix the violations reported above and re-run ./tools/verify."
+exit 1

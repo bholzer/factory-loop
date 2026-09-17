@@ -1,0 +1,48 @@
+#!/bin/sh
+# scaffolding-markers — no live artifact still carries authoring scaffolding.
+#
+# The payload's skeletons carry two markers, both defined in template/AGENTS.md:
+# a fill slot, and a guidance block opened by an HTML comment. A filled artifact
+# holds neither. The pattern below writes the final letter of each marker word
+# in brackets so that it cannot match a file that merely quotes it; the known
+# limit of matching the words anywhere is D2 in docs/DEBT.md.
+#
+# Exit 0 holds, exit 1 is a violation, exit 2 means undecidable.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+set -- AGENTS.md GOALS.md ARCHITECTURE.md docs/PRINCIPLES.md \
+	docs/MATURITY.md docs/DEBT.md docs/specs/index.md \
+	docs/capabilities/index.md
+
+scanned=0
+absent=0
+for f in "$@"; do
+	if [ -f "$f" ]; then
+		scanned=$((scanned + 1))
+	else
+		echo "scaffolding-markers: cannot run — $f is in the checked set and does not exist."
+		absent=$((absent + 1))
+	fi
+done
+
+if [ "$absent" -ne 0 ]; then
+	echo "Restore the file, or update the checked set in tools/checks/scaffolding-markers to match the artifacts this project actually has."
+	exit 2
+fi
+
+hits=$(grep -nE '\{\{FIL[L]|GUIDANC[E]' "$@")
+if [ -z "$hits" ]; then
+	echo "scaffolding-markers: ok — $scanned artifacts scanned, 0 markers found."
+	exit 0
+fi
+
+printf '%s\n' "$hits" | while IFS= read -r hit; do
+	echo "scaffolding-markers: $hit"
+	echo "  This line still holds authoring scaffolding — a fill slot or a guidance block. Replace the slot with this project's own content, or delete the guidance block; an artifact is filled only when neither marker remains."
+done
+found=$(printf '%s\n' "$hits" | wc -l | tr -d ' ')
+noun="markers"
+[ "$found" -eq 1 ] && noun="marker"
+echo "scaffolding-markers: $found $noun found in $scanned artifacts scanned."
+exit 1
