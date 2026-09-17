@@ -54,9 +54,14 @@ about the payload.
 ### Check layer
 
 - Lives in: `tools/` — the aggregator `tools/verify`, one executable per
-  check under `tools/checks/`, allowlists under `tools/allow/`, and
+  check under `tools/checks/`, allowlists under `tools/allow/`,
   `tools/hooks/pre-commit`, the hook this repository keeps in version
-  control rather than in each clone.
+  control rather than in each clone, and `tools/blueprint-eval`, the driver
+  of the live trial: it builds a trial repository from both halves outside
+  this tree and decides the trial's scriptable parts. That one is not a
+  check, sits beside the aggregator rather than under `tools/checks/`, and
+  the cheap command does not run it — its subject is a filled copy of the
+  payload, which exists only while a trial runs and never in a commit here.
 - Owns: the mechanical decisions this repository makes about itself. One
   check per card in `docs/capabilities/`, plus `scaffolding-markers`, whose
   invariant belongs to the marker definition rather than to a card.

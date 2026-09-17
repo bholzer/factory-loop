@@ -44,6 +44,22 @@ Observe all five of:
   that session, not restated from the plan;
 - the session stopped after one milestone rather than continuing.
 
+The first of those five needs saying out loud, because a harness whose only
+route to a procedure is the map would otherwise fail it on a property this
+project has parked rather than decided. It holds when a session given only the
+trial repository and the harness's own default configuration names and then
+follows the right procedure for the task it was handed, with no file anywhere
+created or edited to make the procedures visible. The operator's prompt may not
+name a procedure, nor any filename or path among the artifacts and procedures
+that arrived in the copy. The target project's own intended layout — its module
+names, where it keeps its state — is owner interview input and belongs in that
+prompt freely: it names nothing the session has to find for itself. A flag
+granting the harness permission to write files or reach the network is not a
+file edit; it is recorded with the invocation rather than counted against this
+observation. Whether the harness surfaced the procedures by itself, and from
+which root, is recorded as evidence for the open question of where they should
+live, which `docs/DEBT.md` tracks; it decides nothing here.
+
 Record harness, version, date, and outcome in the plan that runs the trial.
 The card stays a specification and holds no results.
 

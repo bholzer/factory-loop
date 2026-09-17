@@ -34,13 +34,20 @@ edits to both halves.
 ## Commands
 
 There is no build, test, or lint toolchain: the artifacts are markdown, so
-there is nothing to compile and no suite to run. What a machine can decide
-here is decided by one command.
+there is nothing to compile and no suite to run. Two commands exist. One
+decides what a machine can decide about this repository; the other builds a
+throwaway repository elsewhere and reads the payload the way a target project
+receives it.
 
 - `./tools/verify` — the cheap verification command. Budget: 5 seconds. It
   runs each executable under `tools/checks/` in a fixed order, streams what
   each one reports, and exits nonzero if any of them finds a violation or
   cannot decide. `docs/capabilities/fast-verify.md` is its card.
+- `./tools/blueprint-eval` — the live-trial driver, and not a check: `new
+  <label>` copies both halves into a fresh git repository outside this tree
+  and prints where, and `check <repo-dir>` reads such a copy and decides
+  procedure layout, leftover scaffolding, and whether its paths resolve with
+  no access to this tree. `docs/capabilities/blueprint-eval.md` is its card.
 - `git config core.hooksPath tools/hooks` — once per clone. After it,
   `tools/hooks/pre-commit` refuses any commit that `./tools/verify` rejects.
 
