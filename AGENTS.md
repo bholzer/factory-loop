@@ -30,6 +30,8 @@ and a reference from `template/` outward is a bug.
 - `skills/<name>/SKILL.md` — the portable procedures an agent invokes; each
   one references the artifacts above rather than restating them.
 - `template/` — the payload copied into a target project and filled in there.
+- `CLAUDE.md` — one-line entry-point shim for harnesses that do not read
+  `AGENTS.md` natively. Owns nothing; contains only a reference to this file.
 
 ## Commands
 

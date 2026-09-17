@@ -43,9 +43,9 @@ about the payload.
 
 ### Skill layer
 
-- Lives in: `skills/<name>/SKILL.md`. Five exist — `plan-author`,
-  `plan-execute`, `doc-garden`, `retro`, and `capability-build`; the
-  bootstrap procedure the next entry names does not exist yet.
+- Lives in: `skills/<name>/SKILL.md`. Six exist — `harness-init`,
+  `plan-author`, `plan-execute`, `doc-garden`, `retro`, and
+  `capability-build`.
 - Owns: the reusable procedures an agent invokes — bootstrap, plan authoring,
   plan execution, capability building, doc gardening, retrospection.
 - Does not: carry rules that belong to an artifact. A skill references
@@ -73,6 +73,15 @@ a spec, a card, or a plan file exists only in the project that wrote it.
 Skill bodies may not name `template/`, because a target project does not
 receive it, and may not name a harness-specific tool, because the same file
 must work in every harness.
+
+That rule binds the bootstrap procedure too, which is the only skill that
+executes outside a bootstrapped project and whose subject matter is the
+payload it may not name. It resolves both unnamable things at run time
+instead: the payload directory through the `AGENTS.md` map of the checkout it
+was invoked from, and the entry-point filename a harness reads natively
+through the harness it is running in. No exemption exists, because a body
+that named either one would ship a path that resolves in exactly one
+checkout.
 
 The live root artifacts may name `template/` freely: the payload is this
 project's subject matter. This is the asymmetry that the first two rules

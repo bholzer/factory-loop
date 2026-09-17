@@ -7,6 +7,7 @@
 | D1 | Template ↔ live correspondence is checked by hand | `template/` against the repository root | The live tree only came into existence with the correspondence rule, and writing the checker in the same session would have traded the milestone's content for its enforcement | The first commit that changes a `template/` file without its live counterpart, or the reverse |
 | D2 | The scaffolding check cannot tell a quoted marker from a real slot | the second command under Commands in `AGENTS.md` | No file in the checked set needs to quote a marker, so keeping the marker definition to one owner is currently enough | The first live artifact in the checked set that has to quote a marker in its prose |
 | D3 | The payload's generic capability cards are not instantiated for this project | `docs/capabilities/` against `template/docs/capabilities/` | Writing the starter set plus this project's own three cards was one unit of work; instantiating four more registers here would have doubled it while nothing enforces any card in either half | The first of: a generic card reaching `built` anywhere, or a change landing here that one of the four applicable cards would have caught |
+| D4 | The installed procedures sit outside every harness's auto-discovery root | `skills/` against a harness's own skills location | The file shape is portable and `AGENTS.md`'s map makes each procedure reachable by path, so an agent can always read one; only automatic surfacing is missing, and where to put the files is a per-harness configuration question that a live trial answers better than a guess | The first harness whose configuration cannot reach `skills/`, or the live trial specced in `docs/capabilities/blueprint-eval.md` |
 
 ## Details
 
@@ -66,3 +67,24 @@ means copying each applicable card into `docs/capabilities/`, adding its row
 to the register there with status `specced`, and adding its gating row to the
 table in `docs/MATURITY.md` — after which this project's L1 gate set matches
 the ladder's intent instead of being one card wide.
+
+### D4 — Installed procedures are not auto-discovered
+
+`docs/decisions/0008-portability-lowest-common-denominator.md` places skills
+at `skills/<name>/SKILL.md` as the intersection of the three harnesses'
+conventions. The file shape is genuinely the intersection — one directory per
+skill, one `SKILL.md`, `name` matching the directory, a one-line
+`description` — but the location is not. A harness that loads procedures
+automatically reads them from a root it chooses itself, not from a
+repository-root `skills/`: one of the three scans an ancestor dotted
+directory for `skills/*/SKILL.md` and reaches anywhere else only through a
+configured extra directory. So the six procedures here are readable by path
+and listed in `AGENTS.md`'s map, and that is the whole mechanism today.
+
+Three ways to pay it down, and choosing between them wants evidence from a
+real session rather than reasoning: configure each harness to scan `skills/`;
+move the canonical location into whichever dotted directory the harnesses
+share and keep the map pointing at it; or have the bootstrap procedure place
+a link into the environment's own root, which is what its step 9 already
+tells it to do. The first two would change what the payload installs, so both
+are decisions, not fixes.
