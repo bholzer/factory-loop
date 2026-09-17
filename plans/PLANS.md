@@ -17,6 +17,23 @@ prerequisite.
 If a milestone can only be completed with memory of a previous session, the
 plan is broken. Fix the plan, not the session.
 
+## Authoring rules
+
+- **Decisions are made in the plan, not outsourced.** When ambiguity exists,
+  the author resolves it in the plan and records why. A plan that asks its
+  executor to "choose an appropriate approach" for anything load-bearing is
+  incomplete.
+- **Prose first.** Narrative sections are sentences, not bullet skeletons —
+  reasoning survives in prose and dies in fragments. Checklists belong in
+  Progress; short lists elsewhere only when prose would obscure.
+- **Over-explain user-visible effects; under-specify incidental
+  implementation.** The failure mode to prevent is work that satisfies the
+  letter of a milestone but does nothing meaningful. Acceptance guards this:
+  behavior, never attributes.
+- **Commands are exact and legible.** State the working directory and the
+  exact command line; include a short expected output so a novice can tell
+  success from failure by comparison.
+
 ## Context hygiene
 
 The plan file is durable context; the context window is a disposable cache.
@@ -56,10 +73,19 @@ updating them is part of executing any milestone, not optional bookkeeping.
   they could not before, and how to see it working.
 - **Context & Orientation** — current state for a reader who knows nothing.
   Key files by full path. Definitions of non-obvious terms.
+- **Interfaces & Dependencies** — prescriptive contracts that later
+  milestones or other work rely on: file formats, schemas, signatures, paths,
+  statuses. Stated in full — a fresh-context session cannot remember the
+  contract an earlier milestone established; the plan is where it lives.
 - **Milestones** — narrative, one short block each: scope, what exists at the
   end that didn't before, and observable acceptance. Acceptance is phrased as
   behavior a human can verify, never internal attributes ("running X exits 0
-  and prints Y", not "added a helper").
+  and prints Y", not "added a helper"). Spike milestones are encouraged when
+  requirements carry real unknowns: scoped as prototypes, with explicit
+  criteria for promoting or discarding the result.
+- **Idempotence & Recovery** — whether steps are safe to re-run; retry or
+  rollback paths for any risky step. May be one sentence when everything is
+  trivially safe.
 - **Validation & Acceptance** — how to exercise the overall result and what
   to observe.
 

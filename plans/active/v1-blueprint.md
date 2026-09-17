@@ -93,6 +93,16 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   (orient → map → propose → fill) must work unchanged on a non-empty repo.
   Rationale: Brownfield just means ARCHITECTURE.md and DEBT.md start full.
   The hard part (boundary-lint retrofit) is deferred and tracked. 2026-09-16.
+- Decision: Backfill `plans/PLANS.md` against the OpenAI ExecPlan doc after
+  user review flagged its leanness. Adopted: decisions-made-in-plan,
+  prose-first, exact-commands-with-expected-output, Interfaces & Dependencies
+  and Idempotence & Recovery as required sections, spike milestones.
+  Deliberately rejected: proceed-through-milestones-without-stopping
+  (contradicts one-milestone-stop), chat-envelope fencing rules (our plans
+  are files), repetition-as-emphasis (a fat convention is a per-session
+  context tax).
+  Rationale: Their doc optimizes single long-context runs; ours optimizes
+  fresh-context loops. Gaps real, bulk not. 2026-09-16.
 
 ## Surprises & Discoveries
 
@@ -127,6 +137,25 @@ Terms used below:
   self-verifying → L2 agent-reviewed → L3 bounded autonomous classes.
   Promotion rule: a human gate retires only when a mechanical check subsumes
   it and has been green for N cycles.
+
+## Interfaces & Dependencies
+
+Contracts that milestones establish and later fresh-context sessions rely on:
+
+- **Skill layout**: `skills/<name>/SKILL.md`, YAML frontmatter with exactly
+  `name` (lowercase-hyphenated, matching the directory) and `description`.
+  Bodies reference `plans/PLANS.md` and other repo files; procedures use
+  only files, shell, and git.
+- **Capability card statuses**: `specced` → `built` → `enforced`, recorded in
+  the owning `docs/capabilities/index.md`. A card may not reach `built`
+  without a demonstrated failing case showing its remediation message.
+- **Card format**: defined by `template/docs/capabilities/CARD_FORMAT.md`
+  (M4) with sections Invariant, Enforcement point, Acceptance, Remediation
+  message, Per-stack hints. All M6 cards conform to it.
+- **Template ↔ live correspondence**: every file under `template/` has a
+  same-relative-path live counterpart at repo root; structure identical,
+  only project-specific content varies.
+- **Claude shim**: root `CLAUDE.md` containing exactly `@AGENTS.md` (M9).
 
 ## Milestones
 
