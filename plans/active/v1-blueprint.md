@@ -19,7 +19,11 @@ from repo content alone.
 
 - [x] (2026-09-16) Seed contract: `GOALS.md`, `AGENTS.md` stub, `plans/PLANS.md`.
 - [x] (2026-09-16) This plan authored.
-- [ ] M3: Template payload — core artifacts.
+- [x] (2026-09-16) M3: Template payload — core artifacts. `template/AGENTS.md`,
+  `template/GOALS.md`, `template/ARCHITECTURE.md`, `template/plans/PLANS.md`
+  (byte-identical to live), `template/plans/{active,completed}/.gitkeep`.
+  Forward references to `docs/` paths in the three skeletons are deliberate
+  and resolve at M4; nothing in M3's own outputs is unresolved.
 - [ ] M4: Template payload — docs tree + capability spec-card format.
 - [ ] M5: Instantiate live repo from template.
 - [ ] M6: Capability spec cards + MATURITY.md.
@@ -128,10 +132,50 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   resolution, prose-first, exact commands, Interfaces & Dependencies and
   Idempotence & Recovery via the skeleton, spike milestones). User call.
   2026-09-16.
+- Decision: Two skeleton markers — `{{FILL: ...}}` for content slots, HTML
+  comment blocks whose first word is `GUIDANCE` for authoring instructions,
+  with guidance deleted once a file is filled.
+  Rationale: M3 required a reader to tell placeholder from guidance at a
+  glance, and both markers are mechanically greppable, so "is this template
+  filled in?" becomes `grep -rn '{{FILL' <file>` plus `grep -rn GUIDANCE
+  <file>` both empty rather than a judgement call. Guidance lives in HTML
+  comments so a filled artifact renders clean without a deletion pass being
+  required for correctness; guidance is nonetheless deleted on fill because
+  authoring scaffolding in a shipped project file is per-session context tax.
+  2026-09-16.
+- Decision: Durable ownership boundaries live as real content in
+  `AGENTS.md`'s Map (one line per artifact, naming what it owns); the
+  per-file boundary/anti-pattern statements are authoring-time guidance.
+  Rationale: An agent routing a new piece of knowledge needs one registry,
+  not a scavenger hunt across eight file headers. `AGENTS.md` is already the
+  entry point, so the map doubles as the ownership registry at zero extra
+  context cost. The per-file guidance is for whoever fills that file and has
+  no reader after that. 2026-09-16.
+- Decision: `template/plans/PLANS.md` is a byte-identical copy of live
+  `plans/PLANS.md`, not a symlink, include, or annotated variant.
+  Rationale: The payload must survive a plain recursive copy into a target
+  project on any filesystem, and skills may not depend on symlink support.
+  Identity also makes this the one template file whose drift check is exact:
+  `diff template/plans/PLANS.md plans/PLANS.md` must be empty, with no
+  project-specific variance to reason about. 2026-09-16.
 
 ## Surprises & Discoveries
 
-- None yet.
+- Observation: `plans/PLANS.md` needed no generalization for the template.
+  M3 specified the skeleton as the live file "with blueprint-specific
+  references removed"; there were none. The adopted ExecPlan text speaks
+  only of "this repository", `plans/active/`, `plans/completed/`,
+  `docs/specs/`, and `docs/decisions/` — all of which are template-provided
+  paths, so every reference resolves inside any instantiation.
+  Evidence: `grep -cniE "blueprint|harness|skills/|template/|GOALS\.md|
+  ARCHITECTURE\.md" template/plans/PLANS.md` → `0`; `cmp plans/PLANS.md
+  template/plans/PLANS.md` → silent (bytes equal).
+- Observation: Guidance comments dominate the skeletons by line count, but
+  the artifact a target project keeps is small, so the ~100-line `AGENTS.md`
+  cap is not endangered by verbose authoring guidance.
+  Evidence: `sed '/^<!--$/,/^-->$/d' <file> | grep -c .` → AGENTS.md 34,
+  GOALS.md 23, ARCHITECTURE.md 22 non-blank lines; raw files are 96, 108,
+  and 104 lines.
 
 ## Outcomes & Retrospective
 
@@ -181,6 +225,16 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   same-relative-path live counterpart at repo root; structure identical,
   only project-specific content varies.
 - **Claude shim**: root `CLAUDE.md` containing exactly `@AGENTS.md` (M9).
+- **Skeleton markers**: `{{FILL: ...}}` marks a content slot; every HTML
+  comment block in a template file begins with the word `GUIDANCE` and is
+  authoring instruction to be deleted on fill. A template file is fully
+  filled when `grep -rn '{{FILL' <file>` and `grep -rn GUIDANCE <file>` are
+  both empty. M4's docs skeletons and M9's `harness-init` procedure depend
+  on this convention (M3).
+- **PLANS.md identity**: `template/plans/PLANS.md` and live `plans/PLANS.md`
+  are byte-identical; `diff` between them must be empty. This is the
+  zero-tolerance case of template ↔ live correspondence and the simplest
+  check the M6 `template-live-drift` card must cover (M3).
 
 ## Milestones
 
@@ -342,3 +396,9 @@ plan alone per `plans/PLANS.md`.
   loop, evidence, and lifecycle rules. This plan already conforms: all
   mandatory living sections exist, and its Milestones narrative covers the
   skeleton's Plan of Work / Concrete Steps roles.
+- 2026-09-16: M3 executed. Added two Interfaces & Dependencies contracts
+  (skeleton marker convention, template ↔ live PLANS.md byte identity),
+  three Decision Log entries, and two Surprises observations. Reason: the
+  marker convention and the PLANS.md identity rule are relied on by M4, M6,
+  and M9, so they must be readable from the plan alone by a fresh-context
+  session. No milestone scope changed.
