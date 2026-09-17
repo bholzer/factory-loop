@@ -56,7 +56,17 @@ from repo content alone.
   skill layer was empty reconciled — `ARCHITECTURE.md`'s Skill layer entry
   and a new `skills/` line in `AGENTS.md`'s map. Acceptance met without
   carve-out.
-- [ ] M8: Skills — doc-garden, retro, capability-build.
+- [x] (2026-09-17 05:22Z) M8: Skills — doc-garden, retro, capability-build.
+  `skills/doc-garden/SKILL.md`, `skills/retro/SKILL.md` and
+  `skills/capability-build/SKILL.md` written, and `ARCHITECTURE.md`'s Skill
+  layer entry — the one live claim that four of the six procedures did not
+  exist — reconciled to name five. The milestone was executed in one
+  session; the authored option to split it into two was not needed.
+  Acceptance met with one named substitution against its own text: the
+  template ↔ live sweep the milestone assigns doc-garden "(in this repo)"
+  is stated as a sweep of whatever structural correspondence
+  `ARCHITECTURE.md` declares, because the skill layer's reference rule
+  forbids a skill body from naming `template/`.
 - [ ] M9: Skill — harness-init + portability glue.
 - [ ] M10: Paper verification, first retro, close plan.
 
@@ -429,6 +439,50 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   and this repository already wrote that rule down twice — as the
   `.gitkeep` exclusion in the drift card and as the principle that content
   with no reader left is removed rather than annotated. 2026-09-17.
+- Decision: `doc-garden` states its structural-correspondence sweep as
+  "whatever `ARCHITECTURE.md` declares", not as a template ↔ live check.
+  Rationale: the milestone text assigns the skill a template ↔ live sweep
+  "(in this repo)", and a skill body may not name `template/` — the same
+  rule M7 sharpened after a decision-record citation nearly shipped
+  dangling. The alternatives were a harness-blueprint-only paragraph, which
+  breaks the rule outright, and dropping the sweep, which would leave the
+  one invariant this project most needs swept unowned. Pointing at the
+  declaring artifact keeps the skill portable and makes the sweep stronger
+  than the milestone asked: any correspondence a project declares gets
+  walked, in this project's case the counterpart, subsequence, and byte
+  identity rules. It also puts the comparison method where it already lives,
+  since `ARCHITECTURE.md` states the subsequence form that a naive diff gets
+  wrong. 2026-09-17.
+- Decision: The convention-change audit is split the way M7 predicted:
+  `doc-garden` owns the trigger and the audit's scope, and points at
+  `skills/plan-author/SKILL.md` for where inside a plan the outcome is
+  recorded.
+  Rationale: `plan-author` already disclaims the trigger and describes the
+  recording, so the two skills now form a closed pair with neither fact
+  duplicated. Leaving the pointer out was the alternative, and it would have
+  left an auditing session knowing it must record an outcome with no
+  statement of where — which is how the outcome ends up in a commit message.
+  2026-09-17.
+- Decision: `retro`'s materiality test is three questions — will it recur,
+  does it cost less than it saves, can it be stated as something checkable
+  or applicable — all three required, with the failed question recorded on
+  every no-change.
+  Rationale: the milestone requires an explicit materiality test and a
+  "no change" owner, and an unrecorded no-change is indistinguishable from
+  an oversight, so the next retro re-examines the same difference cold. The
+  third question is the one that does the work: it is what rejects "be more
+  careful", which is the lesson a retro produces by default and the one no
+  reader can act on. 2026-09-17.
+- Decision: `capability-build`'s procedure is a numbered ten-step sequence
+  where the M7 and M8 sibling skills are narrative, and repairing an
+  unbuildable card is explicitly outside it.
+  Rationale: the steps are a proof obligation rather than advice — a failing
+  case observed before the check was wired, or a status flipped before the
+  failing case, proves nothing — and order is exactly what prose loses. The
+  card-repair exclusion follows the card scope rule: a card whose invariant
+  is a wish has no acceptance that can gate promotion, so the pass stops and
+  reports rather than quietly narrowing the invariant to whatever it managed
+  to build. 2026-09-17.
 
 ## Surprises & Discoveries
 
@@ -636,6 +690,54 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   five generic card files and the two `.gitkeep` placeholders under
   `template/plans/` — and the eleven remaining pairs passing by subsequence
   or, for `plans/PLANS.md`, by byte identity.
+- Observation: The skill layer's reference rule forbids what M9's milestone
+  text requires. `ARCHITECTURE.md` states that a skill body may not name
+  `template/`, and M9 asks `harness-init` to "copy and fill `template/`" —
+  so the sixth skill is the one skill whose subject matter is the payload
+  directory it may not name. The tension is real rather than verbal: every
+  other skill runs inside a bootstrapped project, where `template/` is
+  genuinely absent, while `harness-init` runs against a payload it must
+  locate. M9 has to settle it, and the two shapes available are an exemption
+  stated in `ARCHITECTURE.md` (this one skill names the payload because it
+  is the only one that executes outside a bootstrapped project) or a
+  parameterized phrasing that never writes the path (the payload directory
+  of the checkout the skill was invoked from). This milestone did not choose;
+  it recorded the conflict on discovery.
+  Evidence: `ARCHITECTURE.md`'s layer map — "Skill bodies may not name
+  `template/`, because a target project does not receive it" — against the
+  M9 milestone text below; the three skills written here needed no such
+  reference and report zero `template/` mentions.
+- Observation: The non-duplication shingle check came up clean on the first
+  run for all three skills, and instead caught an overlap between two new
+  skills — a class M7's version of the check never looked for. `doc-garden`
+  and `retro` had independently written the same eight-word window while
+  telling their reader to consult the capability register, because both
+  consult it for nearly the same reason.
+  Evidence: against `plans/PLANS.md`, `n=6/7/8 overlaps=0` for all three
+  bodies on the first run; the pairwise scan at `n=8` printed one shared
+  window, `'docs capabilities index md which invariants are already'`,
+  between `doc-garden` and `retro`; after rewriting `retro`'s line the
+  pairwise scan reports `0` for every pair across all five skills.
+- Observation: Only one live artifact claimed anything about which skills
+  exist, and finding that out cost one grep rather than a reading pass. Two
+  other mentions of the missing procedures are not state claims and were
+  correctly left alone.
+  Evidence: `grep -rn "doc-garden\|capability-build\|retro\b\|harness-init"
+  AGENTS.md GOALS.md ARCHITECTURE.md docs/` returned `ARCHITECTURE.md:47`
+  (the Skill layer entry, edited), `GOALS.md:25–26` and `:84` (the roster as
+  an intended outcome, not a present-tense claim), `docs/capabilities/
+  blueprint-eval.md:50–62` (a failing-case instruction that deliberately
+  names a file which must not exist), and
+  `docs/decisions/0009`/`0013` (an immutable roster decision and the record
+  naming `doc-garden` as the audit's owner, now satisfied).
+- Observation: A skill's procedure shape is set by whether its steps are
+  ordered, and one of the three turned out to be. `capability-build` carries
+  a numbered sequence because its steps are a proof whose order is load
+  bearing; `doc-garden`'s sweeps are a set that can be run in any order, and
+  `retro`'s phases are sequential but coarse. The five skills now span 111
+  to 150 lines with no correlation to their procedure's shape.
+  Evidence: `grep -c ''` over the five bodies → `capability-build` 126,
+  `doc-garden` 145, `plan-author` 136, `plan-execute` 111, `retro` 150.
 
 ## Outcomes & Retrospective
 
@@ -650,9 +752,9 @@ layer map), `docs/` (`PRINCIPLES.md`, the filled `MATURITY.md`, `DEBT.md`
 with three register rows, `decisions/0001`–`0015` plus `DECISION_FORMAT.md`,
 `specs/index.md`, `capabilities/index.md` plus `CARD_FORMAT.md` and this
 project's three cards), `plans/PLANS.md` and this plan, the `template/`
-payload with its five generic cards, and `skills/` holding `plan-author` and
-`plan-execute`. What does not exist yet: the `doc-garden`, `retro`,
-`capability-build` and `harness-init` skills, and the `CLAUDE.md` shim.
+payload with its five generic cards, and `skills/` holding `plan-author`,
+`plan-execute`, `doc-garden`, `retro` and `capability-build`. What does not
+exist yet: the `harness-init` skill and the `CLAUDE.md` shim.
 
 Terms used below:
 
@@ -820,6 +922,42 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   `doc-garden` must state that trigger; if it does not, the rule that
   `docs/decisions/0013-convention-change-triggers-plan-audit.md` graduated
   has no procedure carrying it.
+- **Skill set state** (M8): five skills exist — `plan-author`,
+  `plan-execute`, `doc-garden`, `retro`, `capability-build` — all conforming
+  to the M7 body shape, all reporting zero shared six-, seven- and
+  eight-word windows against `plans/PLANS.md` and zero eight-word windows
+  against each other. `harness-init` is the sixth and last; M9's phrase
+  "install the other five skills" refers to exactly this set.
+- **Handoff graph is closed** (M8, extends the M7 contract): `doc-garden`
+  hands a swept gap that wants a mechanism to `capability-build` and a
+  multi-file repair — plus the question of where an audit outcome is
+  recorded — to `plan-author`; `retro` routes a mechanizable lesson to
+  `capability-build` and states that a `plans/PLANS.md` edit obliges the
+  audit `doc-garden` owns; `plan-author` and `plan-execute` name each other.
+  Every skill is therefore named by at least one sibling, which settles the
+  M7 question about right-sizing: `harness-init` may not prune a skill,
+  because pruning any one of the five dangles a reference in another. The
+  right-sizing rules M9 writes apply to payload artifacts and cards, not to
+  the skill set.
+- **Skill portability check set** (M8): the checks each skill-writing
+  milestone runs, all of which pass on the five existing skills — frontmatter
+  keys exactly `name` and `description` with `name` equal to the directory;
+  a `Never` section and a `Stop condition` section present; every backticked
+  repository-relative path resolving from the repository root; zero mentions
+  of `template/`, of this repository, and of harness-specific vocabulary
+  (matched as `claude|codex|omp|cursor|copilot|mcp|subagent|slash command|
+  read tool|bash tool|grep tool|tool call|prompt`); zero shingle overlap
+  against the convention at n = 6, 7, 8 and against sibling skills at n = 8.
+  M9 runs the same set on `harness-init`, with the `template/` clause
+  pending the exemption question recorded in Surprises.
+- **Project-specific invariants inside portable skills** (M8): a skill that
+  must sweep, check, or reason about an invariant only one project declares
+  names the artifact that declares it rather than the invariant's subject.
+  `doc-garden`'s correspondence sweep reads `ARCHITECTURE.md` and walks
+  whatever structural correspondence it finds declared there, which is how
+  this repository's template ↔ live rules get swept by a body that cannot
+  name `template/`. M9 and M10 reuse this shape wherever a procedure needs a
+  fact that lives in a project's own artifacts.
 
 ## Milestones
 
@@ -1052,3 +1190,22 @@ plan alone per `plans/PLANS.md`.
   because the sharpened reference rule is now content in `ARCHITECTURE.md`
   and a second copy in `docs/decisions/` would be the drift this repository
   keeps legislating against.
+- 2026-09-17: M8 executed. Added four Interfaces & Dependencies contracts
+  (skill set state, the now-closed handoff graph, the skill portability
+  check set, project-specific invariants inside portable skills), four
+  Decision Log entries, four Surprises observations, and refreshed Context &
+  Orientation. Reason: M9 writes the last skill and needs the check set
+  stated as commands rather than as a remembered practice, and it needs the
+  handoff graph, which answers M7's open right-sizing question in the
+  direction M7 did not anticipate — no skill may be pruned, because every
+  one is now named by a sibling. The milestone also surfaced a conflict M9
+  must settle rather than discover: the layer rule banning `template/` from
+  skill bodies collides with M9's instruction that `harness-init` copy the
+  payload, and the two available shapes are recorded in Surprises. No
+  milestone scope changed. M8's written acceptance is met with one named
+  substitution: its template ↔ live sweep for `doc-garden` is stated
+  generically, as a sweep of the structural correspondence
+  `ARCHITECTURE.md` declares, because a skill body may not name the payload
+  directory. No decision graduated — each entry either binds only the
+  sessions writing skills or is already content in the artifact that owns
+  it.
