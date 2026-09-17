@@ -67,9 +67,12 @@ nothing as well.
    inside the directory that owns it, an illustrative filename inside a
    format document, and a deliberate mention of a file that does not or must
    not exist. Everything else is a defect.
-2. **Leftover scaffolding.** No artifact still carries the fill slots or
-   authoring-guidance blocks that `AGENTS.md` defines. A live artifact
-   holding a placeholder is a file nobody finished.
+2. **Leftover scaffolding.** No artifact still carries a fill slot or an
+   authoring-guidance comment block from the skeleton it was filled from.
+   These are self-describing where they survive — an unfilled skeleton's own
+   guidance explains its markers — so the sweep needs no external
+   definition. A live artifact holding a placeholder is a file nobody
+   finished.
 3. **Statements that stopped being true.** Walk the claims that name
    concrete things — the map's entries, the component descriptions, the rung
    the ladder in `docs/MATURITY.md` claims and the gating rows behind it, the

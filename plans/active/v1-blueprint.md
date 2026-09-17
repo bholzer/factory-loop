@@ -483,6 +483,25 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   is a wish has no acceptance that can gate promotion, so the pass stops and
   reports rather than quietly narrowing the invariant to whatever it managed
   to build. 2026-09-17.
+- Decision: (post-M8 review) `doc-garden`'s scaffolding sweep no longer
+  attributes the marker definition to `AGENTS.md` — post-fill, no AGENTS.md
+  defines the markers anywhere, since the defining guidance blocks are
+  deleted on fill. Reworded to note markers are self-describing where they
+  survive. A portable skill's claims must be true in a bootstrapped
+  project, not only in this repository; the portability check set missed
+  this because it checks paths and vocabulary, not attributions.
+  2026-09-17/reviewer.
+- Decision: (post-M8 review, routed to M10 retro rather than acted on) The
+  skill reference-scope rule structurally forces fact duplication between
+  portable skills and project cards: `doc-garden`'s reference sweep carries
+  the three legitimate-miss classes that `doc-integrity` also specifies,
+  because a skill body may not cite a prunable card file. The duplication
+  is currently verbatim-free (shingle-clean) but conceptual, and one copy
+  will drift. M10's retro should weigh owners: the classes could live in
+  `CARD_FORMAT.md`-adjacent shipped-verbatim documentation both may cite,
+  or the sweep could defer to "whatever the register's built cards decide"
+  the way the correspondence sweep defers to `ARCHITECTURE.md`.
+  2026-09-17/reviewer.
 
 ## Surprises & Discoveries
 
@@ -1209,3 +1228,8 @@ plan alone per `plans/PLANS.md`.
   directory. No decision graduated — each entry either binds only the
   sessions writing skills or is already content in the artifact that owns
   it.
+- 2026-09-17: Post-M8 review — reworded doc-garden sweep 2 (marker
+  definition attributed to AGENTS.md, false post-fill in any bootstrapped
+  project) and logged the skill-vs-card conceptual duplication for M10
+  retro routing. Reason: portable skill claims must hold outside this
+  repository.
