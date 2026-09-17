@@ -270,6 +270,21 @@ Observed during M5 execution, 2026-09-17, against this machine's Codex CLI insta
   Rationale: the premise was measured at authoring time from the help text, and the help text still says nothing about skills; the mechanism is nonetheless present and enabled in `codex-cli 0.150.1`, with a system skills root on this machine and a default root map that includes a workspace-relative procedure directory. Leaving the sentence standing would hand the resuming session a false reason to skip the question, and observation 1 in this harness is the one the card's criterion was written for — the whole point of recording it is that nobody knows the answer. Correcting the framing is inside this milestone's boundary because it is this milestone's own text; deciding the answer is not, because only a driven session can.
   Date/Author: 2026-09-17, M5 execution session.
 
+- Decision: (post-M5 review, routed to M7's retro rather than acted on) The
+  unparseable Codex invocation is a lesson about authoring practice, not only
+  a corrected line: the authoring session measured every flag from `--help`
+  and never parsed the composed command, and the pre-execution review missed
+  it the same way. `--help` is not a parse. The candidate rule, for the retro
+  to weigh and route — likely to `skills/plan-author/SKILL.md`, whose step 8
+  already demands rereading as the executor: an expected invocation in a plan
+  is dry-run to the first refusal the environment can produce without doing
+  the work — argument parsing, authentication, a version banner — and the
+  refusal point reached is labelled beside the line. This plan's own history
+  argues for it twice: the discovery criterion and the failing-case premise
+  were both defects of the same shape, statements about composed behavior
+  checked only component-wise.
+  Date/Author: 2026-09-17, reviewer.
+
 ## Outcomes & Retrospective
 
 The plan-level retrospective is written at M7, and it owes the reader a comparison against the purpose stated above: whether a copy of the payload and the procedures, with no access to this repository, carried one feature to an executed milestone in each of the three harnesses; which of the card's five observations held in which harness; what the trial found that reading the payload could not have found; what was fixed in the payload as a result, and what was routed to `docs/DEBT.md` instead; and what the three harnesses reported about how they found the procedures, which is the input `D4` has been waiting for. Complete as of M4 are the first two harnesses' trials, whose outcome records sit below; the milestone that runs Codex CLI adds the third beside them.
@@ -841,3 +856,8 @@ Anything about `loop-runner`, `D5`, or the rung above L0. The trial produces evi
   Interfaces and Dependencies changed, and the briefs are byte-for-byte as
   specified: the copies in the trial repository were extracted from this file's
   own blocks at 62, 21 and 6 lines.
+- 2026-09-17 (post-M5 review): added one routed decision — the unparseable
+  invocation as an authoring-practice lesson for the M7 retro, candidate
+  owner plan-author. Reason: three defects in this plan now share the shape
+  "composed behavior checked component-wise", and a lesson that has recurred
+  three times inside one plan meets the materiality bar on recurrence alone.
