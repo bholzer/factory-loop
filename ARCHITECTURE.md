@@ -162,3 +162,7 @@ nobody can write. It stays a review job.
   that corresponds structurally is about the same subject, and whether a
   live-only file should have had a counterpart. Both are tracked as `D9` in
   `docs/DEBT.md` and read by hand.
+- One clause of the layer map above is not decided by anything mechanical:
+  whether a skill body names a harness-specific tool. It needs a list of tool
+  names that nobody can write, so it is tracked as `D10` in `docs/DEBT.md` and
+  read during review of any change to a procedure.
