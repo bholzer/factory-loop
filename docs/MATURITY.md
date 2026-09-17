@@ -2,12 +2,13 @@
 
 ## Current rung
 
-L0 — human-gated. Three checks are now mechanical: `./tools/verify` decides the
+L0 — human-gated. Four checks are now mechanical: `./tools/verify` decides the
 absence of authoring scaffolding in the live artifacts, the whole
 correspondence between `template/` and the live tree — counterpart existence,
-byte identity, and heading subsequence — and the resolution of every path
-reference in the live artifacts; and the hook at `tools/hooks/pre-commit`
-refuses a commit it rejects. Everything else here is still enforced by a human
+byte identity, and heading subsequence — the resolution of every path
+reference in the live artifacts, and the absence of prose shared between any
+two artifacts in either half; and the hook at `tools/hooks/pre-commit` refuses
+a commit it rejects. Everything else here is still enforced by a human
 reading, and a human reads every change before it lands.
 
 The rung stays L0 although both L1 rows in the Gating capabilities table below
@@ -17,7 +18,9 @@ rule requires, and a gate the committer cannot switch off, which
 `docs/DEBT.md` `D8` records this one as not being. Of the L2 rows,
 `doc-integrity` reads `enforced` too, while `blueprint-eval` needs a live
 trial this project has deliberately parked and `loop-runner` gates a rung two
-steps away.
+steps away. `prose-duplication` is enforced and appears in no row at all: its
+card gates no rung deliberately, because a shared window tells a reader where
+to look and not what to do about it.
 
 ## Rungs
 
