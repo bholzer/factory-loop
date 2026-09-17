@@ -123,6 +123,15 @@ Three things were measured while authoring, and each one changed a milestone's c
 - Observation (M6): six checks cost half a second, the same as five.
   Evidence: `time ./tools/verify` reported `real 0m0.505s` with `fast-verify: 6 of 6 checks passed`, against the 5-second budget `AGENTS.md` publishes, so the budget line needs no change in this milestone either. The new check's own share is 0.15 to 0.28 seconds over 440 references, which is the largest single share so far and still an order of magnitude inside the budget.
 
+- Observation (M7): the close-out's starting state was clean, and the budget published in `AGENTS.md` still holds with room to spare.
+  Evidence: `time ./tools/verify` before any edit printed `fast-verify: 6 of 6 checks passed (0s).` at exit 0 with `real 0m0.529s`, against the 5-second budget. Six checks, seven milestones' worth of invariants, half a second — acceptance clause 1 is met by the number already published rather than by a correction.
+
+- Observation (M7): deleting a debt row is not the whole edit, because another row's Details cited it.
+  Evidence: `grep -rn 'D3\b'` over the live half found the row, its Details section, and one sentence inside `D6` — "and D3's copying pass must not pretend otherwise" — which would have pointed at a deleted identifier. Rewritten to name the instantiation rather than the row. Nothing mechanical would have caught it: `D3` is not a path, so no check reads it, which is the class `docs/DEBT.md` `D9` describes from the other direction.
+
+- Observation (M7): the new debt row's first sentence named two format documents in a row and collided with a procedure that lists the same two paths.
+  Evidence: `./tools/verify` reported `prose-duplication: docs/DEBT.md and skills/harness-init/SKILL.md share the window "docs capabilities card format md and docs decisions"` — a path-list window, which is exactly the judgement class the allowlist exists for. Reworded so seven words sit between the two paths instead of adding a twenty-first allowlist entry; the next run printed `prose-duplication: ok — 44 artifacts compared, 31627 eight-word windows examined, 20 allowlist entries applied, 0 stale.` A path list is cheap to break up and expensive to excuse.
+
 ## Decision Log
 
 - Decision: the checks live in a new live-only directory, `tools/`, and the payload gains nothing from this plan.
@@ -296,6 +305,10 @@ Three things were measured while authoring, and each one changed a milestone's c
 - Decision: (M6) this check has no allowlist, and the mention scan skips a line already reported for its path reference.
   Rationale: nothing in the tree needs an exception — the first run was clean over 418 references — and the one case an allowlist would have covered, an illustrative foreign path, has a syntactic answer instead: write it unbackticked. An allowlist file created empty for symmetry with the sibling checks is a file whose first entry nobody has had to justify. The dedupe is the same instinct in the output: one word, one rule, one block, because the two scans see the same line from two directions (observed; see Surprises).
   Date/Author: 2026-09-17, M6 session.
+
+- Decision: (M7) the post-M2 review finding about the two format documents becomes debt row `D11` rather than work inside this close-out.
+  Rationale: the reviewer routed it here with both options open. Holding `docs/capabilities/CARD_FORMAT.md` and `docs/decisions/DECISION_FORMAT.md` to byte identity widens the invariant of a card that already reads `enforced`, and `docs/capabilities/CARD_FORMAT.md` requires a failing case observed with the card's own remediation text before any status claim — a capability pass with its own acceptance, which is not what a milestone whose acceptance is five close-out clauses can carry without widening scope. Both pairs are byte-identical today, verified with `cmp` in this session, so the row records a latent gap rather than an active defect, and it carries the three-line fix and the demonstration it needs.
+  Date/Author: 2026-09-17, M7 session.
 
 ## Outcomes & Retrospective
 
