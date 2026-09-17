@@ -5,12 +5,13 @@
 | ID | Item | Where | Why deferred | Trigger to pay it down |
 | --- | --- | --- | --- | --- |
 | D1 | Template ↔ live correspondence is checked by hand | `template/` against the repository root | The live tree only came into existence with the correspondence rule, and writing the checker in the same session would have traded the milestone's content for its enforcement | The first commit that lands a generic change in one half only — a `template/` edit whose live counterpart wants the same change, or the reverse |
-| D2 | The scaffolding check cannot tell a quoted marker from a real slot | the second command under Commands in `AGENTS.md` | No file in the checked set needs to quote a marker, so keeping the marker definition to one owner is currently enough | The first live artifact in the checked set that has to quote a marker in its prose |
+| D2 | The scaffolding check cannot tell a quoted marker from a real slot | `tools/checks/scaffolding-markers` | No file in the checked set needs to quote a marker, so keeping the marker definition to one owner is currently enough | The first live artifact in the checked set that has to quote a marker in its prose |
 | D3 | The payload's generic capability cards are not instantiated for this project | `docs/capabilities/` against `template/docs/capabilities/` | Writing the starter set plus this project's own three cards was one unit of work; instantiating four more registers here would have doubled it while nothing enforces any card in either half | Fired at v1 close: the reference sweep found a dangling reference that `doc-integrity` decides. Overdue — see Details |
 | D4 | The installed procedures sit outside every harness's auto-discovery root | `skills/` against a harness's own skills location | The file shape is portable and `AGENTS.md`'s map makes each procedure reachable by path, so an agent can always read one; only automatic surfacing is missing, and where to put the files is a per-harness configuration question that a live trial answers better than a guess | The first harness whose configuration cannot reach `skills/`, or the live trial specced in `docs/capabilities/blueprint-eval.md` |
 | D5 | The unattended outer loop is specced, not built | `docs/capabilities/loop-runner.md` | v1 is the watched phase: a human invokes each milestone session and judges after each whether iteration continues, which is how the failure domains get seen before they are automated away | Enough consecutive sessions whose stop rule held without human correction that the halt conditions are known, or L2 being wanted for another reason |
 | D6 | `boundary-lint` has no retrofit path for an existing codebase | `template/docs/capabilities/boundary-lint.md` against a brownfield target | Greenfield-first was the v1 scope choice in `GOALS.md`; a codebase that already violates its own layer map needs a baseline-and-ratchet story that no card here carries | The first bootstrap of this payload into a codebase whose declared layer map is already violated |
 | D7 | The blueprint has never been run; evaluation is paper-only | `docs/capabilities/blueprint-eval.md` | The owners scoped v1 to paper verification. A trial needs a target project, two or more harnesses, and one feature driven through the loop end to end — its own unit of work, not a milestone tail | Any of: a project bootstrapped from this payload for real, a harness whose configuration cannot reach `skills/` (`D4`), or a payload change whose effect reading cannot predict |
+| D8 | The only gate is skippable, and absent in a fresh clone | `tools/hooks/pre-commit` against a clone that has not run the install line | A hook is the strongest enforcement point a repository with no remote has; making it unskippable needs a place to run that the committer does not control, and there is none yet | The first remote or continuous-integration system this repository gets |
 
 ## Details
 
@@ -33,21 +34,22 @@ to have had a template counterpart at all.
 
 ### D2 — Marker mention versus marker use
 
-The check that live artifacts carry no leftover authoring scaffolding is a
-grep for the fill and guidance markers. It cannot distinguish a marker that is
-a real unfilled slot from one quoted in prose, and its own command line
-contains the pattern, so the pattern is written with bracketed final letters
-(`{{FIL[L]`) to keep it from matching the file it is listed in.
+The check that live artifacts carry no leftover authoring scaffolding is
+`tools/checks/scaffolding-markers`, a grep for the fill and guidance markers
+over eight named artifacts. It cannot distinguish a marker that is a real
+unfilled slot from one quoted in prose. The pattern lives in that script and
+is written with bracketed final letters (`{{FIL[L]`) so that a file which only
+mentions the markers — this register among them — does not trip it.
 
 That trick handles self-matching but not genuine mentions. Two live files
-originally tripped the check by discussing the convention; one was the command
-line itself, and the other duplicated a definition that `template/AGENTS.md`
-already owns, so removing the duplication fixed the check and the duplication
-at once. The check therefore holds only while no file in its set needs to
-quote a marker. Fixed would mean matching the markers' real shapes — a slot is
-a brace pair opening a line or following whitespace outside backticks, and
-guidance is a marker word opening an HTML comment block — rather than matching
-the words anywhere.
+originally tripped the check by discussing the convention; one was the check's
+own published command line, which is now the script body, and the other
+duplicated a definition that `template/AGENTS.md` already owns, so removing
+the duplication fixed the check and the duplication at once. The check
+therefore holds only while no file in its set needs to quote a marker. Fixed
+would mean matching the markers' real shapes — a slot is a brace pair opening
+a line or following whitespace outside backticks, and guidance is a marker
+word opening an HTML comment block — rather than matching the words anywhere.
 
 ### D3 — Generic cards not instantiated here
 
@@ -60,13 +62,14 @@ command), `evidence-check` (active plans carry their living sections),
 `isolated-env`, does not apply: there is no toolchain and no runtime here, so
 a card for it would be a check that passes on everything.
 
-Each of the five invariants currently lives here as prose that a human
-enforces by reading: the two commands under Commands in `AGENTS.md`, the
+One of the five is now instantiated and enforced: `fast-verify` sits at
+`docs/capabilities/fast-verify.md` and runs as `./tools/verify`. The other
+four still live here as prose that a human enforces by reading — the
 living-section requirements in `plans/PLANS.md`, and the first two entries of
-`docs/PRINCIPLES.md` with the layer map in `ARCHITECTURE.md`. Paying this down
-means copying each applicable card into `docs/capabilities/`, adding its row
-to the register there with status `specced`, and adding a gating row to the
-table in `docs/MATURITY.md` for each card that gates a rung — after which this
+`docs/PRINCIPLES.md` with the layer map in `ARCHITECTURE.md`. Paying the rest
+down means copying each remaining card into `docs/capabilities/`, adding its
+row to the register there, and adding a gating row to the table in
+`docs/MATURITY.md` for each card that gates a rung — after which this
 project's L1 gate set matches the ladder's intent instead of being one card
 wide.
 
@@ -118,3 +121,20 @@ codebase in front of you — where the baseline lives so that deleting a line
 from it is a visible commit, and whether the ratchet is enforced per file or
 per repository. Until one exists, the card's acceptance is unreachable on a
 brownfield target, and D3's copying pass must not pretend otherwise.
+
+### D8 — A gate the committer can turn off
+
+`tools/hooks/pre-commit` runs `./tools/verify` and refuses the commit when it
+fails, but three things weaken it. `git commit --no-verify` skips it and
+leaves no trace that it was skipped. A fresh clone has no hook at all until
+someone runs `git config core.hooksPath tools/hooks`, which `AGENTS.md`
+publishes but nothing enforces. And the hook judges the working tree rather
+than the staged content, so committing a subset of a dirty tree is decided on
+the whole tree — conservative in the direction that refuses too much, which is
+why it is a weakness and not a hole.
+
+The consequence that matters is for `docs/MATURITY.md`: its promotion rule
+requires a gating card to be `enforced` with no run in which the check was
+disabled or skipped, and a flag that silently turns the gate off makes that
+run unobservable. No rung may be claimed on this gate until the check also
+runs somewhere the committer does not control.

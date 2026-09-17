@@ -2,17 +2,22 @@
 
 ## Current rung
 
-L0 — human-gated. Nothing mechanical exists in this repository: every card in
-`docs/capabilities/index.md` is `specced`, the two commands published under
-Commands in `AGENTS.md` are run by hand when someone remembers, and a human
-reads every change before it lands.
+L0 — human-gated. Two things are now mechanical: `./tools/verify` decides the
+byte identity of the two copies of `plans/PLANS.md` and the absence of
+authoring scaffolding in the live artifacts, and the hook at
+`tools/hooks/pre-commit` refuses a commit it rejects. Everything else here is
+still enforced by a human reading, and a human reads every change before it
+lands.
 
-The single thing that would have to become mechanical to move up is
-`template-live-drift`: it is the only invariant here a check can decide today,
-and building it retires the hand walk between `template/` and the live tree
-that `docs/DEBT.md` records as `D1`. Nothing else is close — `blueprint-eval`
-needs a live trial this project has deliberately parked, and `loop-runner`
-gates a rung two steps away.
+The rung stays L0, because a claim on L1 needs more than one enforced gate:
+every card in an L1 row of the Gating capabilities table below must read
+`enforced` in `docs/capabilities/index.md`, and the promotion rule adds twenty
+consecutive green landed changes on top of that. `template-live-drift` is the
+gate still missing — it is the invariant a check can decide today, and
+building it retires the hand walk between `template/` and the live tree that
+`docs/DEBT.md` records as `D1`. `blueprint-eval` needs a live trial this
+project has deliberately parked, and `loop-runner` gates a rung two steps
+away.
 
 ## Rungs
 
@@ -100,14 +105,11 @@ a ladder with no record of falling reads as one that only ever rose.
 
 | Rung | Gating card | What it must subsume |
 | --- | --- | --- |
+| L1 | `fast-verify` | a human remembering to run this repository's checks by hand after every edit |
 | L1 | `template-live-drift` | a human walking `template/` against the live tree to find divergence |
 | L2 | `blueprint-eval` | a human judging that a payload change still bootstraps a working project in every supported harness |
 | L2 | `loop-runner` | a human invoking each milestone session and deciding after each whether iteration continues |
 
-Rows name only cards in this project's own register. The payload's generic
-gates — `fast-verify` and `evidence-check` at L1, `doc-integrity` and
-`boundary-lint` at L2 — are shipped in `template/docs/capabilities/` but are
-not instantiated here, so this table is thinner than the ladder intends;
-`docs/DEBT.md` `D3` carries that gap. L3 has no row, because the check that
-decides whether a change falls inside an autonomous class has to be written
-against named classes this project does not yet have.
+Rows name only cards in this project's own register. L3 has no row, because
+the check that decides whether a change falls inside an autonomous class has
+to be written against named classes this project does not yet have.

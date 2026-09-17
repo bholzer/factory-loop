@@ -51,6 +51,18 @@ about the payload.
 - Does not: carry rules that belong to an artifact. A skill references
   `plans/PLANS.md` and the docs tree; it never restates their content.
 
+### Check layer
+
+- Lives in: `tools/` — the aggregator `tools/verify`, one executable per
+  check under `tools/checks/`, allowlists under `tools/allow/`, and the
+  versioned hook `tools/hooks/pre-commit`.
+- Owns: the mechanical decisions this repository makes about itself. One
+  check per card in `docs/capabilities/`, plus `scaffolding-markers`, whose
+  invariant belongs to the marker definition rather than to a card.
+- Does not: get copied into `template/`, and does not state an invariant. A
+  shell script that assumes this file set is not portable payload, and the
+  property a check decides is the card's to write down.
+
 ## Layer map and dependency rules
 
 Two of the four components are portable payload — `template/` and `skills/` —

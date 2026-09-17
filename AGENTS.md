@@ -34,17 +34,15 @@ edits to both halves.
 ## Commands
 
 There is no build, test, or lint toolchain: the artifacts are markdown, so
-there is nothing to compile and no suite to run. Two checks are cheap enough
-to run after any edit.
+there is nothing to compile and no suite to run. What a machine can decide
+here is decided by one command.
 
-- Convention identity (silence is a pass):
-  `cmp template/plans/PLANS.md plans/PLANS.md`
-- Live artifacts carry no leftover authoring scaffolding (the bracketed
-  letters keep the pattern from matching this file):
-  `grep -rn '{{FIL[L]\|GUIDANC[E]' AGENTS.md GOALS.md ARCHITECTURE.md
-  docs/PRINCIPLES.md docs/MATURITY.md docs/DEBT.md docs/specs/index.md
-  docs/capabilities/index.md` — silence is a pass; any output names a file
-  still holding template markers.
+- `./tools/verify` — the cheap verification command. Budget: 5 seconds. It
+  runs each executable under `tools/checks/` in a fixed order, streams what
+  each one reports, and exits nonzero if any of them finds a violation or
+  cannot decide. `docs/capabilities/fast-verify.md` is its card.
+- `git config core.hooksPath tools/hooks` — once per clone. After it,
+  `tools/hooks/pre-commit` refuses any commit that `./tools/verify` rejects.
 
 The wider template ↔ live structural walk is hand-run and unmechanized.
 `docs/DEBT.md` `D1` carries the hand procedure, its blind spots, and the
