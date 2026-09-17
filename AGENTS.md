@@ -41,11 +41,13 @@ to run after any edit.
   letters keep the pattern from matching this file):
   `grep -rn '{{FIL[L]\|GUIDANC[E]' AGENTS.md GOALS.md ARCHITECTURE.md
   docs/PRINCIPLES.md docs/MATURITY.md docs/DEBT.md docs/specs/index.md
-  docs/capabilities/index.md` — any output names a file still holding
-  template markers; `docs/MATURITY.md` is the only expected hit today.
+  docs/capabilities/index.md` — silence is a pass; any output names a file
+  still holding template markers.
 
-The wider template ↔ live structural walk is hand-run and unmechanized; the
-commands and what they cannot yet catch are in `docs/DEBT.md` under `D1`.
+The wider template ↔ live structural walk is hand-run and unmechanized. What a
+mechanism must do is specified in
+`docs/capabilities/template-live-drift.md`; the hand procedure and its blind
+spots are in `docs/DEBT.md` under `D1`.
 
 ## Working rules
 

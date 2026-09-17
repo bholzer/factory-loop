@@ -6,32 +6,29 @@
 | --- | --- | --- | --- | --- |
 | D1 | Template ↔ live correspondence is checked by hand | `template/` against the repository root | The live tree only came into existence with the correspondence rule, and writing the checker in the same session would have traded the milestone's content for its enforcement | The first commit that changes a `template/` file without its live counterpart, or the reverse |
 | D2 | The scaffolding check cannot tell a quoted marker from a real slot | the second command under Commands in `AGENTS.md` | No file in the checked set needs to quote a marker, so keeping the marker definition to one owner is currently enough | The first live artifact in the checked set that has to quote a marker in its prose |
+| D3 | The payload's generic capability cards are not instantiated for this project | `docs/capabilities/` against `template/docs/capabilities/` | Writing the starter set plus this project's own three cards was one unit of work; instantiating four more registers here would have doubled it while nothing enforces any card in either half | The first of: a generic card reaching `built` anywhere, or a change landing here that one of the four applicable cards would have caught |
 
 ## Details
 
 ### D1 — Hand-checked template ↔ live correspondence
 
 `ARCHITECTURE.md` states that every file under `template/` has a live
-counterpart at the same relative path from the repository root, with identical
-headings in identical order, and that `template/plans/PLANS.md` is
-byte-identical to `plans/PLANS.md`. Nothing enforces either claim. Both were
-established by hand: the file set discovered with `find` under `template/`,
-byte identity with `cmp`, and structure by comparing headings.
+counterpart at the same relative path from the repository root, that
+`template/plans/PLANS.md` is byte-identical to `plans/PLANS.md`, and that
+every other pair corresponds by heading subsequence. Nothing enforces any of
+it. All three were established by hand: the file set discovered with `find`
+under `template/`, byte identity with `cmp`, counterpart existence with
+`test -e`, and structure by comparing headings.
 
-Naive heading comparison does not work, because some headings are themselves
-content: `ARCHITECTURE.md` names its components in headings, `docs/PRINCIPLES.md`
-its principles, `docs/DEBT.md` its items, and every file's title. The rule that
-does work, and that a mechanism should implement, is a subsequence test: take
-the template file's headings, drop the ones containing a fill slot, and require
-the remainder to appear in the live file in the same order. Extra live headings
-are expected — filled content adds them.
+What a mechanism must do is specified in
+`docs/capabilities/template-live-drift.md`, including the exclusions a naive
+walk gets wrong and the failing cases that promote it to `built`. This row is
+the debt — the check does not exist — not a second copy of its design.
 
-Fixed would be one command that discovers the file set from `template/` itself,
-applies byte identity where it is required and the subsequence test everywhere
-else, and names the offending path and the missing or reordered heading in its
-output. Two things such a command still would not catch: whether a live file's
-content is actually about the same subject as its template counterpart, and
-whether a live-only file ought to have had a template counterpart at all.
+Two things such a command still would not catch, and which stay a reading
+job after it is built: whether a live file's content is actually about the
+same subject as its template counterpart, and whether a live-only file ought
+to have had a template counterpart at all.
 
 ### D2 — Marker mention versus marker use
 
@@ -50,3 +47,22 @@ quote a marker. Fixed would mean matching the markers' real shapes — a slot is
 a brace pair opening a line or following whitespace outside backticks, and
 guidance is a marker word opening an HTML comment block — rather than matching
 the words anywhere.
+
+### D3 — Generic cards not instantiated here
+
+The payload ships five cards in `template/docs/capabilities/`. Four state
+invariants that hold for this repository too: `fast-verify` (the cheap
+command), `evidence-check` (active plans carry their living sections),
+`doc-integrity` (references resolve), and `boundary-lint` (the layer map in
+`ARCHITECTURE.md`, whose rules are the outward-reference bans). The fifth,
+`isolated-env`, does not apply: there is no toolchain and no runtime here, so
+a card for it would be a check that passes on everything.
+
+Each of the four invariants currently lives here as prose that a human
+enforces by reading: the two commands under Commands in `AGENTS.md`, the
+living-section requirements in `plans/PLANS.md`, and the first two entries of
+`docs/PRINCIPLES.md` with the layer map in `ARCHITECTURE.md`. Paying this down
+means copying each applicable card into `docs/capabilities/`, adding its row
+to the register there with status `specced`, and adding its gating row to the
+table in `docs/MATURITY.md` — after which this project's L1 gate set matches
+the ladder's intent instead of being one card wide.

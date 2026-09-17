@@ -41,7 +41,15 @@ from repo content alone.
   acceptance: live `docs/MATURITY.md` is the unfilled skeleton copy,
   because M6 owns its content in both copies — the live fill check
   therefore reports 24 marker hits in that one file and none anywhere else.
-- [ ] M6: Capability spec cards + MATURITY.md.
+- [x] (2026-09-17 04:52Z) M6: Capability spec cards + MATURITY.md. Five
+  generic cards in `template/docs/capabilities/` — `fast-verify`,
+  `evidence-check`, `doc-integrity`, `boundary-lint`, `isolated-env`; three
+  of this project's own in live `docs/capabilities/` —
+  `template-live-drift`, `blueprint-eval`, `loop-runner`. Both registers
+  list their cards at `specced`; `MATURITY.md` filled in both copies;
+  `ARCHITECTURE.md`, `docs/DEBT.md` (`D1` retargeted, `D3` added) and
+  `AGENTS.md` reconciled; decisions `0014`–`0015` graduated. Acceptance met
+  without carve-out.
 - [ ] M7: Skills — plan-author, plan-execute.
 - [ ] M8: Skills — doc-garden, retro, capability-build.
 - [ ] M9: Skill — harness-init + portability glue.
@@ -318,6 +326,63 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   plan's own structural-correspondence contract, both of which the same
   session wrote. An invariant stated stronger than reality teaches readers
   to discount invariants. 2026-09-17/reviewer.
+- Decision: Capability cards are project content, not skeletons: the payload
+  ships a starter register a project prunes by deletion, so card files under
+  `template/docs/capabilities/` are excluded from counterpart-existence
+  correspondence, as are `.gitkeep` placeholders.
+  `docs/capabilities/index.md` is not excluded. Graduated as `0014`.
+  Rationale: the alternative that keeps correspondence total is
+  instantiating all five shipped cards live, and `isolated-env` in a
+  repository with no toolchain would be a check that passes on everything —
+  a manufactured register row to satisfy a structural rule. The `.gitkeep`
+  exclusion came from the walk finding `plans/active/.gitkeep` unmatched,
+  which is placeholder semantics rather than drift. 2026-09-17.
+- Decision: `MATURITY.md` ships with rung definitions, promotion rule, and
+  demotion rule as final content; the only fill slot left in the template
+  copy is Current rung, and the Gating capabilities table ships filled with
+  the five shipped cards. Graduated as `0015`.
+  Rationale: the plan said "fill `MATURITY.md` (template + live)", which is
+  ambiguous between filling both with the same generic ladder and inventing
+  a project position in the payload. The ladder is the blueprint's opinion
+  and an opinion left as a slot is not shipped; the current rung is the only
+  part that is genuinely per-project. One slot remains so the file stays in
+  the skeleton class and the mechanical fill check still covers it.
+  2026-09-17.
+- Decision: Each card states one decidable invariant, which narrowed two of
+  the five generic cards against this plan's own milestone text.
+  `doc-integrity` is referential integrity only — the milestone's
+  parenthetical also named "required sections present" and "freshness";
+  sections moved to `evidence-check`, freshness is named in the card as not
+  decidable from text and left to review. `evidence-check` checks section
+  presence and timestamps on completed entries; the convention's
+  "never report a planned command as passing evidence" is named in the card
+  as a judgement no checker can make and stays a working rule in
+  `AGENTS.md`. Deliberate non-resolving references are handled by an
+  allowlist of exact `path:reference` pairs rather than a heuristic.
+  Rationale: `CARD_FORMAT.md` forbids two invariants per card because such a
+  card cannot report one actionable failure, and it warns specifically
+  against checks built from a vague wish. An honest card that says what it
+  does not cover routes the leftover to a named owner; a card that promises
+  freshness detection gets built as something that greps timestamps and is
+  then trusted. The allowlist choice follows the same logic: a checker that
+  reports legitimate references is switched off, and then nothing is
+  checked. Not graduated — each narrowing is stated in the card that owns
+  it. 2026-09-17.
+- Decision: This project's live register holds only its own three cards; the
+  four generic invariants that do apply here stay prose enforced by reading,
+  tracked as `docs/DEBT.md` `D3`, and the live L1 gate is
+  `template-live-drift` alone. The two own cards whose milestone
+  descriptions were capabilities rather than invariants were restated as
+  decidable properties: `loop-runner` as a commit-shape stop rule (one
+  Progress entry advanced per iteration, halt on unobserved acceptance),
+  `blueprint-eval` as sufficiency of a plain copy to carry one feature
+  through the loop in every supported harness.
+  Rationale: instantiating four more cards here would have doubled the
+  milestone while nothing is enforced in either half, so the gap is recorded
+  where gaps are picked up cold rather than half-closed. The restatements
+  were forced by `CARD_FORMAT.md`: "an unattended outer loop" and "a live
+  trial" are wishes, and a card whose Invariant section is a wish cannot
+  have an acceptance that gates promotion. 2026-09-17.
 
 ## Surprises & Discoveries
 
@@ -446,6 +511,38 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   plans/active' template/ | wc -l` → `2`, both `plans/active/`; dropping
   that term from the pattern returns `0`. The rule a mechanism needs is
   "no path that fails to resolve after a plain copy", not "no path".
+- Observation: The counterpart walk found a correspondence hole that
+  predates this milestone and is not a defect: `template/plans/active/`
+  ships a `.gitkeep`, while live `plans/active/` holds a real plan and needs
+  none. Placeholder semantics are an exclusion the rule had not stated.
+  Evidence: `for f in $(cd template && find . -type f); do [ -e "${f#./}" ]
+  || echo "MISS ${f#./}"; done` → `MISS plans/active/.gitkeep`, the only
+  miss across 13 template files.
+- Observation: Resolving backticked paths across the eight new cards left
+  nine unresolved references, none of them defects, and they add a class
+  M5's classification did not have: paths that must *not* exist, because
+  they appear inside failing-case instructions and remediation examples.
+  Evidence: `docs/NOPE.md` ×3 in `doc-integrity`,
+  `template/docs/EXAMPLE.md` and `docs/EXAMPLE.md` in
+  `template-live-drift`, `skills/harness-init/README.md` in
+  `blueprint-eval`; plus `NNNN-short-slug.md` and the suffix pattern
+  `_FORMAT.md` (illustrative filenames), and `skills/harness-init/SKILL.md`,
+  a forward reference to a file M9 creates. A checker cannot infer any of
+  these, which is why `doc-integrity` specifies an allowlist of exact
+  `path:reference` pairs.
+- Observation: The live tree is fully filled for the first time — the marker
+  check that reported 24 hits after M5 now reports none, so its published
+  expectation in `AGENTS.md` changed from "`docs/MATURITY.md` is the only
+  expected hit today" to "silence is a pass".
+  Evidence: `grep -rn '{{FIL[L]\|GUIDANC[E]' AGENTS.md GOALS.md
+  ARCHITECTURE.md docs/PRINCIPLES.md docs/MATURITY.md docs/DEBT.md
+  docs/specs/index.md docs/capabilities/index.md` → exit 1, no output.
+- Observation: The payload's own vocabulary collides with ordinary English
+  in one place worth watching. A per-stack hint in `doc-integrity` said
+  "documentation test harness", where "harness" means a test runner and not
+  the agent harness the blueprint is about; it was reworded to "test suite".
+  Evidence: `grep -rniE 'harness|claude|codex' template/docs/capabilities/`
+  returned that single line, and returns nothing after the edit.
 
 ## Outcomes & Retrospective
 
@@ -500,8 +597,11 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   (M4) with sections Invariant, Enforcement point, Acceptance, Remediation
   message, Per-stack hints. All M6 cards conform to it.
 - **Template ↔ live correspondence**: every file under `template/` has a
-  same-relative-path live counterpart at repo root; structure identical,
-  only project-specific content varies.
+  same-relative-path live counterpart at repo root; structure corresponds by
+  subsequence, only project-specific content varies. Two exclusions (M6):
+  card files under `template/docs/capabilities/`, which are project content
+  a target project prunes, and `.gitkeep` placeholders. The two index files
+  and both format documents are not excluded.
 - **Claude shim**: root `CLAUDE.md` containing exactly `@AGENTS.md` (M9).
 - **Skeleton markers**: `{{FILL: ...}}` marks a content slot; every HTML
   comment block in a template file begins with the word `GUIDANCE` and is
@@ -543,8 +643,12 @@ Contracts that milestones establish and later fresh-context sessions rely on:
 - **MATURITY.md section shape** (M4, filled at M6): headings Current rung;
   Rungs with `### L0`–`### L3`; Promotion rule; Demotion rule; Gating
   capabilities as a table with columns `Rung | Gating card | What it must
-  subsume`. M6 replaces the slots and keeps the headings, in both the
-  template and live copies.
+  subsume`. M6 filled the rung definitions, promotion rule, demotion rule
+  and gating table in both copies and left exactly one slot in the template
+  copy — Current rung — so the file stays in the skeleton class. Template
+  gating rows: `fast-verify` and `evidence-check` at L1, `doc-integrity`,
+  `boundary-lint` and `isolated-env` at L2, no L3 row. Live gating rows:
+  `template-live-drift` at L1, `blueprint-eval` and `loop-runner` at L2.
 - **DEBT.md shape** (M4): a Register table with columns
   `ID | Item | Where | Why deferred | Trigger to pay it down`, IDs of the
   form `D<n>` never reused, plus an optional per-item Details section for
@@ -565,14 +669,32 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   final letters so it does not match its own command line, and its file set
   deliberately excludes `docs/decisions/` and the two format documents,
   which may quote markers freely. Any milestone adding a live
-  skeleton-derived artifact adds it to that list.
-- **Next free identifiers** (M5): decision records run `0001`–`0013`, so
-  the next is `0014` and numbers are never reused. Debt items run `D1`–`D2`,
-  so the next is `D3`. M10's deferred-work entries continue that sequence.
+  skeleton-derived artifact adds it to that list; M6 added cards, which
+  carry no markers, so the set is unchanged and both checks are now silent
+  on a clean tree.
+- **Next free identifiers** (M6): decision records run `0001`–`0015`, so
+  the next is `0016` and numbers are never reused. Debt items run `D1`–`D3`,
+  so the next is `D4`. M10's deferred-work entries continue that sequence.
 - **Live-only files** (M5): correspondence runs template → live only.
   `docs/decisions/NNNN-*.md` and `plans/active/*` are project content with
   no template counterpart, and that is not drift; the reverse check does
   not exist.
+- **Card set** (M6): the payload ships five cards at
+  `template/docs/capabilities/<name>.md` — `fast-verify`, `evidence-check`,
+  `doc-integrity`, `boundary-lint`, `isolated-env` — and this project owns
+  three at `docs/capabilities/<name>.md` — `template-live-drift`,
+  `blueprint-eval`, `loop-runner`. All eight are `specced`; none is built.
+  Card files carry no fill slots and no guidance blocks, which makes them a
+  third form alongside the two template file classes: shipped verbatim like
+  the format documents, but prunable like project content. M9's
+  `harness-init` right-sizes by deleting a card file together with its
+  register row and its gating row, and records the omission in `GOALS.md`
+  under scope.
+- **Card scope rule** (M6): one decidable invariant per card, and anything
+  adjacent that a checker cannot decide is named in the card as out of scope
+  with its owner. M8's `capability-build` inherits this: a card whose
+  Invariant is a capability rather than a property has no acceptance that
+  can gate promotion, and is a card to rewrite before building.
 
 ## Milestones
 
@@ -780,3 +902,15 @@ plan alone per `plans/PLANS.md`.
   invariant to the subsequence form; it overstated the rule its own D1 and
   the plan contract define. Reason: an invariant falsified by the current
   tree is worse than none.
+- 2026-09-17: M6 executed. Added two Interfaces & Dependencies contracts
+  (card set, card scope rule), amended three (correspondence exclusions,
+  MATURITY.md fill state and gating rows, next free identifiers), added four
+  Decision Log entries and four Surprises observations, and graduated
+  `0014`–`0015`. Reason: M7 through M10 read the card set and the gating
+  rows, M8's `capability-build` needs the one-decidable-invariant rule, and
+  M9's `harness-init` needs the prune-by-deletion behavior of cards — none
+  of which is recoverable from the artifacts alone. Two amendments were
+  corrections rather than additions: the correspondence contract was stated
+  without exclusions that the tree now requires, and the MATURITY.md
+  contract said M6 "replaces the slots", which would have put a project's
+  rung into the payload.

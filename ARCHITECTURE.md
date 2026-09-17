@@ -18,9 +18,9 @@ about the payload.
 
 - Lives in: `template/`
 - Owns: the artifacts a target project starts from — skeletons carrying fill
-  slots and authoring-guidance comments, format documents kept verbatim, and
-  the plan convention. The marker syntax itself is defined in
-  `template/AGENTS.md`.
+  slots and authoring-guidance comments, format documents kept verbatim, the
+  plan convention, and the starter set of capability cards a project prunes
+  to fit. The marker syntax itself is defined in `template/AGENTS.md`.
 - Does not: name this repository, or any path outside `template/`.
 
 ### Live instantiation
@@ -86,14 +86,20 @@ reached through the card's history, not by a link from the card.
   cross-reference inside the copy resolving.
 - Every artifact is markdown, operated on with shell and git only.
 - Each `template/` file has a live counterpart at the same relative path from
-  the repository root. Structure corresponds by subsequence: the template's
-  headings, minus those containing fill slots, appear in the live file in the
-  same order, and extra live headings are expected where filled content adds
+  the repository root, with two exclusions: card files under
+  `template/docs/capabilities/`, which are project content rather than
+  skeletons — the payload ships a starter register and a project prunes it —
+  and `.gitkeep` placeholders, whose only job is to keep an empty directory
+  in git. Structure corresponds by subsequence: the template's headings,
+  minus those containing fill slots, appear in the live file in the same
+  order, and extra live headings are expected where filled content adds
   them. `plans/PLANS.md` is the zero-tolerance case: the two copies are
   byte-identical.
 
 ## Known rough edges
 
 - Template ↔ live correspondence is maintained by hand; no check enforces the
-  structural identity or the byte identity above — tracked as `D1` in
-  `docs/DEBT.md`.
+  counterpart existence, the structural subsequence, or the byte identity
+  above. The mechanism is specified in
+  `docs/capabilities/template-live-drift.md` and its absence is tracked as
+  `D1` in `docs/DEBT.md`.
