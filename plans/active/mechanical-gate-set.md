@@ -132,6 +132,9 @@ Three things were measured while authoring, and each one changed a milestone's c
 - Observation (M7): the new debt row's first sentence named two format documents in a row and collided with a procedure that lists the same two paths.
   Evidence: `./tools/verify` reported `prose-duplication: docs/DEBT.md and skills/harness-init/SKILL.md share the window "docs capabilities card format md and docs decisions"` — a path-list window, which is exactly the judgement class the allowlist exists for. Reworded so seven words sit between the two paths instead of adding a twenty-first allowlist entry; the next run printed `prose-duplication: ok — 44 artifacts compared, 31627 eight-word windows examined, 20 allowlist entries applied, 0 stale.` A path list is cheap to break up and expensive to excuse.
 
+- Observation (M7): the new spec's list of what a person still reads collided with the file that owns the rough edges, and routing it to the debt rows was shorter than the sentence it replaced.
+  Evidence: the first draft of `docs/specs/mechanical-checks.md` restated the two undecidable correspondence questions and `./tools/verify` printed `prose-duplication: ARCHITECTURE.md and docs/specs/mechanical-checks.md share the window "about the same subject and whether a live"`. Replaced with one clause per debt row naming `D9`, `D10` and `D11` and nothing about what each one contains, after which `prose-duplication: ok — 45 artifacts compared, 32554 eight-word windows examined, 20 allowlist entries applied, 0 stale.` The check found the spec doing what a spec is most tempted to do — summarizing a neighbour — on its first run.
+
 ## Decision Log
 
 - Decision: the checks live in a new live-only directory, `tools/`, and the payload gains nothing from this plan.
@@ -308,6 +311,10 @@ Three things were measured while authoring, and each one changed a milestone's c
 
 - Decision: (M7) the post-M2 review finding about the two format documents becomes debt row `D11` rather than work inside this close-out.
   Rationale: the reviewer routed it here with both options open. Holding `docs/capabilities/CARD_FORMAT.md` and `docs/decisions/DECISION_FORMAT.md` to byte identity widens the invariant of a card that already reads `enforced`, and `docs/capabilities/CARD_FORMAT.md` requires a failing case observed with the card's own remediation text before any status claim — a capability pass with its own acceptance, which is not what a milestone whose acceptance is five close-out clauses can carry without widening scope. Both pairs are byte-identical today, verified with `cmp` in this session, so the row records a latent gap rather than an active defect, and it carries the three-line fix and the demonstration it needs.
+  Date/Author: 2026-09-17, M7 session.
+
+- Decision: (M7) the close-out spec is a new file, `docs/specs/mechanical-checks.md`, and it names each card rather than describing the invariant the card owns.
+  Rationale: `docs/specs/index.md` asks for either a new file or an edit to the file that already owns the behavior, and `docs/specs/bootstrap-flow.md` owns what an outside reader receives from the payload — what this repository decides about itself is a different subject, and folding it in would have made that file two specs. Naming the card in each paragraph is what keeps the spec from becoming a seventh copy of six invariants: a reader who wants the failing case reads the card, and the spec answers the question the cards cannot, which is what the whole set covers and what it leaves alone.
   Date/Author: 2026-09-17, M7 session.
 
 ## Outcomes & Retrospective

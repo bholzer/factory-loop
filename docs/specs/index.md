@@ -23,3 +23,4 @@ One row per spec file, with a narrow statement of what that file covers.
 | Spec | Covers |
 | --- | --- |
 | `bootstrap-flow.md` | What this repository offers a target project, what a project has once the payload and the procedures are installed, and which of those claims have been observed |
+| `mechanical-checks.md` | What a reader can run, what each of the six checks decides, and which of this repository's claims are still read by a person |
