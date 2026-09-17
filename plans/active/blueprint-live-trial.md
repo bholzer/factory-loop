@@ -75,7 +75,7 @@ Everything below was observed while authoring this plan, on 2026-09-17, by runni
   Rationale: the alternative was to factor the extractor into a file both scripts read, which is the better answer when two owners of one definition is the risk. It loses here for two reasons. `tools/checks/boundary-lint` already implements a third variant of the same idea with a deliberately different reference definition, so a shared extractor would unify two of three and read as an oversight. And the trial's walk runs against a copy that contains no `tools/` directory at all and a filled artifact set that differs from this repository's, so the checked set and the resolution root are both different. The definition's owner stays `docs/capabilities/doc-integrity.md`, and the driver's header comment names that card as the owner and states why the copy exists.
   Date/Author: 2026-09-17, plan authoring session.
 
-- Decision: the discovery observation — "the harness discovered every skill with no per-harness edit to any file" — is judged as follows, and the card is edited in M1 to say so: it holds when a session given only the trial repository and the harness's default configuration names and follows the correct procedure for the task it was given, without the operator's prompt naming a procedure, a filename, or a path, and without any file being created or edited to make the procedures visible. Whether the harness surfaced them automatically, and from which root, is recorded separately as evidence for `D4` and is not a pass or fail of the trial.
+- Decision: the discovery observation — "the harness discovered every skill with no per-harness edit to any file" — is judged as follows, and the card is edited in M1 to say so: it holds when a session given only the trial repository and the harness's default configuration names and follows the correct procedure for the task it was given, without the operator's prompt naming a procedure, or a filename or path among the arrived artifacts and procedures, and without any file being created or edited to make the procedures visible. The target project's own intended layout — `tally/core/`, the store path, the module names — is owner interview input and may appear in a brief freely; it is not among the arrived artifacts and names nothing the session must discover. Whether the harness surfaced them automatically, and from which root, is recorded separately as evidence for `D4` and is not a pass or fail of the trial.
   Rationale: `plans/PLANS.md` forbids leaving a decision to an executing session that authoring could settle, and this one would otherwise be settled differently in each of the three harness milestones. The invariant on the card is that the copy is *sufficient to carry one feature*, and a session that reaches a procedure through the map has been carried. Reading it as "surfaced automatically" would fail Codex CLI on a property `D4` explicitly parks — `docs/DEBT.md` `D4` calls the location a per-harness configuration question a live trial answers better than a guess, which is not a question the trial is allowed to answer by failing. The card's failing case still fails under this reading: with `skills/harness-init/SKILL.md` renamed, no route reaches the bootstrap procedure, because the map the payload ships names procedures by the path `skills/<name>/SKILL.md` and nothing else names them at all. A flag that grants the harness permission to write files or reach the network is not a file edit and does not violate the observation; it is recorded with the invocation.
   Date/Author: 2026-09-17, plan authoring session.
 
@@ -139,7 +139,7 @@ Acceptance, seven observable checks.
 4. The scriptable half of the card's first failing case: rename `skills/harness-init/SKILL.md` to `skills/harness-init/README.md`, build a fresh copy, and run the layout part. It exits 1 naming `skills/harness-init/SKILL.md` as missing and stating that the layout is fixed by every supported harness at once. Restore the name, rebuild, and observe the part exit zero.
 5. `./tools/blueprint-eval check .` — this repository, not a trial copy — exits 2 and refuses, naming the destination and the reason a trial must run outside this tree.
 6. `./tools/verify` still ends in `6 of 6 checks passed`, and the `doc-integrity`, `prose-duplication` and `boundary-lint` summary lines still report zero violations. The driver is not in the check list; confirm by reading `tools/verify`'s `CHECKS` line.
-7. `docs/capabilities/blueprint-eval.md` states, inside its Acceptance section, how the discovery observation is judged and that the operator's prompt may not name a procedure, a filename, or a path. `AGENTS.md`'s Commands section names `./tools/blueprint-eval` with one line saying what it is for, and `ARCHITECTURE.md`'s Check layer entry names it as the trial driver that is not a check and is not run by the cheap command. `docs/capabilities/index.md` is untouched: the status stays `specced`.
+7. `docs/capabilities/blueprint-eval.md` states, inside its Acceptance section, how the discovery observation is judged and that the operator's prompt may not name a procedure, or a filename or path among the arrived artifacts and procedures — the target project's own intended layout is owner input and exempt. `AGENTS.md`'s Commands section names `./tools/blueprint-eval` with one line saying what it is for, and `ARCHITECTURE.md`'s Check layer entry names it as the trial driver that is not a check and is not run by the cheap command. `docs/capabilities/index.md` is untouched: the status stays `specced`.
 
 The work. Write `tools/blueprint-eval` to the interface given under Interfaces and Dependencies. It is POSIX `sh` with `awk`, `grep`, `find`, `sed` and `test`, like every check here, because `GOALS.md` constrains this repository to markdown, git and shell. Its header comment names `docs/capabilities/blueprint-eval.md` as the card it serves and `docs/capabilities/doc-integrity.md` as the owner of the reference definition it reimplements, with the reason from the Decision Log.
 
@@ -341,7 +341,7 @@ The layering rule the project declares, and the one `boundary-lint` decides for 
 
 ### Brief one: bootstrap
 
-Written verbatim to `<trial>/logs/brief-bootstrap.md`. It names no procedure, no filename and no path, because the discovery observation depends on the session finding those itself.
+Written verbatim to `<trial>/logs/brief-bootstrap.md`. It names no procedure and no filename or path among the arrived artifacts, because the discovery observation depends on the session finding those itself; the `tally` layout it does name is owner interview input, exempt under the criterion's own terms.
 
     You are working in a git repository that has just received an agent-harness
     payload: skeleton knowledge artifacts and a set of portable procedures are
@@ -454,3 +454,15 @@ Mechanizing the harness-driven three quarters of the card. `docs/capabilities/bl
 A second trial target, a brownfield target, and any judgement about how the payload lands on an existing codebase. `docs/DEBT.md` `D6` owns the brownfield gap and nothing here touches it.
 
 Anything about `loop-runner`, `D5`, or the rung above L0. The trial produces evidence about the payload, not about unattended iteration, and `docs/MATURITY.md`'s promotion rule needs twenty consecutive green landed changes and an unskippable gate that this plan does not provide.
+
+## Revision Notes
+
+- 2026-09-17 (pre-execution review): scoped the discovery criterion — in the
+  Decision Log, M1 acceptance 7, and the brief-one preamble — to filenames
+  and paths *among the arrived artifacts and procedures*, exempting the
+  target project's own intended layout as owner interview input. Reason:
+  the unqualified criterion contradicted brief one, which names the tally
+  module layout; a strict judge would fail observation 1 against the brief
+  itself and a loose one would judge differently per harness, which is the
+  divergence the criterion decision exists to prevent. No milestone
+  boundaries, acceptance counts, or contracts changed.
