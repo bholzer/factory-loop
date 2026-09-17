@@ -19,12 +19,12 @@ What an outside reader sees, concretely: `tools/verify` exists and passes; `docs
 - [x] (2026-09-17 15:23Z) M1 — `tools/verify` exists, aggregates the two checks this repository ran by hand, and is published in `AGENTS.md` with a 5-second budget; `fast-verify` instantiated and `enforced`; pre-commit hook wired and observed refusing a commit.
 - [x] (2026-09-17 15:37Z) M2 — `template-live-drift` built and `enforced`; all three of its comparisons demonstrated failing through `./tools/verify` and restored; `plans-md-identity` deleted; `D1` deleted from `docs/DEBT.md` and `D9` added.
 - [x] (2026-09-17 15:55Z) M3 — `doc-integrity` instantiated, built and `enforced`; allowlist seeded with the three deliberate mentions and all three observed applying; the failing case demonstrated through `./tools/verify` and through the hook, then restored; a fourth decidable class — quoted material in fenced and indented blocks — added to both halves of the card.
-- [ ] M4 — `prose-duplication` instantiated, built and `enforced`; the two known skill ↔ card pairs allowlisted with their live twins; any newly found pair routed.
+- [x] (2026-09-17 17:30Z) M4 — `prose-duplication` instantiated, built and `enforced`; HTML comment blocks added to the quoted-material class in both halves; the first run reported 8 pairs — 3 repaired in the non-owning file, 1 a defect in the check itself, 4 allowlisted as the judgement class over 20 window keys; the failing case demonstrated through `./tools/verify` and through the hook, then restored.
 - [ ] M5 — `evidence-check` instantiated, built and `enforced`; both of its failing halves demonstrated against this plan file.
 - [ ] M6 — `boundary-lint` instantiated, built and `enforced`; the layer map carries the rule-id block the check binds to; the undecidable clause recorded as debt.
 - [ ] M7 — close-out: budget re-measured and published, behavior reflected into `docs/specs/`, authoring decisions graduated to `docs/decisions/`, `D3` deleted, plan moved to `plans/completed/`.
 
-Use timestamps to measure rates of progress. M1, M2 and M3 were each executed in one session on 2026-09-17; M4 has not been started.
+Use timestamps to measure rates of progress. M1 through M4 were each executed in one session on 2026-09-17; M5 has not been started.
 
 ## Surprises & Discoveries
 
@@ -71,6 +71,21 @@ Three things were measured while authoring, and each one changed a milestone's c
 
 - Observation (M3): a check whose remediation line embeds an allowlist key produces a key that looks like a path and is not one.
   Evidence: the violation line names `` `AGENTS.md:docs/NOPE.md` `` as the thing to add, and that span contains a slash and no excluded character, so the extractor treats it as a reference. It is only harmless because remediation text lives in an indented block; a card that quoted its own key in prose would report a second, phantom violation on every run.
+
+- Observation (M4): the first run found 8 pairs, none of them among the twelve the v1 close found by hand, and all 8 explainable — the sizing guard's "pairs nobody has seen" happened, and its stop condition was never reached.
+  Evidence: `./tools/checks/prose-duplication` with an empty allowlist printed `prose-duplication: 8 duplicated pairs in 27769 windows across 41 artifacts.` Three were repaired in the non-owning file — the three cards whose Enforcement point sentence collided with the `tools/` inventory in `ARCHITECTURE.md`, two of them also restating in their Per-stack hints the markdown-shell-git constraint that same file owns. One was a defect in the check, below. Four went to the allowlist as the judgement class.
+
+- Observation (M4): the same restatement read as attributed in the live half and unattributed in the payload, because a payload file that cites `AGENTS.md` is citing `template/AGENTS.md`.
+  Evidence: the first run reported `template/AGENTS.md and template/docs/capabilities/evidence-check.md share the window "never report a planned command as passing evidence"` while saying nothing about `AGENTS.md` against that same card — the card's Invariant section cites `AGENTS.md`, which the attribution class resolved for the live pair and not for the payload pair. The card is right: the rule it quotes is owned by the `AGENTS.md` the target project receives. Fixed in the check rather than allowlisted, since an allowlist entry there would have excused a correctly attributed restatement.
+
+- Observation (M4): an allowlist entry for the enforcement-point collision would have grown by one entry per card this plan still builds.
+  Evidence: the window `and the versioned hook tools hooks pre commit` was shared by `ARCHITECTURE.md` with all three cards that existed — `doc-integrity`, `fast-verify`, `template-live-drift` — because every card's Enforcement point names the same hook path in the same phrasing, and M5 and M6 each add another. The `tools/` component entry in `ARCHITECTURE.md` was reworded instead; it is the non-owning file for a card's enforcement point, and an inventory has no reason to phrase itself like one.
+
+- Observation (M4): the new card could not state its own same-relative-path class without `doc-integrity` reporting it, which is the second card in a row to fail a sibling check on its own specification text.
+  Evidence: the clause first read "`template/X` against `X`", and the aggregator printed `doc-integrity: docs/capabilities/prose-duplication.md:36 references \`template/X\`, which does not exist.` — a backticked span with a slash and no excluded character is a reference no matter what it means. Rewritten as prose naming the two halves, after which `./tools/verify` passed. M3 hit the same shape from the other direction and recorded the same rule: a card that must write an unresolvable path writes it in an indented block or not in backticks at all.
+
+- Observation (M4): the whole invariant costs 0.4 seconds over 29,129 windows, and the per-window allowlist is four times the size of the pair count it covers.
+  Evidence: `time ./tools/verify` reported `real 0m0.397s` with all four checks passing, against the 5-second budget `AGENTS.md` publishes, so the budget line needs no change in this milestone. The passing summary reads `prose-duplication: ok — 42 artifacts compared, 29129 eight-word windows examined, 20 allowlist entries applied, 0 stale.` — 20 keys for 4 pairs, because the key format in Interfaces and Dependencies is one window per entry and a pair-level key would excuse duplication nobody has read yet.
 
 ## Decision Log
 
@@ -190,9 +205,29 @@ Three things were measured while authoring, and each one changed a milestone's c
   Rationale: it counted the instantiated payload cards — "one of the five" — and naming two of five is a one-line edit, while leaving it wrong for four more milestones makes the register and the debt row disagree about the same fact. `docs/DEBT.md`'s row for `D3` and its trigger cell are history and stay as written; M7 still deletes both.
   Date/Author: 2026-09-17, M3 session.
 
+- Decision: (M4) the attribution class resolves a citation three ways — repository-relative, as a bare sibling filename, and, from inside `template/`, relative to `template/`.
+  Rationale: a payload file citing `AGENTS.md` is citing `template/AGENTS.md`, because that is how every reference inside the payload resolves in the copy a target project receives; a checker that reads the citation from this repository's root sees no attribution and reports the pair (observed; see Surprises). Without the third form the same restatement is a finding in the payload and a legitimate class in the live half, which is an asymmetry that would have to be paid for with an allowlist entry excusing a correctly attributed sentence. The sibling form is there for the same reason one directory over: a file cites its neighbour by bare filename, and `docs/capabilities/index.md` is cited as `index.md` from inside that directory.
+  Date/Author: 2026-09-17, M4 session.
+
+- Decision: (M4) the `tools/` component entry in `ARCHITECTURE.md` is reworded so that an inventory stops phrasing itself like a card's Enforcement point.
+  Rationale: the window `and the versioned hook tools hooks pre commit` was shared with all three cards that existed, and every card this plan still builds states its enforcement point the same way, so the alternative was an allowlist growing by one entry per card — the shape this plan already refused for the instantiated-card pairs. The fact is not duplicated: `ARCHITECTURE.md` owns what lives under `tools/` and a card owns where it is enforced. Only the phrasing collided, and the non-owning file for a card's enforcement point is the architecture.
+  Date/Author: 2026-09-17, M4 session.
+
+- Decision: (M4) the Per-stack hints of `docs/capabilities/doc-integrity.md` and `docs/capabilities/template-live-drift.md` now attribute the markdown-shell-git constraint to `ARCHITECTURE.md` instead of restating it.
+  Rationale: both opened with "No toolchain applies: this repository is markdown operated on with shell and git", which is the cross-cutting invariant `ARCHITECTURE.md` owns, restated without naming its owner — precisely what `docs/PRINCIPLES.md` forbids and what the attribution class is for. Naming the owner in the same section is the repair the card's own remediation message offers, and it is cheaper than an allowlist entry per card. Both edits are live-half only: the payload's cards carry generic hints that never contained the sentence.
+  Date/Author: 2026-09-17, M4 session.
+
+- Decision: (M4) four pairs are carried as 20 per-window allowlist entries, and the two `docs/decisions/0016-skill-and-card-may-restate-one-fact.md` pairs are seeded with the live twin that record could not foresee.
+  Rationale: the key format in `Interfaces and Dependencies` is one window per entry, and it stays that way — a pair-level key would silently excuse the next sentence someone copies between the same two files. Three pairs are the `0016` family: `skills/doc-garden/SKILL.md` against both copies of the `doc-integrity` card, and `skills/harness-init/SKILL.md` against `template/docs/capabilities/isolated-env.md`. The fourth is `ARCHITECTURE.md` against `docs/specs/bootstrap-flow.md`, which is the card's proper-noun-run class exactly: the six skill names in roster order, spelled out in one file to say where the procedures live and in the other to say what an outside reader receives.
+  Date/Author: 2026-09-17, M4 session.
+
+- Decision: (M4) `docs/MATURITY.md`'s Current rung section says in one sentence that `prose-duplication` is enforced and gates no rung.
+  Rationale: that section counts the mechanical checks, so this milestone makes it stale either way, and a card that is `enforced` while appearing in no row of the Gating capabilities table reads as an omission unless the absence is stated. The card's reason is its own — a shared window locates a fact in two files without deciding which one owns it — so the sentence names the consequence rather than copying the reasoning.
+  Date/Author: 2026-09-17, M4 session.
+
 ## Outcomes & Retrospective
 
-M1, M2 and M3 are executed; the remaining four milestones are not, so this section stays unwritten until M7. What M1 fixes for that comparison: the budget published in `AGENTS.md` is 5 seconds against an observed clean run of 0.5 seconds, and the one defect found while building was in the check rather than in the tree — `cmp`'s missing line number on a prefix difference, recorded in Surprises. What M2 adds: the hand walk between the halves is gone from `docs/DEBT.md`, and building it found no defect in the tree at all — the authoring tally was confirmed rather than corrected, which is the first milestone here to report that. What M3 adds: the reference sweep that found a dangling path by hand at the close of v1 is now a command, the three references it reports are the three deliberate mentions authoring measured, and again no defect was found in the tree — the defect this milestone did find was in the card's own specification, which could not state its remediation message without a class the payload was missing. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
+M1 through M4 are executed; the remaining three milestones are not, so this section stays unwritten until M7. What M1 fixes for that comparison: the budget published in `AGENTS.md` is 5 seconds against an observed clean run of 0.5 seconds, and the one defect found while building was in the check rather than in the tree — `cmp`'s missing line number on a prefix difference, recorded in Surprises. What M2 adds: the hand walk between the halves is gone from `docs/DEBT.md`, and building it found no defect in the tree at all — the authoring tally was confirmed rather than corrected, which is the first milestone here to report that. What M3 adds: the reference sweep that found a dangling path by hand at the close of v1 is now a command, the three references it reports are the three deliberate mentions authoring measured, and again no defect was found in the tree — the defect this milestone did find was in the card's own specification, which could not state its remediation message without a class the payload was missing. What M4 adds: the one-owner rule that a hand sweep enforced at the close of v1 is decided across both halves by a command, and this is the first milestone whose first run found defects in the tree rather than confirming a tally — three pairs closed by repairs in the non-owning file, one inventory sentence and two Per-stack hints paragraphs; one defect in the check itself; and four pairs carried as the judgement class the card declares. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
 
 ## Context and Orientation
 
@@ -220,13 +255,13 @@ The **maturity ladder** in `docs/MATURITY.md` has four rungs from L0 (human-gate
 
 ### What exists today
 
-`docs/capabilities/` holds the three cards this project wrote for itself — `template-live-drift`, `blueprint-eval`, `loop-runner` — plus the instantiated `fast-verify` and `doc-integrity`, `CARD_FORMAT.md`, and the register `index.md`. As of M3, `fast-verify`, `template-live-drift` and `doc-integrity` read `enforced` and the other two read `specced`; the register is where that is stated, and the sentence you are reading is orientation, not a second copy of it.
+`docs/capabilities/` holds the three cards this project wrote for itself — `template-live-drift`, `blueprint-eval`, `loop-runner` — plus the instantiated `fast-verify`, `doc-integrity` and `prose-duplication`, `CARD_FORMAT.md`, and the register `index.md`. As of M4, four of the six rows read `enforced` and `blueprint-eval` and `loop-runner` read `specced`; the register is where that is stated, and the sentence you are reading is orientation, not a second copy of it.
 
 `template/docs/capabilities/` holds six generic cards the payload ships: `fast-verify`, `evidence-check`, `doc-integrity`, `boundary-lint`, `prose-duplication`, and `isolated-env`. Five of the six state invariants that hold in this repository too. `isolated-env` does not apply: there is no toolchain and no runtime here.
 
 `AGENTS.md` publishes one command under Commands, `./tools/verify` with a 5-second budget, plus the one-time `git config core.hooksPath tools/hooks` install line. The two hand commands it published before M1 are now `tools/checks/scaffolding-markers` and, since M2, the byte-identity comparison inside `tools/checks/template-live-drift`. The marker check's pattern is written with the final letter of each marker word in brackets so that the script does not match itself; that trick, and its limit — it cannot tell a real unfilled slot from a marker quoted in prose — is `D2` in `docs/DEBT.md`.
 
-`docs/DEBT.md` runs `D2` through `D9`. `D1` — the hand-checked correspondence between the two halves — was deleted in M2 when the check replaced it, and `D9` records the two questions that check cannot decide. `D3` is the uninstantiated generic cards and is marked overdue; M3 updated its Details paragraph from one instantiated card to two, and M7 still deletes the row. `D6` (no brownfield ratchet for `boundary-lint`) and `D7` (the blueprint has never been run) are not this plan's work and stay.
+`docs/DEBT.md` runs `D2` through `D9`. `D1` — the hand-checked correspondence between the two halves — was deleted in M2 when the check replaced it, and `D9` records the two questions that check cannot decide. `D3` is the uninstantiated generic cards and is marked overdue; its Details paragraph has been kept current as each card landed and now reads three of five instantiated, and M7 still deletes the row. `D6` (no brownfield ratchet for `boundary-lint`) and `D7` (the blueprint has never been run) are not this plan's work and stay.
 
 ### The invariants this plan mechanizes, and who owns each one
 
@@ -496,6 +531,56 @@ and `git log --oneline -1` still named the previous commit, `06b6326`. Restored 
 
 One note for a later session reading this transcript: the refusal was demonstrated through `git commit … | tail -20`, whose own exit status is the pipeline's last command, so the `echo "commit exit=$?"` beside it printed `0` and means nothing. What proves the refusal is `git log --oneline -1` naming the previous commit — not the echo.
 
+M4's transcripts below are **observed**, copied from the session that executed it on 2026-09-17. The first run, with the card not yet written and `tools/allow/prose-duplication.txt` holding only its header comment, is the routing work of this milestone rather than a failing case:
+
+    printf '# prose-duplication judgement-class exceptions.\n' > tools/allow/prose-duplication.txt
+    time ./tools/checks/prose-duplication
+
+    …eight violation blocks, abbreviated to their first clauses…
+    prose-duplication: ARCHITECTURE.md and docs/capabilities/doc-integrity.md share the window
+    "and the versioned hook tools hooks pre commit" (16 words shared in total). …
+    prose-duplication: ARCHITECTURE.md and docs/specs/bootstrap-flow.md share the window
+    "harness init plan author plan execute doc garden" (9 words shared in total). …
+    prose-duplication: 8 duplicated pairs in 27769 windows across 41 artifacts.
+
+    real 0m0.642s
+
+Three of the eight were repaired in the non-owning file and one was a defect in the check, all four recorded in `Surprises & Discoveries` and the `Decision Log`; the remaining four were seeded into the allowlist as 20 window keys. The passing case after that, run through the aggregator with the card, the register row and the wiring all in place:
+
+    time ./tools/verify
+
+    scaffolding-markers: ok — 8 artifacts scanned, 0 markers found.
+    …the twenty-one template-live-drift lines…
+    doc-integrity: ok — 297 of 300 references resolved in 39 artifacts,
+    2 format documents skipped, 3 allowlist entries applied, 0 stale.
+    prose-duplication: ok — 42 artifacts compared, 29129 eight-word windows
+    examined, 20 allowlist entries applied, 0 stale.
+    fast-verify: 4 of 4 checks passed (0s).
+
+with `real 0m0.397s`, an order of magnitude inside the 5-second budget `AGENTS.md` publishes, so the budget line needs no change in this milestone either.
+
+The failing case, the sentence at `docs/PRINCIPLES.md` line 14 appended as a bullet under Working rules in `AGENTS.md` — a section that does not cite that file, which is what keeps the copy from being a legitimate attributed restatement:
+
+    printf -- '- The rule: every fact lives in exactly one file, and every other file that\n  needs it links to that file instead of restating it.\n' >> AGENTS.md
+    ./tools/verify; echo "exit=$?"
+
+Observed, after the unchanged output of the three earlier checks:
+
+    prose-duplication: AGENTS.md and docs/PRINCIPLES.md share the window "the
+    rule every fact lives in exactly one" (24 words shared in total). One of
+    the two owns this fact. Delete the copy, leave a reference to the owning
+    file, name the owning file in the same section so the restatement reads as
+    attributed, or — if the window is a proper-noun run, a path list or a
+    section-name list both files must spell out — add
+    "AGENTS.md:docs/PRINCIPLES.md:the rule every fact lives in exactly one" to
+    tools/allow/prose-duplication.txt with a reason.
+    prose-duplication: 1 duplicated pair in 29097 windows across 42 artifacts.
+    fast-verify: 1 of 4 checks failed.
+    Fix the violations reported above and re-run ./tools/verify.
+    exit=1
+
+The enforcement point was confirmed with the violation still in the tree. `git add AGENTS.md && git commit -m "should be refused"` printed that same remediation text, then the `pre-commit: commit refused` block, and `git log --oneline -1` still named the previous commit, `d3bca76`. Restored with `git reset -q HEAD AGENTS.md && git checkout -- AGENTS.md`, after which the check printed its clean summary at exit 0 and `git status --porcelain` printed nothing. The hook was then seen passing on this milestone's own commits.
+
 M7:
 
     time ./tools/verify
@@ -562,7 +647,7 @@ These contracts are what a later session cannot rediscover, so they are fixed he
 
 **Identifiers already spent.** Debt rows `D1` through `D7` exist; this plan creates `D8` (M1), `D9` (M2), `D10` (M6) and deletes the `D1` and `D3` rows. Decision records run `0001` through `0016`; graduation in M7 starts at `0017`. Neither series reuses a number.
 
-**Files this plan edits outside `tools/`.** `AGENTS.md` (Commands, and the hand-walk paragraph), `ARCHITECTURE.md` (a component entry for `tools/`, the rule-id block, the allowed-target list, the instantiated-card clause, Known rough edges), `GOALS.md` (Scope, one sentence in M7), `docs/DEBT.md` (`D2`'s location, `D8`/`D9`/`D10` added, `D1`/`D3` deleted, `D3`'s instantiation count kept current until it is), `docs/MATURITY.md` (Current rung, four gating rows, the closing paragraph), `docs/capabilities/index.md` (header prose and six rows), `docs/capabilities/template-live-drift.md` (what it does not decide), `docs/capabilities/fast-verify.md` (its remediation example's check count, re-measured in every milestone that adds a check), five new card files under `docs/capabilities/`, `template/docs/capabilities/doc-integrity.md` (the plan-file exclusion and, as M3 found, the quoted-material class) and `template/docs/capabilities/prose-duplication.md` (HTML comments join the quoted-material class) — the only two payload files this plan edits — `docs/specs/` (a new spec and its index row), and `docs/decisions/` (new records in M7).
+**Files this plan edits outside `tools/`.** `AGENTS.md` (Commands, and the hand-walk paragraph), `ARCHITECTURE.md` (a component entry for `tools/` — reworded in M4 so an inventory does not phrase itself like a card's enforcement point — the rule-id block, the allowed-target list, the instantiated-card clause, Known rough edges), `GOALS.md` (Scope, one sentence in M7), `docs/DEBT.md` (`D2`'s location, `D8`/`D9`/`D10` added, `D1`/`D3` deleted, `D3`'s instantiation count kept current until it is), `docs/MATURITY.md` (Current rung, four gating rows, the closing paragraph, and one sentence in M4 stating that `prose-duplication` gates no rung), `docs/capabilities/index.md` (header prose and six rows), `docs/capabilities/template-live-drift.md` (what it does not decide, and as M4 found, its Per-stack hints attributing the markdown-shell-git constraint rather than restating it), `docs/capabilities/doc-integrity.md` (the same hints repair, on top of being one of the new card files), `docs/capabilities/fast-verify.md` (its remediation example's check count, re-measured in every milestone that adds a check), five new card files under `docs/capabilities/`, `template/docs/capabilities/doc-integrity.md` (the plan-file exclusion and, as M3 found, the quoted-material class) and `template/docs/capabilities/prose-duplication.md` (HTML comments join the quoted-material class) — the only two payload files this plan edits — `docs/specs/` (a new spec and its index row), and `docs/decisions/` (new records in M7).
 
 **What this plan deliberately does not do.** It does not instantiate `isolated-env`, which would be a check that passes on everything in a repository with no toolchain. It does not build `blueprint-eval` or `loop-runner`, which need a live trial and an unattended loop that `docs/DEBT.md` `D5` and `D7` park. It does not claim L1 on the ladder: the promotion rule needs twenty consecutive green landed changes and a named human, and this plan produces neither. It does not add continuous integration, because there is no remote to add it to. It does not touch `D4` (skill auto-discovery) or `D6` (the brownfield ratchet for `boundary-lint`), both of which are payload questions that a real target project answers.
 
@@ -623,3 +708,21 @@ These contracts are what a later session cannot rediscover, so they are fixed he
   every target project instantiating that card would hit. Milestone
   boundaries and acceptance counts are unchanged; the payload files this plan
   touches are still the same two.
+
+- 2026-09-17 (M4 execution): recorded M4 complete in `Progress`, added M4's
+  observed transcripts to `Concrete Steps`, five observations to `Surprises &
+  Discoveries` and five decisions to the `Decision Log`; refreshed the two
+  paragraphs under `Context and Orientation` → `What exists today` that
+  counted enforced cards and `D3`'s state, and the `Outcomes &
+  Retrospective` running summary; and amended the files list under
+  `Interfaces and Dependencies` for three edits M4 made that the list did not
+  allot — the rewording of the `tools/` component entry, the Per-stack hints
+  repair in two live cards, and the sentence in `docs/MATURITY.md` saying
+  this card gates no rung. Reason: the first run found eight pairs, and where
+  a pair was a phrasing collision rather than a duplicated fact the repair
+  belonged in the non-owning file, which pulled three files into this
+  milestone that authoring had not foreseen. Milestone boundaries and
+  acceptance counts are unchanged; the one contract that changed is the
+  attribution class, which now resolves a payload citation the way the
+  payload resolves it, with the rationale in the `Decision Log`. The payload
+  files this plan touches are still the same two.
