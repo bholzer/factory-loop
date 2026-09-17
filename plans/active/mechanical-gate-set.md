@@ -20,11 +20,11 @@ What an outside reader sees, concretely: `tools/verify` exists and passes; `docs
 - [x] (2026-09-17 15:37Z) M2 — `template-live-drift` built and `enforced`; all three of its comparisons demonstrated failing through `./tools/verify` and restored; `plans-md-identity` deleted; `D1` deleted from `docs/DEBT.md` and `D9` added.
 - [x] (2026-09-17 15:55Z) M3 — `doc-integrity` instantiated, built and `enforced`; allowlist seeded with the three deliberate mentions and all three observed applying; the failing case demonstrated through `./tools/verify` and through the hook, then restored; a fourth decidable class — quoted material in fenced and indented blocks — added to both halves of the card.
 - [x] (2026-09-17 17:30Z) M4 — `prose-duplication` instantiated, built and `enforced`; HTML comment blocks added to the quoted-material class in both halves; the first run reported 8 pairs — 3 repaired in the non-owning file, 1 a defect in the check itself, 4 allowlisted as the judgement class over 20 window keys; the failing case demonstrated through `./tools/verify` and through the hook, then restored.
-- [ ] M5 — `evidence-check` instantiated, built and `enforced`; both of its failing halves demonstrated against this plan file.
+- [x] (2026-09-17 17:48Z) M5 — `evidence-check` instantiated, built and `enforced`; both failing halves demonstrated against this plan file through `./tools/verify` and the second through the hook, then restored; the check's four other paths exercised too, and one defect found in `prose-duplication`'s attribution class and fixed there.
 - [ ] M6 — `boundary-lint` instantiated, built and `enforced`; the layer map carries the rule-id block the check binds to; the undecidable clause recorded as debt.
 - [ ] M7 — close-out: budget re-measured and published, behavior reflected into `docs/specs/`, authoring decisions graduated to `docs/decisions/`, `D3` deleted, plan moved to `plans/completed/`.
 
-Use timestamps to measure rates of progress. M1 through M4 were each executed in one session on 2026-09-17; M5 has not been started.
+Use timestamps to measure rates of progress. M1 through M5 were each executed in one session on 2026-09-17; M6 has not been started.
 
 ## Surprises & Discoveries
 
@@ -86,6 +86,21 @@ Three things were measured while authoring, and each one changed a milestone's c
 
 - Observation (M4): the whole invariant costs 0.4 seconds over 29,129 windows, and the per-window allowlist is four times the size of the pair count it covers.
   Evidence: `time ./tools/verify` reported `real 0m0.397s` with all four checks passing, against the 5-second budget `AGENTS.md` publishes, so the budget line needs no change in this milestone. The passing summary reads `prose-duplication: ok — 42 artifacts compared, 29129 eight-word windows examined, 20 allowlist entries applied, 0 stale.` — 20 keys for 4 pairs, because the key format in Interfaces and Dependencies is one window per entry and a pair-level key would excuse duplication nobody has read yet.
+
+- Observation (M5): the new card's own out-of-scope sentence collided with the payload's `AGENTS.md`, and the pair the check reported was the diagonal of the correspondence rather than the citation the card actually makes.
+  Evidence: with the card written and attributing the working rule to `AGENTS.md`, `./tools/verify` printed `prose-duplication: docs/capabilities/evidence-check.md and template/AGENTS.md share the window "never report a planned command as passing evidence"` — and said nothing about the live `AGENTS.md`, which the attribution class resolved. The window exists in both copies of `AGENTS.md` because the live file is the filled form of the payload skeleton, so a card citing the live owner is unattributed against the payload copy of that same owner. This is M4's payload-citation observation seen from the other side: M4 fixed the citing end, and the target end had the same hole.
+
+- Observation (M5): the attribution fix excused nothing that was already allowlisted.
+  Evidence: after adding the fourth citation form, `prose-duplication: ok — 43 artifacts compared, 30011 eight-word windows examined, 20 allowlist entries applied, 0 stale.` — the same 20 keys applied and none decayed, so the new form widened the class by exactly the one pair it was written for rather than quietly covering the judgement class.
+
+- Observation (M5): the plan file's Progress tallies are what the check reports, so the summary line moves as the plan is written.
+  Evidence: the clean run printed `4 of 7 Progress entries complete, every one timestamped.` before this milestone's entry was ticked, against a Progress section holding four completed and three open entries — the check reads the tree, and its own count is a fact about the file it is run beside rather than a constant.
+
+- Observation (M5): the remediation's timestamp example is a format, not a date, which is a deviation from the generic card.
+  Evidence: the first implementation printed `- [x] (2026-09-17 15:23Z) M5 — …`, reusing M1's real observation time inside a message that asks the reader for a time they observed. `template/docs/capabilities/evidence-check.md` shows a concrete date in the same position. A message that asks for an observation and hands over a paste-ready date invites the fabrication the working rule in `AGENTS.md` forbids, so the shape `(YYYY-MM-DD HH:MMZ)` is printed instead; the failing case was re-run after the change and the card records the reason.
+
+- Observation (M5): the four paths the milestone's acceptance does not name were exercised anyway, and all four behaved.
+  Evidence: a throwaway second plan under `plans/active/` — one ticked entry with no stamp, an empty `## Surprises & Discoveries`, and no `## Outcomes & Retrospective` — produced all three message shapes at once, two per-plan lines, and `evidence-check: 3 violations in 2 active plans, 8 Progress entries read.`; and with this plan moved aside, `evidence-check: ok — no active plans under plans/active/, 4 sections required of each.` at exit 0. Both were restored and the clean run re-observed. The empty-section message and the empty-directory pass are published on the card, and a published message nobody has seen print is a message that has never been checked.
 
 ## Decision Log
 
@@ -225,9 +240,25 @@ Three things were measured while authoring, and each one changed a milestone's c
   Rationale: that section counts the mechanical checks, so this milestone makes it stale either way, and a card that is `enforced` while appearing in no row of the Gating capabilities table reads as an omission unless the absence is stated. The card's reason is its own — a shared window locates a fact in two files without deciding which one owns it — so the sentence names the consequence rather than copying the reasoning.
   Date/Author: 2026-09-17, M4 session.
 
+- Decision: (M5) `prose-duplication`'s attribution class gains a fourth citation form — a citation of either copy of a fact whose owner sits at the same relative path in both halves attributes the window against both copies — fixed in the check rather than allowlisted, with the live card's enumeration amended and the payload card untouched.
+  Rationale: the pair the check reported was `docs/capabilities/evidence-check.md` against `template/AGENTS.md` while the card cites `AGENTS.md` correctly (observed; see Surprises). An allowlist entry there would have excused a correctly attributed restatement, which is the same reason M4 fixed the citing end of this class in the check. The payload's card states the class generically as "a backticked path to the file that owns the fact" and never enumerates the resolution forms, so the enumeration is the live specification of how a citation resolves here and the fix is live-half only — the generic sentence already covers an owner that a declared correspondence stores twice.
+  Date/Author: 2026-09-17, M5 session.
+
+- Decision: (M5) the timestamp remediation prints the shape `(YYYY-MM-DD HH:MMZ)` where the payload's card shows a concrete date.
+  Rationale: the message asks the reader for the time they observed, and the first implementation handed them M1's real timestamp in the same line (observed; see Surprises) — a paste-ready date inside a request for an observation is the fabrication `AGENTS.md`'s working rule forbids and `evidence-check` explicitly cannot detect. The card carries the reason beside the message so a later reader does not "correct" it back to a date. This is a message-text choice in one instantiation, not a change to the invariant, so the payload card is untouched.
+  Date/Author: 2026-09-17, M5 session.
+
+- Decision: (M5) the check reports an empty-section failure with its own message rather than folding it into the missing-section message.
+  Rationale: `template/docs/capabilities/evidence-check.md` states that an empty section is also a failure and publishes only two message shapes, one of which says so in its closing clause. A reader whose Decision Log heading is present and empty would be told the heading is missing, which is false at the moment it is read — the worst property a remediation line can have. Three shapes cost three lines in the card and remove the contradiction; the next action is identical in all three, which is what keeps it one invariant rather than two.
+  Date/Author: 2026-09-17, M5 session.
+
+- Decision: (M5) the check scopes the timestamp rule to the Progress section and reads headings only at column zero, with fenced and indented blocks skipped.
+  Rationale: a plan quotes the convention's own skeleton — `plans/PLANS.md` shows `- [x] (2025-10-01 13:00Z) Example completed step.` inside an indented block — and quotes its own transcripts, so a checkbox or a heading inside quoted material is an example rather than a section or an entry. The same rule the sibling checks already apply to references and to windows applies here for the same reason, and it keeps the contract to the three things the card says are decidable without parsing the plan.
+  Date/Author: 2026-09-17, M5 session.
+
 ## Outcomes & Retrospective
 
-M1 through M4 are executed; the remaining three milestones are not, so this section stays unwritten until M7. What M1 fixes for that comparison: the budget published in `AGENTS.md` is 5 seconds against an observed clean run of 0.5 seconds, and the one defect found while building was in the check rather than in the tree — `cmp`'s missing line number on a prefix difference, recorded in Surprises. What M2 adds: the hand walk between the halves is gone from `docs/DEBT.md`, and building it found no defect in the tree at all — the authoring tally was confirmed rather than corrected, which is the first milestone here to report that. What M3 adds: the reference sweep that found a dangling path by hand at the close of v1 is now a command, the three references it reports are the three deliberate mentions authoring measured, and again no defect was found in the tree — the defect this milestone did find was in the card's own specification, which could not state its remediation message without a class the payload was missing. What M4 adds: the one-owner rule that a hand sweep enforced at the close of v1 is decided across both halves by a command, and this is the first milestone whose first run found defects in the tree rather than confirming a tally — three pairs closed by repairs in the non-owning file, one inventory sentence and two Per-stack hints paragraphs; one defect in the check itself; and four pairs carried as the judgement class the card declares. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
+M1 through M5 are executed; the remaining two milestones are not, so this section stays unwritten until M7. What M1 fixes for that comparison: the budget published in `AGENTS.md` is 5 seconds against an observed clean run of 0.5 seconds, and the one defect found while building was in the check rather than in the tree — `cmp`'s missing line number on a prefix difference, recorded in Surprises. What M2 adds: the hand walk between the halves is gone from `docs/DEBT.md`, and building it found no defect in the tree at all — the authoring tally was confirmed rather than corrected, which is the first milestone here to report that. What M3 adds: the reference sweep that found a dangling path by hand at the close of v1 is now a command, the three references it reports are the three deliberate mentions authoring measured, and again no defect was found in the tree — the defect this milestone did find was in the card's own specification, which could not state its remediation message without a class the payload was missing. What M4 adds: the one-owner rule that a hand sweep enforced at the close of v1 is decided across both halves by a command, and this is the first milestone whose first run found defects in the tree rather than confirming a tally — three pairs closed by repairs in the non-owning file, one inventory sentence and two Per-stack hints paragraphs; one defect in the check itself; and four pairs carried as the judgement class the card declares. What M5 adds: the requirement that a plan carry its own record is no longer enforced only by the session that is running out of room to honour it, and the defect this milestone found was again in a check rather than in the tree — `prose-duplication` resolved a citation from the citing end but not to both copies of the cited owner, which the new card's own out-of-scope sentence exposed on the first run. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
 
 ## Context and Orientation
 
@@ -255,13 +286,13 @@ The **maturity ladder** in `docs/MATURITY.md` has four rungs from L0 (human-gate
 
 ### What exists today
 
-`docs/capabilities/` holds the three cards this project wrote for itself — `template-live-drift`, `blueprint-eval`, `loop-runner` — plus the instantiated `fast-verify`, `doc-integrity` and `prose-duplication`, `CARD_FORMAT.md`, and the register `index.md`. As of M4, four of the six rows read `enforced` and `blueprint-eval` and `loop-runner` read `specced`; the register is where that is stated, and the sentence you are reading is orientation, not a second copy of it.
+`docs/capabilities/` holds the three cards this project wrote for itself — `template-live-drift`, `blueprint-eval`, `loop-runner` — plus the instantiated `fast-verify`, `doc-integrity`, `prose-duplication` and `evidence-check`, `CARD_FORMAT.md`, and the register `index.md`. As of M5, five of the seven rows read `enforced` and `blueprint-eval` and `loop-runner` read `specced`; the register is where that is stated, and the sentence you are reading is orientation, not a second copy of it.
 
 `template/docs/capabilities/` holds six generic cards the payload ships: `fast-verify`, `evidence-check`, `doc-integrity`, `boundary-lint`, `prose-duplication`, and `isolated-env`. Five of the six state invariants that hold in this repository too. `isolated-env` does not apply: there is no toolchain and no runtime here.
 
 `AGENTS.md` publishes one command under Commands, `./tools/verify` with a 5-second budget, plus the one-time `git config core.hooksPath tools/hooks` install line. The two hand commands it published before M1 are now `tools/checks/scaffolding-markers` and, since M2, the byte-identity comparison inside `tools/checks/template-live-drift`. The marker check's pattern is written with the final letter of each marker word in brackets so that the script does not match itself; that trick, and its limit — it cannot tell a real unfilled slot from a marker quoted in prose — is `D2` in `docs/DEBT.md`.
 
-`docs/DEBT.md` runs `D2` through `D9`. `D1` — the hand-checked correspondence between the two halves — was deleted in M2 when the check replaced it, and `D9` records the two questions that check cannot decide. `D3` is the uninstantiated generic cards and is marked overdue; its Details paragraph has been kept current as each card landed and now reads three of five instantiated, and M7 still deletes the row. `D6` (no brownfield ratchet for `boundary-lint`) and `D7` (the blueprint has never been run) are not this plan's work and stay.
+`docs/DEBT.md` runs `D2` through `D9`. `D1` — the hand-checked correspondence between the two halves — was deleted in M2 when the check replaced it, and `D9` records the two questions that check cannot decide. `D3` is the uninstantiated generic cards and is marked overdue; its Details paragraph has been kept current as each card landed and now reads four of five instantiated, with `boundary-lint` the one that remains, and M7 still deletes the row. `D6` (no brownfield ratchet for `boundary-lint`) and `D7` (the blueprint has never been run) are not this plan's work and stay.
 
 ### The invariants this plan mechanizes, and who owns each one
 
@@ -581,6 +612,59 @@ Observed, after the unchanged output of the three earlier checks:
 
 The enforcement point was confirmed with the violation still in the tree. `git add AGENTS.md && git commit -m "should be refused"` printed that same remediation text, then the `pre-commit: commit refused` block, and `git log --oneline -1` still named the previous commit, `d3bca76`. Restored with `git reset -q HEAD AGENTS.md && git checkout -- AGENTS.md`, after which the check printed its clean summary at exit 0 and `git status --porcelain` printed nothing. The hook was then seen passing on this milestone's own commits.
 
+M5's transcripts below are **observed**, copied from the session that executed it on 2026-09-17. The passing case, run through the aggregator with the card, the register row and the wiring all in place:
+
+    time ./tools/verify
+
+    scaffolding-markers: ok — 8 artifacts scanned, 0 markers found.
+    …the twenty-one template-live-drift lines…
+    doc-integrity: ok — 311 of 314 references resolved in 40 artifacts,
+    2 format documents skipped, 3 allowlist entries applied, 0 stale.
+    prose-duplication: ok — 43 artifacts compared, 30103 eight-word windows
+    examined, 20 allowlist entries applied, 0 stale.
+    evidence-check: plans/active/mechanical-gate-set.md — Progress, Surprises
+    & Discoveries, Decision Log and Outcomes & Retrospective all present and
+    non-empty; 4 of 7 Progress entries complete, every one timestamped.
+    evidence-check: ok — 1 active plan checked, 4 sections required of each,
+    7 Progress entries read.
+    fast-verify: 5 of 5 checks passed (0s).
+
+with `real 0m0.433s`, an order of magnitude inside the 5-second budget `AGENTS.md` publishes, so the budget line needs no change in this milestone either.
+
+The first failing half, the missing section, produced by rewriting this plan through `grep -v '^## Decision Log$'`:
+
+    ./tools/verify; echo "exit=$?"
+
+Observed, after the unchanged output of the four earlier checks:
+
+    evidence-check: plans/active/mechanical-gate-set.md is missing the
+    required section `## Decision Log`.
+      plans/PLANS.md requires Progress, Surprises & Discoveries, Decision Log
+      and Outcomes & Retrospective in every plan. Add the heading and the
+      entries the work produced; a heading with nothing under it is also a
+      failure.
+    evidence-check: 1 violation in 1 active plan, 7 Progress entries read.
+    fast-verify: 1 of 5 checks failed.
+    Fix the violations reported above and re-run ./tools/verify.
+    exit=1
+
+Restored from a copy taken before the edit, after which `./tools/verify` printed its clean summary at exit 0. The second failing half, the untimestamped entry, produced by ticking this plan's own M5 checkbox with `sed -i '' '23s/^- \[ \] M5/- [x] M5/'`:
+
+    evidence-check: plans/active/mechanical-gate-set.md:23 — Progress entry
+    "M5 — `evidence-check` instantiated, built and `enforced`; …" is marked
+    complete but carries no timestamp.
+      Completed entries record when the work was observed, as
+        - [x] (YYYY-MM-DD HH:MMZ) M5 — `evidence-check` instantiated, built
+        and `enforced`; …
+      Use the time you observed, not an estimate.
+    evidence-check: 1 violation in 1 active plan, 7 Progress entries read.
+    fast-verify: 1 of 5 checks failed.
+    exit=1
+
+The enforcement point was confirmed with that violation still in the tree. `git add plans/active/mechanical-gate-set.md && git commit -m "should be refused"` printed the same remediation text, then the `pre-commit: commit refused` block, and `git log --oneline -1` still named the previous commit, `c7cad06`. Restored with `git reset -q HEAD plans/active/mechanical-gate-set.md && git checkout -- plans/active/mechanical-gate-set.md`, after which `./tools/verify` printed its clean summary at exit 0 and `git status --porcelain` showed only this milestone's own files. The hook was then seen passing on this milestone's own commit.
+
+Two paths beyond the card's failing case were exercised and restored, because the card publishes a message for each. A throwaway second plan under `plans/active/` carrying one ticked entry without a stamp, an empty Surprises heading and no Outcomes heading printed all three message shapes and `evidence-check: 3 violations in 2 active plans, 8 Progress entries read.`; and moving this plan aside printed `evidence-check: ok — no active plans under plans/active/, 4 sections required of each.` at exit 0.
+
 M7:
 
     time ./tools/verify
@@ -637,7 +721,7 @@ These contracts are what a later session cannot rediscover, so they are fixed he
 
 **Language.** POSIX `sh` with `awk`, `grep`, `sed`, `sort`, `find`, `cmp`, and `test`. No other dependency, no bashisms, no network. Every script starts with `#!/bin/sh`, runs with no arguments, and begins by changing to the repository root with `cd "$(git rev-parse --show-toplevel)" || exit 2` so that it behaves identically from a subdirectory and from a git hook.
 
-**Check protocol.** Exit 0 means the invariant holds, and the check's last line is `<check-name>: ok — <what was examined, with counts>`; a check whose card requires per-unit reporting prints one name-prefixed line per unit before it, which as of M2 is `template-live-drift` alone. Exit 1 means a violation, and the check prints one block per violation built from its card's remediation text with the real offender substituted — file, line, target, rule — then the count. Exit 2 means the check could not decide, and it prints `<check-name>: cannot run — <reason>` with the next action; `tools/verify` treats 2 as a failure and never as a pass. No check writes to the tree.
+**Check protocol.** Exit 0 means the invariant holds, and the check's last line is `<check-name>: ok — <what was examined, with counts>`; a check whose card requires per-unit reporting prints one name-prefixed line per unit before it, which as of M5 is `template-live-drift` over the pairs under `template/` and `evidence-check` over the plans in flight. Exit 1 means a violation, and the check prints one block per violation built from its card's remediation text with the real offender substituted — file, line, target, rule — then the count; a check that reports per unit prints the unit's line only when that unit has no violation, so a unit is described once either way. Exit 2 means the check could not decide, and it prints `<check-name>: cannot run — <reason>` with the next action; `tools/verify` treats 2 as a failure and never as a pass. No check writes to the tree.
 
 **Aggregator protocol.** `tools/verify` runs the checks in a fixed order written in the script — a literal list, never a glob, so that output order is stable — and streams each child's output unmodified, because a summary that swallows a remediation message fails `fast-verify`'s own acceptance. It ends with `fast-verify: <M> of <M> checks passed (<seconds>s).` and exit 0, or one line per failure plus `fast-verify: <N> of <M> checks failed.` and `Fix the violations reported above and re-run ./tools/verify.` and exit 1. The check list at the end of this plan's work is: `scaffolding-markers`, `template-live-drift`, `doc-integrity`, `prose-duplication`, `evidence-check`, `boundary-lint`.
 
@@ -647,7 +731,7 @@ These contracts are what a later session cannot rediscover, so they are fixed he
 
 **Identifiers already spent.** Debt rows `D1` through `D7` exist; this plan creates `D8` (M1), `D9` (M2), `D10` (M6) and deletes the `D1` and `D3` rows. Decision records run `0001` through `0016`; graduation in M7 starts at `0017`. Neither series reuses a number.
 
-**Files this plan edits outside `tools/`.** `AGENTS.md` (Commands, and the hand-walk paragraph), `ARCHITECTURE.md` (a component entry for `tools/` — reworded in M4 so an inventory does not phrase itself like a card's enforcement point — the rule-id block, the allowed-target list, the instantiated-card clause, Known rough edges), `GOALS.md` (Scope, one sentence in M7), `docs/DEBT.md` (`D2`'s location, `D8`/`D9`/`D10` added, `D1`/`D3` deleted, `D3`'s instantiation count kept current until it is), `docs/MATURITY.md` (Current rung, four gating rows, the closing paragraph, and one sentence in M4 stating that `prose-duplication` gates no rung), `docs/capabilities/index.md` (header prose and six rows), `docs/capabilities/template-live-drift.md` (what it does not decide, and as M4 found, its Per-stack hints attributing the markdown-shell-git constraint rather than restating it), `docs/capabilities/doc-integrity.md` (the same hints repair, on top of being one of the new card files), `docs/capabilities/fast-verify.md` (its remediation example's check count, re-measured in every milestone that adds a check), five new card files under `docs/capabilities/`, `template/docs/capabilities/doc-integrity.md` (the plan-file exclusion and, as M3 found, the quoted-material class) and `template/docs/capabilities/prose-duplication.md` (HTML comments join the quoted-material class) — the only two payload files this plan edits — `docs/specs/` (a new spec and its index row), and `docs/decisions/` (new records in M7).
+**Files this plan edits outside `tools/`.** `AGENTS.md` (Commands, and the hand-walk paragraph), `ARCHITECTURE.md` (a component entry for `tools/` — reworded in M4 so an inventory does not phrase itself like a card's enforcement point — the rule-id block, the allowed-target list, the instantiated-card clause, Known rough edges), `GOALS.md` (Scope, one sentence in M7), `docs/DEBT.md` (`D2`'s location, `D8`/`D9`/`D10` added, `D1`/`D3` deleted, `D3`'s instantiation count kept current until it is), `docs/MATURITY.md` (Current rung, five gating rows, the closing paragraph, and one sentence in M4 stating that `prose-duplication` gates no rung), `docs/capabilities/index.md` (header prose and six rows), `docs/capabilities/template-live-drift.md` (what it does not decide, and as M4 found, its Per-stack hints attributing the markdown-shell-git constraint rather than restating it), `docs/capabilities/doc-integrity.md` (the same hints repair, on top of being one of the new card files), `docs/capabilities/prose-duplication.md` (one of the new card files, plus the fourth citation form M5 added to its attribution class), `docs/capabilities/fast-verify.md` (its remediation example's check count, re-measured in every milestone that adds a check), five new card files under `docs/capabilities/`, `template/docs/capabilities/doc-integrity.md` (the plan-file exclusion and, as M3 found, the quoted-material class) and `template/docs/capabilities/prose-duplication.md` (HTML comments join the quoted-material class) — the only two payload files this plan edits — `docs/specs/` (a new spec and its index row), and `docs/decisions/` (new records in M7).
 
 **What this plan deliberately does not do.** It does not instantiate `isolated-env`, which would be a check that passes on everything in a repository with no toolchain. It does not build `blueprint-eval` or `loop-runner`, which need a live trial and an unattended loop that `docs/DEBT.md` `D5` and `D7` park. It does not claim L1 on the ladder: the promotion rule needs twenty consecutive green landed changes and a named human, and this plan produces neither. It does not add continuous integration, because there is no remote to add it to. It does not touch `D4` (skill auto-discovery) or `D6` (the brownfield ratchet for `boundary-lint`), both of which are payload questions that a real target project answers.
 
@@ -726,3 +810,22 @@ These contracts are what a later session cannot rediscover, so they are fixed he
   attribution class, which now resolves a payload citation the way the
   payload resolves it, with the rationale in the `Decision Log`. The payload
   files this plan touches are still the same two.
+
+- 2026-09-17 (M5 execution): recorded M5 complete in `Progress`, added M5's
+  observed transcripts to `Concrete Steps`, five observations to `Surprises &
+  Discoveries` and four decisions to the `Decision Log`; refreshed the two
+  paragraphs under `Context and Orientation` → `What exists today` that
+  counted instantiated cards and `D3`'s state, and the `Outcomes &
+  Retrospective` running summary; amended the check protocol under
+  `Interfaces and Dependencies`, which named `template-live-drift` as the
+  only per-unit reporter and now names two, and said nothing about what a
+  per-unit check prints for a unit that has a violation; and amended the
+  files list there for the second edit to `docs/capabilities/prose-duplication.md`
+  and for the fifth gating row in `docs/MATURITY.md`. Reason: the new card's
+  own out-of-scope sentence exposed a hole in the attribution class of the
+  check M4 built — a citation resolved from the citing end but not to both
+  copies of the cited owner — which is a defect in a sibling check rather
+  than in this milestone's tree, fixed where M4 fixed the mirror of it.
+  Milestone boundaries and acceptance counts are unchanged; the payload files
+  this plan touches are still the same two, because the payload's card states
+  the attribution class generically and never enumerates the forms.
