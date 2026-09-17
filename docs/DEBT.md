@@ -12,6 +12,7 @@
 | D7 | The blueprint has never been run; evaluation is paper-only | `docs/capabilities/blueprint-eval.md` | The owners scoped v1 to paper verification. A trial needs a target project, two or more harnesses, and one feature driven through the loop end to end — its own unit of work, not a milestone tail | Any of: a project bootstrapped from this payload for real, a harness whose configuration cannot reach `skills/` (`D4`), or a payload change whose effect reading cannot predict |
 | D8 | The only gate is skippable, and absent in a fresh clone | `tools/hooks/pre-commit` against a clone that has not run the install line | A hook is the strongest enforcement point a repository with no remote has; making it unskippable needs a place to run that the committer does not control, and there is none yet | The first remote or continuous-integration system this repository gets |
 | D9 | Two of the correspondence questions have no mechanism and stay a reading job | `docs/capabilities/template-live-drift.md`, read during the doc-garden pass | Neither question is decidable from text, so there is nothing to build: a heading list cannot tell whether two files discuss the same subject, and no comparison of what the payload ships can reveal what it failed to ship | A pair found structurally corresponding while saying different things, or a live-only artifact that a target project would have needed the payload to carry |
+| D10 | One clause of the layer map — a skill body may not name a harness-specific tool — has no mechanism | `docs/capabilities/boundary-lint.md`, read during review | Deciding it needs a list of every tool name in every harness, which nobody can write and which the next harness release would invalidate | A skill body found naming a harness-specific tool, or a harness whose tool vocabulary is small and stable enough to enumerate |
 
 ## Details
 
@@ -45,17 +46,17 @@ command), `evidence-check` (active plans carry their living sections),
 `isolated-env`, does not apply: there is no toolchain and no runtime here, so
 a card for it would be a check that passes on everything.
 
-Four of the five are now instantiated and enforced: `fast-verify` sits at
+All five are now instantiated and enforced: `fast-verify` sits at
 `docs/capabilities/fast-verify.md` and runs as `./tools/verify`, with
-`doc-integrity`, `prose-duplication` and `evidence-check` beside it, running
-as `tools/checks/doc-integrity`, `tools/checks/prose-duplication` and
-`tools/checks/evidence-check` under it. The one that remains still lives here
-as prose that a human enforces by reading — the first entry of
-`docs/PRINCIPLES.md` with the layer map in `ARCHITECTURE.md`. Paying the rest
-down means copying that card into `docs/capabilities/`, adding its row to the
-register there, and adding a gating row to the table in `docs/MATURITY.md`
-because it gates a rung — after which this project's L1 gate set matches the
-ladder's intent instead of being one card wide.
+`doc-integrity`, `prose-duplication`, `evidence-check` and `boundary-lint`
+beside it, running as `tools/checks/doc-integrity`,
+`tools/checks/prose-duplication`, `tools/checks/evidence-check` and
+`tools/checks/boundary-lint` under it. Each carries a register row in
+`docs/capabilities/index.md`, and the four that gate a rung carry a row in the
+table in `docs/MATURITY.md` as well, so this project's gate set now matches
+the ladder's intent instead of being one card wide. Nothing is left to pay
+down here; the row itself is deleted in the milestone that closes the plan
+that built them.
 
 The trigger fired at the close of v1, on both of its clauses. The reference
 sweep, run by hand, found decision record `0015` citing `MATURITY.md` — a path
@@ -64,8 +65,8 @@ directory, which is exactly the miss `doc-integrity` decides. The duplication
 sweep, also by hand, found twelve pairs of live artifacts sharing eight-word
 windows; eight were real single-owner violations and were fixed, which is what
 `prose-duplication` decides. Both defects had been in the tree for at least
-one milestone before anyone looked. The row stands as overdue, and the copying
-described above is a plan of its own rather than a tail on a milestone.
+one milestone before anyone looked. The row stood as overdue while the
+instantiation ran as a plan of its own rather than as a tail on a milestone.
 
 ### D4 — Installed procedures are not auto-discovered
 
@@ -138,3 +139,21 @@ more than it does. Paying it down is not writing a checker. It is either
 finding a case the reading catches — which is evidence for what a mechanism
 would have to decide — or concluding that the reading has caught nothing over
 enough passes to retire the row.
+
+### D10 — The layer-map clause a tool list cannot decide
+
+`tools/checks/boundary-lint` decides three of the four rules in
+`ARCHITECTURE.md`'s layer map, and `docs/capabilities/boundary-lint.md` states
+the fourth as the limitation it leaves open: a skill body may not name a
+harness-specific tool. Nothing in a path reference distinguishes a tool name
+from an ordinary word, so the check would need an enumeration of every tool
+name in every harness the procedures are meant to run in — a list nobody can
+write completely and one that the next release of any harness invalidates.
+
+The owner is therefore review, and specifically the moment a procedure is
+edited: the reviewer asks whether a named command exists outside the harness
+in front of them. The exposure is small because the rule bites only in six
+files, all of them short, and none of them names a tool today. Paying it down
+is either a harness whose tool vocabulary turns out to be stable enough to
+enumerate, or the first body that breaks the rule, which would be evidence
+about what an enumeration would have to contain.

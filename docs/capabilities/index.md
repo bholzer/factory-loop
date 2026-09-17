@@ -21,3 +21,4 @@ invariant holding here too.
 | `doc-integrity` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
 | `prose-duplication` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
 | `evidence-check` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
+| `boundary-lint` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
