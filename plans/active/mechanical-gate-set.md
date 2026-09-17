@@ -16,7 +16,7 @@ What an outside reader sees, concretely: `tools/verify` exists and passes; `docs
 
 ## Progress
 
-- [ ] M1 — `tools/verify` exists, aggregates the two checks this repository runs by hand today, and is published in `AGENTS.md` with a time budget; `fast-verify` instantiated and `enforced`; pre-commit hook wired.
+- [x] (2026-09-17 15:23Z) M1 — `tools/verify` exists, aggregates the two checks this repository ran by hand, and is published in `AGENTS.md` with a 5-second budget; `fast-verify` instantiated and `enforced`; pre-commit hook wired and observed refusing a commit.
 - [ ] M2 — `template-live-drift` built and `enforced`; all three of its comparisons demonstrated failing; `D1` deleted from `docs/DEBT.md`.
 - [ ] M3 — `doc-integrity` instantiated, built and `enforced`; allowlist seeded with the three deliberate mentions this tree already contains.
 - [ ] M4 — `prose-duplication` instantiated, built and `enforced`; the two known skill ↔ card pairs allowlisted with their live twins; any newly found pair routed.
@@ -24,7 +24,7 @@ What an outside reader sees, concretely: `tools/verify` exists and passes; `docs
 - [ ] M6 — `boundary-lint` instantiated, built and `enforced`; the layer map carries the rule-id block the check binds to; the undecidable clause recorded as debt.
 - [ ] M7 — close-out: budget re-measured and published, behavior reflected into `docs/specs/`, authoring decisions graduated to `docs/decisions/`, `D3` deleted, plan moved to `plans/completed/`.
 
-Use timestamps to measure rates of progress. Nothing has been executed: this plan was authored in one sitting and no milestone has been started, so no entry above carries a completion timestamp yet.
+Use timestamps to measure rates of progress. M1 was executed on 2026-09-17 in one session; M2 has not been started.
 
 ## Surprises & Discoveries
 
@@ -38,6 +38,15 @@ Three things were measured while authoring, and each one changed a milestone's c
 
 - Observation: no git remote is configured, there is no `.github` directory, and `core.hooksPath` is unset.
   Evidence: `git remote -v` prints nothing; the repository root contains only `.git`, the four root markdown files, and the `docs`, `plans`, `skills`, `template` directories. Every card in `template/docs/capabilities/` names continuous integration as half of its enforcement point, and there is no continuous integration here to name. M1 settles what the enforcement point is instead, and records the resulting weakness as debt rather than claiming a gate that does not exist.
+
+- Observation (M1): `cmp` reports no line number when one file is a prefix of the other, which is exactly what the card's own failing case produces.
+  Evidence: after `printf 'drift\n' >> template/plans/PLANS.md`, `cmp` printed `cmp: EOF on plans/PLANS.md` and nothing else, so the first version of `tools/checks/plans-md-identity` — which parsed the line number out of `cmp`'s message — printed "one file is a prefix of the other" where M1's acceptance requires the first differing line. The check now decides byte identity with `cmp` and locates the divergence with a two-file `awk` pass that also covers the shorter-live and mid-file cases. Observed after the fix, on three shapes: append to `template/plans/PLANS.md` → `first at line 175`; truncate `plans/PLANS.md` to 100 lines → `first at line 101`; mutate line 30 of the template copy → `first at line 30`.
+
+- Observation (M1): the hook judges the working tree, not the staged content.
+  Evidence: `tools/hooks/pre-commit` invokes `./tools/verify`, which reads files from the checkout, so `git commit` of a clean subset of a dirty tree is refused on the strength of the unstaged violation. It errs toward refusing too much rather than letting a violation through, so it is recorded as one of three weaknesses in `docs/DEBT.md` `D8` rather than treated as a defect in M1.
+
+- Observation (M1): the clean run costs half a second, an order of magnitude under the plan's floor.
+  Evidence: `time ./tools/verify` reported `real 0m0.500s` on the first clean run and `0s` in the aggregator's own whole-second summary. The budget contract says twice the observed run rounded up to five seconds, so the published budget is 5 seconds, and `tools/verify`'s summary line reads `(0s)` — the aggregator counts whole seconds, which is honest at this size and will need tenths only if a later check makes the run slow enough for the budget to bind.
 
 ## Decision Log
 
@@ -89,9 +98,21 @@ Three things were measured while authoring, and each one changed a milestone's c
   Rationale: the rule as specified resolves a reference as `template/<reference>` first, and `template/docs/PRINCIPLES.md` exists — the originally prescribed violation was not a violation, and the milestone would have discovered that mid-demonstration. `tools/verify` resolves live and nowhere inside the payload, so it fails exactly one rule for exactly the stated reason.
   Date/Author: 2026-09-17, reviewer.
 
+- Decision: (M1) `ARCHITECTURE.md` gains a fifth component entry, "Check layer", for `tools/`.
+  Rationale: the Components section enumerates what lives where, and a directory of executables that decides this repository's invariants is not findable from an enumeration that stops at four. The plan's files-list already allots `ARCHITECTURE.md` "a component entry for `tools/`" without assigning it to a milestone; M1 is the milestone that creates the directory, so leaving the entry to a later one would publish a command in `AGENTS.md` whose owner the architecture does not name. The entry states the one boundary that matters — nothing under `tools/` is copied into `template/`, and a check states no invariant of its own — so a later reader cannot mistake a script for the specification.
+  Date/Author: 2026-09-17, M1 session.
+
+- Decision: (M1) a failing check prints a count line after its violation blocks, which M1's authoring-time transcript does not show.
+  Rationale: the check protocol in Interfaces and Dependencies requires "one block per violation … then the count", and the expected transcript in Concrete Steps was written before any implementation existed. The contract governs; the transcript was an expectation. `plans-md-identity` therefore ends its failure output with `plans-md-identity: 1 violation in 1 pair compared.`, which also keeps failing output shaped like passing output — every line prefixed with the check name, so the aggregator's stream stays attributable.
+  Date/Author: 2026-09-17, M1 session.
+
+- Decision: (M1) `tools/verify` counts a check's exit 2 as a failure and names the missing script when a listed check is absent or non-executable.
+  Rationale: the protocol says exit 2 is never a pass, and the recovery note in Idempotence and Recovery warns about the inverse state — a register row reading `enforced` while the aggregator does not run the check. A deleted or chmod-stripped script would otherwise make the aggregator print `2 of 2 checks passed` while running one, which is the failure mode the whole plan exists to remove.
+  Date/Author: 2026-09-17, M1 session.
+
 ## Outcomes & Retrospective
 
-Not yet written: no milestone has been executed. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
+M1 is executed; the remaining six milestones are not, so this section stays unwritten until M7. What M1 fixes for that comparison: the budget published in `AGENTS.md` is 5 seconds against an observed clean run of 0.5 seconds, and the one defect found while building was in the check rather than in the tree — `cmp`'s missing line number on a prefix difference, recorded in Surprises. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
 
 ## Context and Orientation
 
@@ -265,7 +286,7 @@ The work is the lifecycle `plans/PLANS.md` requires plus the two deletions this 
 
 ## Concrete Steps
 
-All commands run from the repository root; each script and each command below assumes it, and `cd "$(git rev-parse --show-toplevel)"` is how a script gets there rather than hard-coding a path. This section is updated as work proceeds; the transcripts below are **expected**, written at authoring time, and no command has been run against an implementation that does not yet exist.
+All commands run from the repository root; each script and each command below assumes it, and `cd "$(git rev-parse --show-toplevel)"` is how a script gets there rather than hard-coding a path. This section is updated as work proceeds. M1's transcripts below are **observed**, copied from the session that executed it on 2026-09-17; the M2-through-M7 transcripts are **expected**, written at authoring time against an implementation that does not yet exist.
 
 M1, in order:
 
@@ -275,22 +296,23 @@ M1, in order:
     chmod +x tools/verify tools/checks/* tools/hooks/pre-commit
     time ./tools/verify
 
-Expected output on a clean tree:
+Observed output on a clean tree, `time ./tools/verify` reporting `real 0m0.500s`:
 
     plans-md-identity: ok — 1 pair compared byte for byte.
     scaffolding-markers: ok — 8 artifacts scanned, 0 markers found.
-    fast-verify: 2 of 2 checks passed (1s).
+    fast-verify: 2 of 2 checks passed (0s).
 
 The failing case, then the revert:
 
     printf 'drift\n' >> template/plans/PLANS.md
     ./tools/verify; echo "exit=$?"
 
-Expected:
+Observed:
 
     plans-md-identity: template/plans/PLANS.md and plans/PLANS.md differ,
-    first at line 153. These two files are byte-identical by construction.
+    first at line 175. These two files are byte-identical by construction.
     Copy the intended version over the other and re-run.
+    plans-md-identity: 1 violation in 1 pair compared.
     scaffolding-markers: ok — 8 artifacts scanned, 0 markers found.
     fast-verify: 1 of 2 checks failed.
     Fix the violations reported above and re-run ./tools/verify.
@@ -299,13 +321,21 @@ Expected:
     git checkout -- template/plans/PLANS.md
     ./tools/verify; echo "exit=$?"
 
+restored the clean run and `exit=0`. The second check was demonstrated the same way — appending an HTML comment opening with the guidance marker word to `docs/DEBT.md` produced `scaffolding-markers: docs/DEBT.md:122:<!-- GUIDANCE: … -->`, the marker remediation line, and `scaffolding-markers: 1 marker found in 8 artifacts scanned.`; and moving `docs/specs/index.md` aside produced `scaffolding-markers: cannot run — docs/specs/index.md is in the checked set and does not exist.` with exit 2, which `tools/verify` counts as a failure. Both were restored and the clean run re-observed.
+
 The hook, demonstrated rather than assumed:
 
     git config core.hooksPath tools/hooks
     printf 'drift\n' >> template/plans/PLANS.md
     git add template/plans/PLANS.md && git commit -m "should be refused"
 
-Expect the same remediation text and no new commit; confirm with `git log --oneline -1`, then `git reset HEAD template/plans/PLANS.md && git checkout -- template/plans/PLANS.md`.
+Observed: the full `plans-md-identity` remediation text and `fast-verify: 1 of 2 checks failed.`, then
+
+    pre-commit: commit refused — ./tools/verify reported the violations above.
+    Fix them and commit again. Do not pass --no-verify: the bypass leaves the
+    violation in history with nothing recording that a gate was skipped.
+
+with `git commit` exiting 1 and `git log --oneline -1` still naming the previous commit. Restored with `git reset HEAD template/plans/PLANS.md && git checkout -- template/plans/PLANS.md`. The hook was then seen passing on this milestone's own two commits, which is the enforcement point firing in its own context rather than from a shell.
 
 M2 through M6 each follow the same three steps: write `tools/checks/<card-name>`, add it to the check list in `tools/verify`, then run the card's passing case and every failing case it specifies, copying the real output into `Surprises & Discoveries`. The failing cases are quoted in each milestone's Acceptance above; run them exactly as written, and if a check does not fail on a violation, the check is wrong — do not adjust the card to match what was built.
 
@@ -390,3 +420,16 @@ These contracts are what a later session cannot rediscover, so they are fixed he
   failing case that passes — which is exactly the class of hole authoring
   review exists to catch. Nothing else changed; milestone boundaries,
   acceptance counts, and contracts stand.
+
+- 2026-09-17 (M1 execution): recorded M1 complete in `Progress`, replaced
+  M1's expected transcripts in `Concrete Steps` with the output observed
+  while running them, added three observations to `Surprises & Discoveries`
+  and three decisions to the `Decision Log`. Reason: `plans/PLANS.md`
+  requires the living sections to carry observed evidence rather than
+  expectations, and two of the three observations change what a later
+  milestone can assume — `cmp` alone cannot locate a prefix difference, and
+  `tools/hooks/pre-commit` judges the working tree rather than the index.
+  One authoring measurement in `Artifacts and Notes` is now stale by design:
+  `core.hooksPath` is set in the clone this session ran in, which is the
+  install line `AGENTS.md` publishes. Milestone boundaries, acceptance
+  counts, and contracts are unchanged.
