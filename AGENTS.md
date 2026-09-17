@@ -1,14 +1,12 @@
 # harness-blueprint — agent guide
 
-This repository builds a harness-portable blueprint for agentic development
-flows: a template payload of repository artifacts (`template/`) plus portable
-skills (`skills/`) that let an in-project agent bootstrap, operate, and
-maintain its own harness. Nothing here compiles; every artifact is markdown
-operated on with shell and git. The one thing to understand before editing:
-`template/` is the payload a target project receives and knows nothing about
-this repository, while the root artifacts you are reading are that same
-payload filled in for this project — so a generic fix belongs in both halves,
-and a reference from `template/` outward is a bug.
+This repository is the blueprint's own workshop and its first client. It has
+two halves: `template/` is the payload a target project receives and knows
+nothing about this repository, and the root artifacts you are reading are that
+same payload filled in for this project. `GOALS.md` states what the blueprint
+is for; `ARCHITECTURE.md` states which direction the two halves may reference
+each other. The one thing to know before editing is that most edits here are
+edits to both halves.
 
 ## Map
 
@@ -48,10 +46,9 @@ to run after any edit.
   docs/capabilities/index.md` — silence is a pass; any output names a file
   still holding template markers.
 
-The wider template ↔ live structural walk is hand-run and unmechanized. What a
-mechanism must do is specified in
-`docs/capabilities/template-live-drift.md`; the hand procedure and its blind
-spots are in `docs/DEBT.md` under `D1`.
+The wider template ↔ live structural walk is hand-run and unmechanized.
+`docs/DEBT.md` `D1` carries the hand procedure, its blind spots, and the
+capability card that specifies a mechanism.
 
 ## Working rules
 
@@ -66,6 +63,5 @@ spots are in `docs/DEBT.md` under `D1`.
   here.
 - This file is a map, not an encyclopedia. Keep it under ~100 lines; content
   that wants to grow moves into `docs/` and leaves a one-line map entry.
-- Respect the layer map in `ARCHITECTURE.md`: nothing under `template/` may
-  name a path outside `template/`, and a generic improvement to a live root
-  artifact is unfinished until `template/` carries it too.
+- Respect the layer map in `ARCHITECTURE.md`. It governs what each half may
+  reference and which fixes are unfinished until both halves carry them.

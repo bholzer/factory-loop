@@ -66,8 +66,9 @@ A project bootstrapped from this blueprint has:
 
 ## Constraints
 
-- The plan file is durable context; the context window is a disposable cache.
-  One milestone per fresh-context session, hard stop after.
+- The fresh-context loop binds every session here: milestone sizing, the
+  one-milestone session, and the evidence bar are stated in `plans/PLANS.md`
+  and are that file's to state.
 - Every specced mechanical enforcer must emit remediation instructions in its
   failure output — error messages are context injection.
 - Anything material decided outside the repo (chat, review, head) must land in

@@ -37,9 +37,10 @@ already drifted from the source on the day it is installed.
 
 Two classes of file arrive. Skeletons carry content slots and authoring
 guidance, and each one's guidance states what that file owns, what it must not
-absorb, the anti-pattern it exists to prevent, and how to shrink it for a
-small project — read a skeleton's guidance before filling it, because this
-procedure deliberately does not repeat it. The rest are kept exactly as they
+absorb, and the anti-pattern it exists to prevent — read a skeleton's guidance
+before filling it, because this procedure deliberately does not repeat it.
+Shrinking is not in every skeleton's guidance and is not meant to be; the
+section below is where it is decided. The rest are kept exactly as they
 arrive, `docs/capabilities/CARD_FORMAT.md` and
 `docs/decisions/DECISION_FORMAT.md` among them: a target project never edits a
 format it is supposed to conform to.

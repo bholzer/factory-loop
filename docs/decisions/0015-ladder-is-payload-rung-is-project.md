@@ -2,11 +2,11 @@
 
 ## Decision
 
-`MATURITY.md` ships with its rung definitions, promotion rule, and demotion
-rule written as final content. What a bootstrapped project fills in is its
-Current rung, the green-cycle count if the default is wrong for its change
-rate, and the Gating capabilities table, whose rows must name only cards that
-exist in its `docs/capabilities/`.
+`docs/MATURITY.md` ships with its rung definitions, promotion rule, and
+demotion rule written as final content. What a bootstrapped project fills in
+is its Current rung, the green-cycle count if the default is wrong for its
+change rate, and the Gating capabilities table, whose rows must name only
+cards that exist in its `docs/capabilities/`.
 
 ## Rationale
 
@@ -24,8 +24,8 @@ file with no slots at all, was rejected because the current rung and the gate
 table are the only parts that are actually about a particular project, and a
 ladder that does not say where this project stands is decoration.
 
-This keeps `MATURITY.md` in the skeleton class with exactly one fill slot, so
-the mechanical "is this file filled in?" check still covers it.
+This keeps `docs/MATURITY.md` in the skeleton class with exactly one fill
+slot, so the mechanical "is this file filled in?" check still covers it.
 
 ## Date
 

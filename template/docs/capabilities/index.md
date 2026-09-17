@@ -34,7 +34,7 @@ GUIDANCE
   check runs — a command, a hook, a CI job — and reads `—` while the status
   is `specced`.
 
-  The five rows below are the cards this project starts with. They are real
+  The six rows below are the cards this project starts with. They are real
   specifications, not examples: each states an invariant worth enforcing in
   any repository, and none of them is built yet. Right-size by deletion — if
   a card does not apply here, delete its file and its row and record the
@@ -49,3 +49,4 @@ GUIDANCE
 | `doc-integrity` | specced | — |
 | `boundary-lint` | specced | — |
 | `isolated-env` | specced | — |
+| `prose-duplication` | specced | — |

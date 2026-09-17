@@ -87,14 +87,15 @@ produce.
    it runs. `built` requires the observed failing case. `enforced` requires it
    to run somewhere it cannot be quietly skipped.
 10. **Record what you observed** — the violating change, the exact command,
-    and the failure text it printed — in the plan that authorized this work.
-    The card stays a specification and is not edited to hold evidence.
+    and the failure text it printed — in the plan that authorized this work,
+    never into the card. Where that evidence lives, and why the card must not
+    absorb it, is stated in `docs/capabilities/CARD_FORMAT.md`.
 
 ## Never
 
 - Never mark a card `built` on the strength of a check that has only been
-  seen to pass. A check never observed to fail is not known to check
-  anything, and its status is then a claim about nothing.
+  seen to pass. The promotion bar in `docs/capabilities/CARD_FORMAT.md` is
+  there because a status resting on an undemonstrated check asserts nothing.
 - Never write a status onto a card file. Status has one home, and a second
   copy of it goes stale in whichever place is read less.
 - Never weaken the invariant so the check passes. A violation the check finds

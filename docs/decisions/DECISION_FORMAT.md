@@ -72,5 +72,11 @@ Rationale names the old one, then edit the old record's Status field to
 record's Decision or Rationale — the wrong reasoning, dated and attributed,
 is exactly what stops the same mistake recurring.
 
+Append-only governs the reasoning, not the typography. A reference inside a
+record that has stopped resolving — a file moved, a path written without its
+directory — is repaired in place, because a citation nobody can follow
+protects nothing. Such a repair changes the path and not one word of the
+argument, and it is not a rewrite.
+
 Reverting is the same operation with Status `reverted` and a new record
 explaining what went wrong in practice.

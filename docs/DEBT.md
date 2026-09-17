@@ -4,27 +4,27 @@
 
 | ID | Item | Where | Why deferred | Trigger to pay it down |
 | --- | --- | --- | --- | --- |
-| D1 | Template ↔ live correspondence is checked by hand | `template/` against the repository root | The live tree only came into existence with the correspondence rule, and writing the checker in the same session would have traded the milestone's content for its enforcement | The first commit that changes a `template/` file without its live counterpart, or the reverse |
+| D1 | Template ↔ live correspondence is checked by hand | `template/` against the repository root | The live tree only came into existence with the correspondence rule, and writing the checker in the same session would have traded the milestone's content for its enforcement | The first commit that lands a generic change in one half only — a `template/` edit whose live counterpart wants the same change, or the reverse |
 | D2 | The scaffolding check cannot tell a quoted marker from a real slot | the second command under Commands in `AGENTS.md` | No file in the checked set needs to quote a marker, so keeping the marker definition to one owner is currently enough | The first live artifact in the checked set that has to quote a marker in its prose |
-| D3 | The payload's generic capability cards are not instantiated for this project | `docs/capabilities/` against `template/docs/capabilities/` | Writing the starter set plus this project's own three cards was one unit of work; instantiating four more registers here would have doubled it while nothing enforces any card in either half | The first of: a generic card reaching `built` anywhere, or a change landing here that one of the four applicable cards would have caught |
+| D3 | The payload's generic capability cards are not instantiated for this project | `docs/capabilities/` against `template/docs/capabilities/` | Writing the starter set plus this project's own three cards was one unit of work; instantiating four more registers here would have doubled it while nothing enforces any card in either half | Fired at v1 close: the reference sweep found a dangling reference that `doc-integrity` decides. Overdue — see Details |
 | D4 | The installed procedures sit outside every harness's auto-discovery root | `skills/` against a harness's own skills location | The file shape is portable and `AGENTS.md`'s map makes each procedure reachable by path, so an agent can always read one; only automatic surfacing is missing, and where to put the files is a per-harness configuration question that a live trial answers better than a guess | The first harness whose configuration cannot reach `skills/`, or the live trial specced in `docs/capabilities/blueprint-eval.md` |
+| D5 | The unattended outer loop is specced, not built | `docs/capabilities/loop-runner.md` | v1 is the watched phase: a human invokes each milestone session and judges after each whether iteration continues, which is how the failure domains get seen before they are automated away | Enough consecutive sessions whose stop rule held without human correction that the halt conditions are known, or L2 being wanted for another reason |
+| D6 | `boundary-lint` has no retrofit path for an existing codebase | `template/docs/capabilities/boundary-lint.md` against a brownfield target | Greenfield-first was the v1 scope choice in `GOALS.md`; a codebase that already violates its own layer map needs a baseline-and-ratchet story that no card here carries | The first bootstrap of this payload into a codebase whose declared layer map is already violated |
+| D7 | The blueprint has never been run; evaluation is paper-only | `docs/capabilities/blueprint-eval.md` | The owners scoped v1 to paper verification. A trial needs a target project, two or more harnesses, and one feature driven through the loop end to end — its own unit of work, not a milestone tail | Any of: a project bootstrapped from this payload for real, a harness whose configuration cannot reach `skills/` (`D4`), or a payload change whose effect reading cannot predict |
 
 ## Details
 
 ### D1 — Hand-checked template ↔ live correspondence
 
-`ARCHITECTURE.md` states that every file under `template/` has a live
-counterpart at the same relative path from the repository root, that
-`template/plans/PLANS.md` is byte-identical to `plans/PLANS.md`, and that
-every other pair corresponds by heading subsequence. Nothing enforces any of
-it. All three were established by hand: the file set discovered with `find`
-under `template/`, byte identity with `cmp`, counterpart existence with
-`test -e`, and structure by comparing headings.
+`ARCHITECTURE.md` declares the correspondence rules under its cross-cutting
+invariants, and `docs/capabilities/template-live-drift.md` specifies the check
+that would decide them, including the exclusions a naive walk gets wrong and
+the failing cases that promote it to `built`. Nothing enforces either. This
+row is the debt — no check exists — and not a third copy of the rules.
 
-What a mechanism must do is specified in
-`docs/capabilities/template-live-drift.md`, including the exclusions a naive
-walk gets wrong and the failing cases that promote it to `built`. This row is
-the debt — the check does not exist — not a second copy of its design.
+Every pass so far was by hand: the file set discovered with `find` under
+`template/`, byte identity with `cmp`, counterpart existence with `test -e`,
+and structure by comparing heading sequences.
 
 Two things such a command still would not catch, and which stay a reading
 job after it is built: whether a live file's content is actually about the
@@ -51,22 +51,34 @@ the words anywhere.
 
 ### D3 — Generic cards not instantiated here
 
-The payload ships five cards in `template/docs/capabilities/`. Four state
+The payload ships six cards in `template/docs/capabilities/`. Five state
 invariants that hold for this repository too: `fast-verify` (the cheap
 command), `evidence-check` (active plans carry their living sections),
-`doc-integrity` (references resolve), and `boundary-lint` (the layer map in
-`ARCHITECTURE.md`, whose rules are the outward-reference bans). The fifth,
+`doc-integrity` (references resolve), `boundary-lint` (the layer map in
+`ARCHITECTURE.md`, whose rules are the outward-reference bans), and
+`prose-duplication` (no run of prose in two artifacts). The sixth,
 `isolated-env`, does not apply: there is no toolchain and no runtime here, so
 a card for it would be a check that passes on everything.
 
-Each of the four invariants currently lives here as prose that a human
+Each of the five invariants currently lives here as prose that a human
 enforces by reading: the two commands under Commands in `AGENTS.md`, the
 living-section requirements in `plans/PLANS.md`, and the first two entries of
 `docs/PRINCIPLES.md` with the layer map in `ARCHITECTURE.md`. Paying this down
 means copying each applicable card into `docs/capabilities/`, adding its row
-to the register there with status `specced`, and adding its gating row to the
-table in `docs/MATURITY.md` — after which this project's L1 gate set matches
-the ladder's intent instead of being one card wide.
+to the register there with status `specced`, and adding a gating row to the
+table in `docs/MATURITY.md` for each card that gates a rung — after which this
+project's L1 gate set matches the ladder's intent instead of being one card
+wide.
+
+The trigger fired at the close of v1, on both of its clauses. The reference
+sweep, run by hand, found decision record `0015` citing `MATURITY.md` — a path
+that resolves from neither the repository root nor that record's own
+directory, which is exactly the miss `doc-integrity` decides. The duplication
+sweep, also by hand, found twelve pairs of live artifacts sharing eight-word
+windows; eight were real single-owner violations and were fixed, which is what
+`prose-duplication` decides. Both defects had been in the tree for at least
+one milestone before anyone looked. The row stands as overdue, and the copying
+described above is a plan of its own rather than a tail on a milestone.
 
 ### D4 — Installed procedures are not auto-discovered
 
@@ -88,3 +100,21 @@ share and keep the map pointing at it; or have the bootstrap procedure place
 a link into the environment's own root, which is what its step 9 already
 tells it to do. The first two would change what the payload installs, so both
 are decisions, not fixes.
+
+### D6 — No brownfield path for a dependency check
+
+`template/docs/capabilities/boundary-lint.md` specifies a check that refuses a
+dependency edge the layer map forbids, and it assumes a tree where no such
+edge exists yet. Bootstrapping into an old codebase inverts that: the map is
+written by reading what is there, so the first run reports hundreds of real
+violations and the only options are to switch the check off or to weaken the
+map until it describes the mess.
+
+What is missing is the third option, and it is a card change rather than a
+build: a recorded baseline of the edges that exist on the day the map is
+written, a refusal that applies only to edges absent from that baseline, and
+a count that may go down but never up. Two things need deciding with a real
+codebase in front of you — where the baseline lives so that deleting a line
+from it is a visible commit, and whether the ratchet is enforced per file or
+per repository. Until one exists, the card's acceptance is unreachable on a
+brownfield target, and D3's copying pass must not pretend otherwise.
