@@ -86,9 +86,11 @@ reached through the card's history, not by a link from the card.
   cross-reference inside the copy resolving.
 - Every artifact is markdown, operated on with shell and git only.
 - Each `template/` file has a live counterpart at the same relative path from
-  the repository root, with identical headings in identical order; only
-  project-specific content differs. `plans/PLANS.md` is the zero-tolerance
-  case: the two copies are byte-identical.
+  the repository root. Structure corresponds by subsequence: the template's
+  headings, minus those containing fill slots, appear in the live file in the
+  same order, and extra live headings are expected where filled content adds
+  them. `plans/PLANS.md` is the zero-tolerance case: the two copies are
+  byte-identical.
 
 ## Known rough edges
 

@@ -310,6 +310,14 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   the template was wrong, so nothing there changed — the first
   correspondence reconciliation resolved entirely in one direction.
   2026-09-17.
+- Decision: (post-M5 review) `ARCHITECTURE.md`'s correspondence invariant
+  corrected from "identical headings in identical order" to the subsequence
+  form. The strict phrasing was false on the tree as committed — live files
+  add headings where filled content is itself headed, and fill-slot
+  headings differ by construction — and was contradicted by `D1` and this
+  plan's own structural-correspondence contract, both of which the same
+  session wrote. An invariant stated stronger than reality teaches readers
+  to discount invariants. 2026-09-17/reviewer.
 
 ## Surprises & Discoveries
 
@@ -768,3 +776,7 @@ plan alone per `plans/PLANS.md`.
   M6 owns its content in both copies, so "every template skeleton has a
   live counterpart" holds structurally while that one counterpart is not
   yet filled.
+- 2026-09-17: Post-M5 review — corrected ARCHITECTURE.md correspondence
+  invariant to the subsequence form; it overstated the rule its own D1 and
+  the plan contract define. Reason: an invariant falsified by the current
+  tree is worse than none.
