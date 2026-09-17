@@ -5,25 +5,35 @@
 Every path reference in this repository's markdown artifacts resolves to a
 file or directory that exists. A reference is a repository-relative path
 written in backticks or used as a markdown link target. The checked set is
-`AGENTS.md`, every artifact its map names, and everything under `docs/` and
-`plans/`.
+`AGENTS.md`, every artifact its map names, everything under `docs/`, and the
+plan convention document `plans/PLANS.md`.
 
-Three classes of non-resolving reference are legitimate and must not be
+Four classes of non-resolving reference are legitimate and must not be
 reported:
 
 - a sibling filename cited from inside the directory that owns it, such as
   `CARD_FORMAT.md` named by `docs/capabilities/index.md`;
 - an illustrative filename in a format document, such as
   `NNNN-short-slug.md`;
+- quoted material: a reference inside a fenced or indented block is a
+  transcript, not a citation. A capability card's remediation example names
+  the file its own failing case creates, so a card checked as prose reports
+  itself;
 - a deliberate mention of a file that does not exist or must not exist, such
   as a non-goal naming the artifact this project chose not to have.
 
-The first two classes are decidable — resolve relative to the citing file,
-and skip files whose own name ends in `_FORMAT.md`. The third is a judgement
-no checker can make, so it is carried as an allowlist of exact
-`path:reference` pairs, each with a one-line reason. An allowlist entry is
-cheap to review; a checker that reports legitimate references is switched off
-within a week, and then nothing is checked at all.
+The first three classes are decidable — resolve relative to the citing file,
+skip files whose own name ends in `_FORMAT.md`, and drop fenced and indented
+blocks before extracting references. The fourth is a judgement no checker can
+make, so it is carried as an allowlist of exact `path:reference` pairs, each
+with a one-line reason. An allowlist entry is cheap to review; a checker that
+reports legitimate references is switched off within a week, and then nothing
+is checked at all.
+
+Plan files are outside the checked set, in both `plans/active/` and
+`plans/completed/`. A plan names the files it will create before they exist
+and the files it deleted after they are gone, so a reference walk over plan
+files reports a finding per planned artifact and not one of them is a defect.
 
 Two things this card deliberately does not cover. Whether a document's
 content is still true — "freshness" — is not decidable from text and stays a

@@ -18,3 +18,4 @@ invariant holding here too.
 | `blueprint-eval` | specced | — |
 | `loop-runner` | specced | — |
 | `fast-verify` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
+| `doc-integrity` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |

@@ -1,0 +1,207 @@
+#!/bin/sh
+# doc-integrity — every path reference in the live artifact half resolves.
+#
+# docs/capabilities/doc-integrity.md is the card. A reference is a backticked
+# span or a markdown link target that contains a slash and none of space, tab,
+# `*`, angle bracket, or brace — those exclusions are what keep commands,
+# globs, and placeholder-bearing paths out of the set. A reference resolves if
+# it exists from the repository root or from the citing file's own directory.
+#
+# Three narrowings the card states, all decidable here: files whose own name
+# ends in _FORMAT.md are skipped whole, fenced and indented blocks are quoted
+# material rather than references, and plan files are outside the checked set
+# because a plan names files before they exist and after they are deleted.
+# Everything left that does not resolve is a violation unless
+# tools/allow/doc-integrity.txt carries it with a reason.
+#
+# Exit 0 holds, exit 1 is a violation, exit 2 means undecidable.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+LC_ALL=C
+export LC_ALL
+
+ALLOW=tools/allow/doc-integrity.txt
+
+# The named part of the checked set: the live artifacts at the repository root
+# plus the one plan file that is convention rather than work in flight.
+NAMED="AGENTS.md GOALS.md ARCHITECTURE.md CLAUDE.md plans/PLANS.md"
+
+absent=0
+for f in $NAMED; do
+	if [ ! -f "$f" ]; then
+		echo "doc-integrity: cannot run — $f is in the checked set and does not exist."
+		absent=$((absent + 1))
+	fi
+done
+for d in docs skills; do
+	if [ ! -d "$d" ]; then
+		echo "doc-integrity: cannot run — $d/ is in the checked set and does not exist."
+		absent=$((absent + 1))
+	fi
+done
+if [ "$absent" -ne 0 ]; then
+	echo "Restore the file, or update the checked set in tools/checks/doc-integrity to match the artifacts this project actually has."
+	exit 2
+fi
+if [ ! -f "$ALLOW" ]; then
+	echo "doc-integrity: cannot run — the allowlist $ALLOW does not exist."
+	echo "Restore it from git history, or create it empty if this project no longer needs a deliberate-mention exception."
+	exit 2
+fi
+
+# The discovered part: every markdown file under docs/ and skills/, minus the
+# format documents, whose illustrative filenames are the card's second class.
+files=$NAMED
+artifacts=0
+formats=0
+for f in $(find docs skills -type f -name '*.md' | sort); do
+	case "${f##*/}" in
+	*_FORMAT.md)
+		formats=$((formats + 1))
+		continue
+		;;
+	esac
+	files="$files $f"
+done
+for f in $files; do
+	artifacts=$((artifacts + 1))
+done
+if [ "$artifacts" -eq 0 ]; then
+	echo "doc-integrity: cannot run — the checked set is empty."
+	echo "Correct the paths in tools/checks/doc-integrity; an empty scope passes forever."
+	exit 2
+fi
+
+# Reference extraction. One awk pass over the whole checked set emitting
+# citing file, line number, and reference, tab separated.
+refs=$(awk '
+	function consider(t) {
+		if (t == "") { return }
+		if (t !~ /\//) { return }
+		if (t ~ /[ \t*<>{}]/) { return }
+		print FILENAME "\t" FNR "\t" t
+	}
+	FNR == 1 { fence = 0 }
+	{
+		if ($0 ~ /^[ \t]*```/) { fence = !fence; next }
+		if (fence) { next }
+		# An indented block is quoted material: a remediation transcript names
+		# the file its own failing case creates, which must not exist.
+		if ($0 ~ /^(    |\t)/) { next }
+		n = split($0, p, "`")
+		for (i = 2; i <= n; i += 2) { consider(p[i]) }
+		s = $0
+		while (match(s, /\]\([^()]+\)/)) {
+			consider(substr(s, RSTART + 2, RLENGTH - 3))
+			s = substr(s, RSTART + RLENGTH)
+		}
+	}
+' $files)
+
+# Allowlist keys, each requiring the reason the format mandates.
+keys=$(awk '
+	/^[ \t]*$/ { next }
+	/^[ \t]*#/ { next }
+	{
+		if ($0 !~ /  #/) { print "BAD\t" FNR "\t" $0; next }
+		i = index($0, "  #")
+		print "KEY\t" FNR "\t" substr($0, 1, i - 1)
+	}
+' "$ALLOW")
+bad=$(printf '%s\n' "$keys" | awk -F'\t' '$1 == "BAD" { print $2 }')
+if [ -n "$bad" ]; then
+	for n in $bad; do
+		echo "doc-integrity: cannot run — $ALLOW line $n has no reason."
+	done
+	echo "Every entry is one key, two spaces, a # and a one-line reason; an exception nobody justified is an exception nobody can review."
+	exit 2
+fi
+
+total=0
+resolved=0
+unresolved=""
+oldifs=$IFS
+IFS='
+'
+for rec in $refs; do
+	file=${rec%%	*}
+	rest=${rec#*	}
+	lineno=${rest%%	*}
+	ref=${rest#*	}
+	total=$((total + 1))
+	if [ -e "$ref" ]; then
+		resolved=$((resolved + 1))
+		continue
+	fi
+	# The sibling class: a reference resolved from the citing file's directory.
+	dir=${file%/*}
+	if [ "$dir" = "$file" ]; then
+		dir="."
+	fi
+	if [ -e "$dir/$ref" ]; then
+		resolved=$((resolved + 1))
+		continue
+	fi
+	unresolved="$unresolved$file	$lineno	$ref
+"
+done
+IFS=$oldifs
+
+# Which allowlist entries earned their place, and which have decayed.
+allowed_keys=""
+applied=0
+stale=0
+oldifs=$IFS
+IFS='
+'
+for rec in $keys; do
+	kind=${rec%%	*}
+	[ "$kind" = "KEY" ] || continue
+	rest=${rec#*	}
+	key=${rest#*	}
+	hit=no
+	for u in $unresolved; do
+		ufile=${u%%	*}
+		urest=${u#*	}
+		uref=${urest#*	}
+		if [ "$ufile:$uref" = "$key" ]; then
+			hit=yes
+			break
+		fi
+	done
+	if [ "$hit" = yes ]; then
+		applied=$((applied + 1))
+		allowed_keys="$allowed_keys$key
+"
+	else
+		stale=$((stale + 1))
+	fi
+done
+
+violations=0
+for rec in $unresolved; do
+	file=${rec%%	*}
+	rest=${rec#*	}
+	lineno=${rest%%	*}
+	ref=${rest#*	}
+	case "$allowed_keys" in
+	*"$file:$ref
+"*)
+		continue
+		;;
+	esac
+	violations=$((violations + 1))
+	echo "doc-integrity: $file:$lineno references \`$ref\`, which does not exist. Create the file, correct the path, or — if the mention is deliberate — add \`$file:$ref\` to $ALLOW with a reason."
+done
+IFS=$oldifs
+
+if [ "$violations" -eq 0 ]; then
+	echo "doc-integrity: ok — $resolved of $total references resolved in $artifacts artifacts, $formats format documents skipped, $applied allowlist entries applied, $stale stale."
+	exit 0
+fi
+
+noun="violations"
+[ "$violations" -eq 1 ] && noun="violation"
+echo "doc-integrity: $violations $noun in $total references across $artifacts artifacts."
+exit 1
