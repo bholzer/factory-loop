@@ -81,6 +81,14 @@ Three things were measured while authoring, and each one changed a milestone's c
   Rationale: `docs/DEBT.md` `D3` and `docs/decisions/0014-cards-are-project-content.md` both state that a card for an absent toolchain would be a check that passes on everything. Deleting the row that carries that reasoning without relocating one sentence of it would lose the only written answer to "why is there no `isolated-env` card here", and the next doc-garden pass would notice the payload ships six cards where the live half has five and treat it as an omission.
   Date/Author: 2026-09-17, plan authoring session.
 
+- Decision: (pre-execution review) `prose-duplication`'s normalization strips HTML comment blocks alongside fenced and indented blocks, and the template card's quoted-material class is amended to say so before instantiation — making the payload edits two, not one.
+  Rationale: the checked set includes `template/`, whose eight skeletons share a verbatim marker-definition guidance block by design — measured: `grep -l` for the shared sentence returns 8 files, which is twenty-eight pair findings covered by no legitimate class. Guidance blocks are authoring scaffolding deleted on fill, not artifact prose; and the gap is generic, since a target project mid-bootstrap can hold two unfilled skeletons whose guidance collides the same way.
+  Date/Author: 2026-09-17, reviewer.
+
+- Decision: (pre-execution review) M6's outward-reference failing case uses `tools/verify`, not `docs/PRINCIPLES.md`.
+  Rationale: the rule as specified resolves a reference as `template/<reference>` first, and `template/docs/PRINCIPLES.md` exists — the originally prescribed violation was not a violation, and the milestone would have discovered that mid-demonstration. `tools/verify` resolves live and nowhere inside the payload, so it fails exactly one rule for exactly the stated reason.
+  Date/Author: 2026-09-17, reviewer.
+
 ## Outcomes & Retrospective
 
 Not yet written: no milestone has been executed. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
@@ -196,7 +204,7 @@ Acceptance, four observable:
 3. `ARCHITECTURE.md`'s cross-cutting invariants state that a live card at a payload card's relative path is that card's instantiation, so the pair is a copy by construction.
 4. `docs/capabilities/index.md` shows `prose-duplication` as `enforced` at `tools/verify` and `docs/MATURITY.md` gains no row for it — the card states that it removes the searching, not the routing, so it gates no rung.
 
-The work. Normalize each artifact to its sequence of lowercase alphanumeric words after stripping fenced and indented blocks, take every window of eight consecutive words, and report any window shared by two artifacts. Eight is the floor the card sets and not a preference: shorter windows fire on ordinary English, longer ones miss a restated one-sentence rule. A single `awk` pass that maps each window to the files containing it decides every pair at once; the pairwise-intersection shape would be several hundred process invocations for the same answer.
+The work. Normalize each artifact to its sequence of lowercase alphanumeric words after stripping fenced blocks, indented blocks, and HTML comment blocks, take every window of eight consecutive words, and report any window shared by two artifacts. HTML comments must be stripped alongside the other two quoted forms because the payload's skeletons each carry a verbatim guidance block by design — eight template files share the same marker-definition sentence, which is twenty-eight pair findings with no legitimate class if comments are windowed — and a guidance block is authoring scaffolding, not the artifact's prose; amend the quoted-material class in `template/docs/capabilities/prose-duplication.md` to say "indented blocks, fenced blocks, and HTML comment blocks" before instantiating it, so the live copy arrives correct. Eight is the floor the card sets and not a preference: shorter windows fire on ordinary English, longer ones miss a restated one-sentence rule. A single `awk` pass that maps each window to the files containing it decides every pair at once; the pairwise-intersection shape would be several hundred process invocations for the same answer.
 
 The checked set is both halves — the live artifact half as in M3, plus everything under `template/` — minus records under `docs/decisions/`, minus plan files, and minus `tools/` since it holds no markdown. Five exclusions are decidable and one is a judgement. Decidable: a pair at the same relative path across the two halves, which `ARCHITECTURE.md`'s correspondence rule owns and M4 is where that clause is added; a pair whose files are governed by the same sibling `*_FORMAT.md` document, whose shared text is the format's; a pair of format documents themselves; a window in a section that also contains a backticked path to the file owning the fact, which is the attributed restatement `docs/PRINCIPLES.md` requires; and quoted material, already stripped before windowing. The judgement class — a proper-noun run, a path list, or a section-name list both files must spell out — is the allowlist at `tools/allow/prose-duplication.txt`.
 
@@ -224,7 +232,7 @@ Note for whoever executes this milestone: the failing cases mutate this plan fil
 Acceptance, five observable:
 
 1. `tools/checks/boundary-lint` on a clean tree exits zero and prints how many references it examined and how many rules it applied; the rule count is 3 and the reference count is greater than zero.
-2. Adding a reference to `docs/PRINCIPLES.md` inside any file under `template/` and running `tools/verify` gives a nonzero exit naming the offending file, line, target, and the rule id violated. Revert.
+2. Adding a backticked reference to `tools/verify` inside any file under `template/` and running `tools/verify` gives a nonzero exit naming the offending file, line, target, and the rule id violated — `tools/verify` resolves in this repository and nowhere inside the payload, which is exactly the outward reference the rule bans. Revert.
 3. Renaming `ARCHITECTURE.md` temporarily and running the check gives a nonzero exit saying the layer map could not be read, rather than a pass over zero rules. Restore the name.
 4. `ARCHITECTURE.md`'s layer map section carries a rule-id block whose ids are exactly the ones the check implements, and its allowed-target list for `skills/` includes `docs/capabilities/index.md` and `docs/specs/index.md`.
 5. `docs/capabilities/index.md` shows `boundary-lint` as `enforced` at `tools/verify`, and `docs/MATURITY.md`'s Gating capabilities table carries an L2 row for it.
@@ -367,6 +375,18 @@ These contracts are what a later session cannot rediscover, so they are fixed he
 
 **Identifiers already spent.** Debt rows `D1` through `D7` exist; this plan creates `D8` (M1), `D9` (M2), `D10` (M6) and deletes the `D1` and `D3` rows. Decision records run `0001` through `0016`; graduation in M7 starts at `0017`. Neither series reuses a number.
 
-**Files this plan edits outside `tools/`.** `AGENTS.md` (Commands, and the hand-walk paragraph), `ARCHITECTURE.md` (a component entry for `tools/`, the rule-id block, the allowed-target list, the instantiated-card clause, Known rough edges), `GOALS.md` (Scope, one sentence in M7), `docs/DEBT.md` (`D2`'s location, `D8`/`D9`/`D10` added, `D1`/`D3` deleted), `docs/MATURITY.md` (Current rung, four gating rows, the closing paragraph), `docs/capabilities/index.md` (header prose and six rows), `docs/capabilities/template-live-drift.md` (what it does not decide), five new card files under `docs/capabilities/`, `template/docs/capabilities/doc-integrity.md` (the plan-file exclusion, the one edit this plan makes to the payload), `docs/specs/` (a new spec and its index row), and `docs/decisions/` (new records in M7).
+**Files this plan edits outside `tools/`.** `AGENTS.md` (Commands, and the hand-walk paragraph), `ARCHITECTURE.md` (a component entry for `tools/`, the rule-id block, the allowed-target list, the instantiated-card clause, Known rough edges), `GOALS.md` (Scope, one sentence in M7), `docs/DEBT.md` (`D2`'s location, `D8`/`D9`/`D10` added, `D1`/`D3` deleted), `docs/MATURITY.md` (Current rung, four gating rows, the closing paragraph), `docs/capabilities/index.md` (header prose and six rows), `docs/capabilities/template-live-drift.md` (what it does not decide), five new card files under `docs/capabilities/`, `template/docs/capabilities/doc-integrity.md` (the plan-file exclusion) and `template/docs/capabilities/prose-duplication.md` (HTML comments join the quoted-material class) — the only two edits this plan makes to the payload — `docs/specs/` (a new spec and its index row), and `docs/decisions/` (new records in M7).
 
 **What this plan deliberately does not do.** It does not instantiate `isolated-env`, which would be a check that passes on everything in a repository with no toolchain. It does not build `blueprint-eval` or `loop-runner`, which need a live trial and an unattended loop that `docs/DEBT.md` `D5` and `D7` park. It does not claim L1 on the ladder: the promotion rule needs twenty consecutive green landed changes and a named human, and this plan produces neither. It does not add continuous integration, because there is no remote to add it to. It does not touch `D4` (skill auto-discovery) or `D6` (the brownfield ratchet for `boundary-lint`), both of which are payload questions that a real target project answers.
+
+## Revision Notes
+
+- 2026-09-17 (pre-execution review): amended M4's normalization to strip
+  HTML comment blocks (with the template card gaining the same clause,
+  making the payload edits two), replaced M6's failing-case reference with
+  one that actually violates the rule, and corrected the files-list
+  accordingly. Reason: both defects would have surfaced mid-milestone in an
+  executing session — one as twenty-eight unexplained findings, one as a
+  failing case that passes — which is exactly the class of hole authoring
+  review exists to catch. Nothing else changed; milestone boundaries,
+  acceptance counts, and contracts stand.
