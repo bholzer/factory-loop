@@ -88,11 +88,16 @@ awk -v ALLOW="$ALLOW" -v W=8 '
 		return p
 	}
 	# The window is attributed when the section it starts in, in either file,
-	# cites the other file in backticks. Three ways a citation can name it: as
-	# a repository-relative path, as a bare sibling filename, and — from inside
+	# cites the other file in backticks. Four ways a citation can name it: as
+	# a repository-relative path, as a bare sibling filename, — from inside
 	# the payload, whose references resolve inside the copy a target project
-	# receives — as a path relative to template/.
-	function cites(citing, section, target,   m, d) {
+	# receives — as a path relative to template/, and as either copy of a fact
+	# whose owner sits at the same relative path in both halves, which
+	# ARCHITECTURE.md declares copies of each other. Without the fourth form a
+	# live card citing AGENTS.md reads as attributed against AGENTS.md and
+	# unattributed against template/AGENTS.md, which holds the same sentence
+	# by construction.
+	function cites(citing, section, target,   m, d, t) {
 		m = ment[citing SUBSEP section]
 		if (m == "") { return 0 }
 		if (index(m, " " target " ")) { return 1 }
@@ -103,6 +108,11 @@ awk -v ALLOW="$ALLOW" -v W=8 '
 		if (substr(citing, 1, 9) == "template/" && substr(target, 1, 9) == "template/") {
 			if (index(m, " " substr(target, 10) " ")) { return 1 }
 		}
+		t = relpath(target)
+		if ((t in inset) && (("template/" t) in inset)) {
+			if (index(m, " " t " ")) { return 1 }
+			if (index(m, " template/" t " ")) { return 1 }
+		}
 		return 0
 	}
 	BEGIN {
@@ -111,6 +121,7 @@ awk -v ALLOW="$ALLOW" -v W=8 '
 		# format share the scaffolding that format imposes, not their own prose.
 		for (i = 1; i < ARGC; i++) {
 			p = ARGV[i]
+			inset[p] = 1
 			base = p
 			sub(/.*\//, "", base)
 			if (base ~ /_FORMAT\.md$/) { fmt[dirof(p)] = base }

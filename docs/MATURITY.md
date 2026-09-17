@@ -2,19 +2,21 @@
 
 ## Current rung
 
-L0 — human-gated. Four checks are now mechanical: `./tools/verify` decides the
+L0 — human-gated. Five checks are now mechanical: `./tools/verify` decides the
 absence of authoring scaffolding in the live artifacts, the whole
 correspondence between `template/` and the live tree — counterpart existence,
 byte identity, and heading subsequence — the resolution of every path
-reference in the live artifacts, and the absence of prose shared between any
-two artifacts in either half; and the hook at `tools/hooks/pre-commit` refuses
-a commit it rejects. Everything else here is still enforced by a human
-reading, and a human reads every change before it lands.
+reference in the live artifacts, the absence of prose shared between any two
+artifacts in either half, and the presence of the living sections and
+completion timestamps in every plan in flight; and the hook at
+`tools/hooks/pre-commit` refuses a commit it rejects. Everything else here is
+still enforced by a human reading, and a human reads every change before it
+lands.
 
-The rung stays L0 although both L1 rows in the Gating capabilities table below
-now read `enforced` in `docs/capabilities/index.md`. Two things are missing on
-top of that status: the twenty consecutive green landed changes the promotion
-rule requires, and a gate the committer cannot switch off, which
+The rung stays L0 although all three L1 rows in the Gating capabilities table
+below now read `enforced` in `docs/capabilities/index.md`. Two things are
+missing on top of that status: the twenty consecutive green landed changes the
+promotion rule requires, and a gate the committer cannot switch off, which
 `docs/DEBT.md` `D8` records this one as not being. Of the L2 rows,
 `doc-integrity` reads `enforced` too, while `blueprint-eval` needs a live
 trial this project has deliberately parked and `loop-runner` gates a rung two
@@ -110,6 +112,7 @@ a ladder with no record of falling reads as one that only ever rose.
 | --- | --- | --- |
 | L1 | `fast-verify` | a human remembering to run this repository's checks by hand after every edit |
 | L1 | `template-live-drift` | a human walking `template/` against the live tree to find divergence |
+| L1 | `evidence-check` | a human noticing that a session landed its work and left the plan's record describing the tree it no longer is |
 | L2 | `doc-integrity` | a human noticing that a map line or a cross-reference names a file that does not exist |
 | L2 | `blueprint-eval` | a human judging that a payload change still bootstraps a working project in every supported harness |
 | L2 | `loop-runner` | a human invoking each milestone session and deciding after each whether iteration continues |

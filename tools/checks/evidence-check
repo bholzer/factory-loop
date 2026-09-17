@@ -1,0 +1,146 @@
+#!/bin/sh
+# evidence-check — every active plan carries its living sections, and every
+# Progress entry marked complete says when it was completed.
+#
+# docs/capabilities/evidence-check.md is the card. Two mechanically decidable
+# facts, and nothing else: the four sections plans/PLANS.md requires are
+# present with text under each, and a checked-off Progress entry carries a
+# parenthesised ISO date. Whether the recorded evidence is true is review's
+# job, and a check claiming to decide it would pass on everything.
+#
+# The plan is not parsed beyond that: headings at column zero, non-blank lines
+# between them, and the checkbox lines in the Progress section. Fenced blocks
+# and indented blocks are quoted material — a plan reproduces the convention's
+# own skeleton and its own transcripts — so neither contributes headings or
+# entries.
+#
+# An empty plans/active/ is a pass that says so.
+#
+# Exit 0 holds, exit 1 is a violation, exit 2 means undecidable.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+LC_ALL=C
+export LC_ALL
+
+DIR=plans/active
+
+if [ ! -d "$DIR" ]; then
+	echo "evidence-check: cannot run — $DIR/ is the checked set and does not exist."
+	echo "Restore the directory, or update the checked set in tools/checks/evidence-check to match where this project keeps work in flight."
+	exit 2
+fi
+
+plans=$(find "$DIR" -type f -name '*.md' | sort)
+
+if [ -z "$plans" ]; then
+	echo "evidence-check: ok — no active plans under $DIR/, 4 sections required of each."
+	exit 0
+fi
+
+# One awk pass per plan. It emits tab-separated findings — NOSTAMP with the
+# line number and the entry text, MISSING and EMPTY with the section name —
+# and a COUNTS record carrying the Progress tallies for the summary line.
+read_plan() {
+	awk '
+	BEGIN {
+		n = split("Progress|Surprises & Discoveries|Decision Log|Outcomes & Retrospective", req, "|")
+	}
+	{
+		if ($0 ~ /^[ \t]*```/) { fence = !fence; next }
+		if (fence) { next }
+		if ($0 ~ /^## /) {
+			cur = substr($0, 4)
+			seen[cur] = 1
+			next
+		}
+		if ($0 ~ /^[ \t]*$/) { next }
+		if (cur != "") { content[cur] = 1 }
+		if (cur != "Progress") { next }
+		if ($0 ~ /^(    |\t)/) { next }
+		if ($0 ~ /^[ \t]*- \[[ ]\]/) { open++; next }
+		if ($0 ~ /^[ \t]*- \[[xX]\]/) {
+			complete++
+			if ($0 !~ /\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/) {
+				t = $0
+				sub(/^[ \t]*- \[[xX]\][ \t]*/, "", t)
+				if (length(t) > 60) { t = substr(t, 1, 60) "…" }
+				print "NOSTAMP\t" FNR "\t" t
+			}
+			next
+		}
+	}
+	END {
+		for (i = 1; i <= n; i++) {
+			if (!(req[i] in seen)) { print "MISSING\t0\t" req[i] }
+			else if (!(req[i] in content)) { print "EMPTY\t0\t" req[i] }
+		}
+		print "COUNTS\t" (complete + open) "\t" complete
+	}
+	' "$1"
+}
+
+checked=0
+entries_read=0
+violations=0
+oldifs=$IFS
+
+for f in $plans; do
+	checked=$((checked + 1))
+	findings=$(read_plan "$f")
+	entries=0
+	complete=0
+	found=0
+	IFS='
+'
+	for rec in $findings; do
+		kind=${rec%%	*}
+		rest=${rec#*	}
+		lineno=${rest%%	*}
+		text=${rest#*	}
+		case "$kind" in
+		COUNTS)
+			entries=$lineno
+			complete=$text
+			;;
+		MISSING)
+			found=$((found + 1))
+			violations=$((violations + 1))
+			echo "evidence-check: $f is missing the required section \`## $text\`."
+			echo "  plans/PLANS.md requires Progress, Surprises & Discoveries, Decision Log and Outcomes & Retrospective in every plan. Add the heading and the entries the work produced; a heading with nothing under it is also a failure."
+			;;
+		EMPTY)
+			found=$((found + 1))
+			violations=$((violations + 1))
+			echo "evidence-check: $f carries the required section \`## $text\` with nothing under it."
+			echo "  plans/PLANS.md requires Progress, Surprises & Discoveries, Decision Log and Outcomes & Retrospective in every plan. Write what the work produced under this heading; an empty section records nothing a later session can read."
+			;;
+		NOSTAMP)
+			found=$((found + 1))
+			violations=$((violations + 1))
+			echo "evidence-check: $f:$lineno — Progress entry \"$text\" is marked complete but carries no timestamp."
+			echo "  Completed entries record when the work was observed, as"
+			echo "    - [x] (YYYY-MM-DD HH:MMZ) $text"
+			echo "  Use the time you observed, not an estimate."
+			;;
+		esac
+	done
+	IFS=$oldifs
+	entries_read=$((entries_read + entries))
+	if [ "$found" -eq 0 ]; then
+		echo "evidence-check: $f — Progress, Surprises & Discoveries, Decision Log and Outcomes & Retrospective all present and non-empty; $complete of $entries Progress entries complete, every one timestamped."
+	fi
+done
+
+plural="plans"
+[ "$checked" -eq 1 ] && plural="plan"
+
+if [ "$violations" -eq 0 ]; then
+	echo "evidence-check: ok — $checked active $plural checked, 4 sections required of each, $entries_read Progress entries read."
+	exit 0
+fi
+
+noun="violations"
+[ "$violations" -eq 1 ] && noun="violation"
+echo "evidence-check: $violations $noun in $checked active $plural, $entries_read Progress entries read."
+exit 1

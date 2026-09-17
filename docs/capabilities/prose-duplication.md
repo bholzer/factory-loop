@@ -47,11 +47,15 @@ decidable and one is a judgement.
 - an attributed restatement — the section the window starts in, in either
   file, cites the other file in backticks, which is what `docs/PRINCIPLES.md`
   requires of a restatement that has to exist. A citation names the other file
-  three ways: as a repository-relative path, as a bare sibling filename, and —
-  from inside `template/`, whose references resolve inside the copy a target
-  project receives — as a path relative to `template/`. Without that third
+  four ways: as a repository-relative path, as a bare sibling filename, — from
+  inside `template/`, whose references resolve inside the copy a target project
+  receives — as a path relative to `template/`, and as either copy of a fact
+  whose owner sits at the same relative path in both halves. Without the third
   form a payload file attributing a fact to `AGENTS.md` would read as
-  unattributed here while its live twin reads as attributed;
+  unattributed here while its live twin reads as attributed; without the fourth
+  the diagonal goes unattributed instead — a live file citing the live owner
+  still collides with the payload copy of that owner, which holds the same
+  sentence by construction;
 - a window that is a proper-noun run, a path list, or a section-name list both
   files must spell out to name the same thing. This is the judgement class,
   carried in `tools/allow/prose-duplication.txt` as exact `fileA:fileB:window`

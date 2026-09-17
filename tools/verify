@@ -11,7 +11,7 @@
 
 cd "$(git rev-parse --show-toplevel)" || exit 2
 
-CHECKS="scaffolding-markers template-live-drift doc-integrity prose-duplication"
+CHECKS="scaffolding-markers template-live-drift doc-integrity prose-duplication evidence-check"
 
 start=$(date +%s)
 total=0

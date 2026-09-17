@@ -55,7 +55,7 @@ that the hook lets through while the violation stands.
 
 ## Remediation message
 
-    fast-verify: 1 of 4 checks failed.
+    fast-verify: 1 of 5 checks failed.
       template-live-drift: template/plans/PLANS.md and plans/PLANS.md differ,
       first at line 175. These two files are byte-identical by construction.
       Copy the intended version over the other and re-run.

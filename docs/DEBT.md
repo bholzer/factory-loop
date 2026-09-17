@@ -45,17 +45,16 @@ command), `evidence-check` (active plans carry their living sections),
 `isolated-env`, does not apply: there is no toolchain and no runtime here, so
 a card for it would be a check that passes on everything.
 
-Three of the five are now instantiated and enforced: `fast-verify` sits at
+Four of the five are now instantiated and enforced: `fast-verify` sits at
 `docs/capabilities/fast-verify.md` and runs as `./tools/verify`, with
-`doc-integrity` and `prose-duplication` beside it, running as
-`tools/checks/doc-integrity` and `tools/checks/prose-duplication` under it.
-The other two still live here as prose that a human enforces by reading — the
-living-section requirements in `plans/PLANS.md`, and the first entry of
+`doc-integrity`, `prose-duplication` and `evidence-check` beside it, running
+as `tools/checks/doc-integrity`, `tools/checks/prose-duplication` and
+`tools/checks/evidence-check` under it. The one that remains still lives here
+as prose that a human enforces by reading — the first entry of
 `docs/PRINCIPLES.md` with the layer map in `ARCHITECTURE.md`. Paying the rest
-down means copying each
-remaining card into `docs/capabilities/`, adding its row to the register
-there, and adding a gating row to the table in `docs/MATURITY.md` for each
-card that gates a rung — after which this project's L1 gate set matches the
+down means copying that card into `docs/capabilities/`, adding its row to the
+register there, and adding a gating row to the table in `docs/MATURITY.md`
+because it gates a rung — after which this project's L1 gate set matches the
 ladder's intent instead of being one card wide.
 
 The trigger fired at the close of v1, on both of its clauses. The reference

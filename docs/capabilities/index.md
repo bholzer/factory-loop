@@ -20,3 +20,4 @@ invariant holding here too.
 | `fast-verify` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
 | `doc-integrity` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
 | `prose-duplication` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
+| `evidence-check` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
