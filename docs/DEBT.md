@@ -5,7 +5,6 @@
 | ID | Item | Where | Why deferred | Trigger to pay it down |
 | --- | --- | --- | --- | --- |
 | D2 | The scaffolding check cannot tell a quoted marker from a real slot | `tools/checks/scaffolding-markers` | No file in the checked set needs to quote a marker, so keeping the marker definition to one owner is currently enough | The first live artifact in the checked set that has to quote a marker in its prose |
-| D3 | The payload's generic capability cards are not instantiated for this project | `docs/capabilities/` against `template/docs/capabilities/` | Writing the starter set plus this project's own three cards was one unit of work; instantiating four more registers here would have doubled it while nothing enforces any card in either half | Fired at v1 close: the reference sweep found a dangling reference that `doc-integrity` decides. Overdue — see Details |
 | D4 | The installed procedures sit outside every harness's auto-discovery root | `skills/` against a harness's own skills location | The file shape is portable and `AGENTS.md`'s map makes each procedure reachable by path, so an agent can always read one; only automatic surfacing is missing, and where to put the files is a per-harness configuration question that a live trial answers better than a guess | The first harness whose configuration cannot reach `skills/`, or the live trial specced in `docs/capabilities/blueprint-eval.md` |
 | D5 | The unattended outer loop is specced, not built | `docs/capabilities/loop-runner.md` | v1 is the watched phase: a human invokes each milestone session and judges after each whether iteration continues, which is how the failure domains get seen before they are automated away | Enough consecutive sessions whose stop rule held without human correction that the halt conditions are known, or L2 being wanted for another reason |
 | D6 | `boundary-lint` has no retrofit path for an existing codebase | `template/docs/capabilities/boundary-lint.md` against a brownfield target | Greenfield-first was the v1 scope choice in `GOALS.md`; a codebase that already violates its own layer map needs a baseline-and-ratchet story that no card here carries | The first bootstrap of this payload into a codebase whose declared layer map is already violated |
@@ -13,6 +12,7 @@
 | D8 | The only gate is skippable, and absent in a fresh clone | `tools/hooks/pre-commit` against a clone that has not run the install line | A hook is the strongest enforcement point a repository with no remote has; making it unskippable needs a place to run that the committer does not control, and there is none yet | The first remote or continuous-integration system this repository gets |
 | D9 | Two of the correspondence questions have no mechanism and stay a reading job | `docs/capabilities/template-live-drift.md`, read during the doc-garden pass | Neither question is decidable from text, so there is nothing to build: a heading list cannot tell whether two files discuss the same subject, and no comparison of what the payload ships can reveal what it failed to ship | A pair found structurally corresponding while saying different things, or a live-only artifact that a target project would have needed the payload to carry |
 | D10 | One clause of the layer map — a skill body may not name a harness-specific tool — has no mechanism | `docs/capabilities/boundary-lint.md`, read during review | Deciding it needs a list of every tool name in every harness, which nobody can write and which the next harness release would invalidate | A skill body found naming a harness-specific tool, or a harness whose tool vocabulary is small and stable enough to enumerate |
+| D11 | The two format documents are compared by heading subsequence though their class makes them one file stored twice | `tools/checks/template-live-drift`, `docs/capabilities/template-live-drift.md` | Widening the invariant of a card that already reads `enforced` requires the failing-case demonstration its own format asks for, which is a capability pass rather than a close-out edit; both pairs match today, so the gap is latent rather than active | The first wording difference between either pair of copies, or the next pass that opens that card for another reason |
 
 ## Details
 
@@ -34,39 +34,6 @@ therefore holds only while no file in its set needs to quote a marker. Fixed
 would mean matching the markers' real shapes — a slot is a brace pair opening
 a line or following whitespace outside backticks, and guidance is a marker
 word opening an HTML comment block — rather than matching the words anywhere.
-
-### D3 — Generic cards not instantiated here
-
-The payload ships six cards in `template/docs/capabilities/`. Five state
-invariants that hold for this repository too: `fast-verify` (the cheap
-command), `evidence-check` (active plans carry their living sections),
-`doc-integrity` (references resolve), `boundary-lint` (the layer map in
-`ARCHITECTURE.md`, whose rules are the outward-reference bans), and
-`prose-duplication` (no run of prose in two artifacts). The sixth,
-`isolated-env`, does not apply: there is no toolchain and no runtime here, so
-a card for it would be a check that passes on everything.
-
-All five are now instantiated and enforced: `fast-verify` sits at
-`docs/capabilities/fast-verify.md` and runs as `./tools/verify`, with
-`doc-integrity`, `prose-duplication`, `evidence-check` and `boundary-lint`
-beside it, running as `tools/checks/doc-integrity`,
-`tools/checks/prose-duplication`, `tools/checks/evidence-check` and
-`tools/checks/boundary-lint` under it. Each carries a register row in
-`docs/capabilities/index.md`, and the four that gate a rung carry a row in the
-table in `docs/MATURITY.md` as well, so this project's gate set now matches
-the ladder's intent instead of being one card wide. Nothing is left to pay
-down here; the row itself is deleted in the milestone that closes the plan
-that built them.
-
-The trigger fired at the close of v1, on both of its clauses. The reference
-sweep, run by hand, found decision record `0015` citing `MATURITY.md` — a path
-that resolves from neither the repository root nor that record's own
-directory, which is exactly the miss `doc-integrity` decides. The duplication
-sweep, also by hand, found twelve pairs of live artifacts sharing eight-word
-windows; eight were real single-owner violations and were fixed, which is what
-`prose-duplication` decides. Both defects had been in the tree for at least
-one milestone before anyone looked. The row stood as overdue while the
-instantiation ran as a plan of its own rather than as a tail on a milestone.
 
 ### D4 — Installed procedures are not auto-discovered
 
@@ -105,7 +72,8 @@ a count that may go down but never up. Two things need deciding with a real
 codebase in front of you — where the baseline lives so that deleting a line
 from it is a visible commit, and whether the ratchet is enforced per file or
 per repository. Until one exists, the card's acceptance is unreachable on a
-brownfield target, and D3's copying pass must not pretend otherwise.
+brownfield target, and instantiating it for a greenfield project must not
+pretend otherwise.
 
 ### D8 — A gate the committer can turn off
 
@@ -157,3 +125,25 @@ files, all of them short, and none of them names a tool today. Paying it down
 is either a harness whose tool vocabulary turns out to be stable enough to
 enumerate, or the first body that breaks the rule, which would be evidence
 about what an enumeration would have to contain.
+
+### D11 — Two copies of a format, compared as if they could differ
+
+Two files here are formats a project conforms to rather than skeletons it
+fills: `docs/capabilities/CARD_FORMAT.md`, and the record format beside it at
+`docs/decisions/DECISION_FORMAT.md`. Each live copy is the payload's copy
+verbatim, which makes the pair one file stored twice. The
+correspondence invariant in `ARCHITECTURE.md` names only the plan convention as
+the pair that must agree to the byte, and `tools/checks/template-live-drift`
+compares these two pairs the way it compares a filled skeleton, by heading
+subsequence, so a sentence rewritten inside a section of one copy and left
+alone in the other is invisible to it. Both pairs agree today: `cmp` printed
+nothing on either pair when the plan that built the checks was closed out.
+
+Paying it down is three lines and one demonstration. The `BYTE_IDENTICAL`
+literal in the check takes the two paths, and the Invariant section of
+`docs/capabilities/template-live-drift.md` and the correspondence bullet in
+`ARCHITECTURE.md` each gain the clause that says why those pairs are held to
+the stricter comparison. The demonstration is what makes this a pass of its
+own rather than an edit made in passing: a card reading `enforced` whose
+invariant widens has to be observed failing on a real difference first, which
+`docs/capabilities/CARD_FORMAT.md` requires of any status claim.

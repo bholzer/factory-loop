@@ -48,6 +48,9 @@ A project bootstrapped from this blueprint has:
 - Conventions, skills, and spec cards — not implementations of enforcers.
 - The maturity ladder (L0 human-gated → L3 bounded autonomy) is documented
   from day one; only L0/L1 behavior is exercised in v1.
+- The payload's `isolated-env` card is not instantiated here: nothing in a
+  repository of markdown has a runtime to isolate or a toolchain to pin, so a
+  live copy of that card would specify a check that every input passes.
 
 ## Non-goals
 
