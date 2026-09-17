@@ -30,7 +30,17 @@ from repo content alone.
   `template/docs/specs/index.md`,
   `template/docs/capabilities/{index.md,CARD_FORMAT.md}`. `MATURITY.md` is
   structure-plus-slots as specified; its L0–L3 text is M6's to write.
-- [ ] M5: Instantiate live repo from template.
+- [x] (2026-09-17 04:32Z) M5: Live repo instantiated from the template.
+  Written as live content: `ARCHITECTURE.md`, `docs/PRINCIPLES.md`,
+  `docs/DEBT.md`, `docs/specs/index.md`, `docs/capabilities/index.md`.
+  Copied verbatim: `docs/capabilities/CARD_FORMAT.md`,
+  `docs/decisions/DECISION_FORMAT.md`. Reconciled: `AGENTS.md` (map,
+  new Commands section, working rules) plus created `plans/completed/` and
+  `skills/`, each holding a `.gitkeep`. Graduated thirteen decisions to
+  `docs/decisions/0001`–`0013`. Carve-out named against this milestone's
+  acceptance: live `docs/MATURITY.md` is the unfilled skeleton copy,
+  because M6 owns its content in both copies — the live fill check
+  therefore reports 24 marker hits in that one file and none anywhere else.
 - [ ] M6: Capability spec cards + MATURITY.md.
 - [ ] M7: Skills — plan-author, plan-execute.
 - [ ] M8: Skills — doc-garden, retro, capability-build.
@@ -238,6 +248,68 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   the exposure was authoring-time only — but the audit currently happened
   because a human worried, and a rule that fires on worry is not a rule.
   2026-09-17/reviewer.
+- Decision: M5 graduates thirteen decisions rather than waiting for plan
+  completion, using the test "does this constrain how future work is done,
+  and does its rationale have no other owning file". Graduated:
+  `0001` meta-repo layout, `0002` PLANS.md adoption, `0003`
+  one-milestone-per-session, `0004` two template file classes, `0005`
+  PLANS.md byte identity, `0006` enforcers specced not implemented, `0007`
+  card status single home, `0008` portability lowest common denominator,
+  `0009` six-skill roster, `0010` autonomy by subsumption, `0011` no
+  decisions index, `0012` evidence lives in plans, `0013` convention change
+  triggers a plan audit. Deliberately not graduated: the scope choices whose
+  fact `GOALS.md` already owns with its reason inline (greenfield-first,
+  no `PROMPTS.md`, paper-only v1 verification, `loop-runner` parked at L2),
+  and the authoring-time craft decisions whose only reader was the session
+  that made them (PRINCIPLES examples living inside a guidance block,
+  DEBT.md's table-plus-details shape, the post-M3 acceptance carve-out, the
+  post-M4 conformance audit finding).
+  Rationale: `plans/PLANS.md` graduates decisions at completion, but M5 is
+  written to graduate them now, and the reason the milestone is right is
+  that M6 through M10 are the first consumers — a card written at M6 needs
+  `0007`'s status rule, and a skill written at M7 needs `0003` and `0008`.
+  Waiting would mean those sessions reading a plan's log for rules that
+  bind work beyond the plan. The stated test is what keeps graduation from
+  becoming a wholesale copy: of the 26 entries this log held before M5, 13
+  graduated and 13 stay. 2026-09-17.
+- Decision: Decision records cite no plan path — origin is recorded in the
+  Date field as "v1 blueprint design conversation", not as
+  `plans/active/v1-blueprint.md`.
+  Rationale: this milestone wrote the layer rule that artifacts never
+  reference a specific plan file, and the reason applies with force here:
+  every such path breaks when the plan moves to `plans/completed/`, which
+  is guaranteed to happen and would silently invalidate thirteen records at
+  once. Attribution without a path costs a reader one search and cannot
+  rot. 2026-09-17.
+- Decision: Live `docs/capabilities/index.md` and `docs/specs/index.md` are
+  filled now with empty-register prose, while live `docs/MATURITY.md` ships
+  as an unfilled skeleton copy until M6.
+  Rationale: the split follows what can be said truthfully today. Both
+  index files' content is a statement about what they contain, and "nothing
+  yet, here is what a row will look like" is that statement — writing it
+  removes them from the fill check permanently. `MATURITY.md`'s slots are
+  rung definitions and a promotion rule, which cannot be honestly
+  summarized as "empty"; an invented placeholder would be worse than a
+  marker, because a marker is visibly unfinished and prose is not.
+  2026-09-17.
+- Decision: `ARCHITECTURE.md` declares the skill layer as a component and
+  states its dependency rule before any skill file exists, marking the
+  directory as empty in the entry itself.
+  Rationale: the rule's whole job is to constrain the first skill written,
+  so writing it at M7 would be writing it after its only chance to prevent
+  the mistake. Declaring an empty component is honest as long as the
+  emptiness is stated, which it is; the alternative — a rough-edge entry
+  plus a debt row — would carry plan state inside an artifact that is not
+  allowed to reference plans. 2026-09-17.
+- Decision: The live `AGENTS.md` divergences from the template are seed
+  bugs and were fixed in the live file; the template was left untouched.
+  Rationale: the seed predates the template by two milestones, and every
+  difference was a template section the seed simply lacked (Commands), a
+  rule it lacked (the map-not-encyclopedia cap), or a conditional made
+  obsolete by this milestone ("once `docs/decisions/` exists"). Nothing in
+  the template was wrong, so nothing there changed — the first
+  correspondence reconciliation resolved entirely in one direction.
+  2026-09-17.
 
 ## Surprises & Discoveries
 
@@ -291,6 +363,81 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   `docs/decisions/DECISION_FORMAT.md`, and `plans/PLANS.md`; thirteen files
   copied including both `plans/{active,completed}/.gitkeep`, and
   `cmp "$T/plans/PLANS.md" plans/PLANS.md` was silent.
+- Observation: The live fill check matched itself. Live artifacts that
+  *discuss* the marker convention are indistinguishable, to a flat grep,
+  from artifacts still carrying markers — and the command line published in
+  `AGENTS.md` contains the pattern it searches for, so it always matched
+  its own file.
+  Evidence: the first run of
+  `grep -rn '{{FILL\|GUIDANCE' AGENTS.md GOALS.md ARCHITECTURE.md docs/…`
+  returned `AGENTS.md:41` (the command itself), `ARCHITECTURE.md:21` (prose
+  naming the markers), and `docs/MATURITY.md:4` (a real unfilled skeleton).
+  Two of three hits were false. Resolved by writing the pattern with
+  bracketed final letters (`{{FIL[L]`, `GUIDANC[E]`) so it cannot match its
+  own command line, and by deleting `ARCHITECTURE.md`'s restatement of the
+  marker syntax, which `template/AGENTS.md` already owns — the false
+  positive and a one-owner-per-fact violation turned out to be the same
+  defect. The residual limitation is registered as `D2` in `docs/DEBT.md`.
+  After both fixes the check reports 24 hits, all in `docs/MATURITY.md`.
+- Observation: Naive heading comparison cannot test template ↔ live
+  structural correspondence, because some headings are content. Four of
+  eleven files "differed" on a plain heading diff, and all four differences
+  were headings that are themselves filled slots — component names,
+  principle names, a debt item title, and every file's own title.
+  Evidence: `diff <(grep '^#' template/ARCHITECTURE.md) <(grep '^#'
+  ARCHITECTURE.md)` reported `### {{FILL: component name}}` ×2 against
+  `### Template payload`, `### Live instantiation`, `### Plan layer`,
+  `### Skill layer`. The test that does work is a subsequence check — drop
+  template headings containing a fill slot, require the remainder to appear
+  in the live file in order — which passed for all 11 files (template
+  heading counts 2–13, fixed 1–13, live 2–13, zero failures). The rule is
+  recorded in `docs/DEBT.md` `D1` as what a mechanism must implement.
+- Observation: The live repository was missing `plans/completed/`, which
+  `AGENTS.md` had claimed since the seed commit. It was found by
+  mechanically resolving every backticked path in the map rather than by
+  reading the map.
+  Evidence: resolving the map's 14 backticked paths reported `MISS
+  plans/completed/` alongside two bare filenames (`DECISION_FORMAT.md`,
+  `CARD_FORMAT.md`) that resolved only relative to their directory; the
+  directory was created with a `.gitkeep`, the two map entries were
+  rewritten as repository-relative paths, and the re-run reported
+  `unresolved: []`.
+- Observation: Reconciling the three seeded files against the template cost
+  one command each and found exactly one nonconformant file.
+  `plans/PLANS.md` was byte-identical, `GOALS.md`'s heading outline matched
+  the template's exactly, and `AGENTS.md` was missing the `## Commands`
+  section entirely plus two working rules.
+  Evidence: `cmp template/plans/PLANS.md plans/PLANS.md` silent;
+  `diff <(grep '^#' template/GOALS.md) <(grep '^#' GOALS.md)` empty;
+  the same diff for `AGENTS.md` showed `## Commands` and `## Working rules`
+  present in the template against `## Working rules` alone in the live file.
+- Observation: Scanning every backticked path across the live artifacts
+  found six that do not resolve from the repository root, and only one was
+  a defect. The rest fall into three classes a link checker has to
+  tolerate: sibling-relative names inside the directory that owns them
+  (`CARD_FORMAT.md` cited from `docs/capabilities/index.md`), illustrative
+  filenames in a format document (`NNNN-short-slug.md`,
+  `0007-single-writer-per-queue.md`), and deliberate mentions of files that
+  must not or do not yet exist (`PROMPTS.md` as a `GOALS.md` non-goal,
+  `CLAUDE.md` as the shim M9 installs).
+  Evidence: resolving the 27 distinct backticked paths across `AGENTS.md`,
+  `GOALS.md`, `ARCHITECTURE.md`, `docs/PRINCIPLES.md`, `docs/DEBT.md`, the
+  two index files, and the 13 decision records left the six above. The one
+  defect was `skills/`, referenced as a real directory by three live files;
+  it now exists with a `.gitkeep`, which also makes `ARCHITECTURE.md`'s
+  declared-but-empty skill layer a true statement rather than a promise.
+  This classification is input for M6's `doc-integrity` card: a checker
+  that flags all six is a checker that gets switched off.
+- Observation: The template still contains zero references outward, but the
+  obvious grep for it over-reports. Searching `template/` for
+  `plans/active` alongside the blueprint-specific terms returned two hits —
+  `template/AGENTS.md`'s map line and a line of the adopted convention —
+  both of which are template-provided paths that resolve inside any
+  instantiation.
+  Evidence: `grep -rniE 'harness-blueprint|blueprint|skills/|v1-blueprint|
+  plans/active' template/ | wc -l` → `2`, both `plans/active/`; dropping
+  that term from the pattern returns `0`. The rule a mechanism needs is
+  "no path that fails to resolve after a plain copy", not "no path".
 
 ## Outcomes & Retrospective
 
@@ -298,9 +445,15 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
 
 ## Context & Orientation
 
-This repository is currently four files: `GOALS.md` (project boundaries — read
-it first), `AGENTS.md` (entry-point map), `plans/PLANS.md` (the plan
-convention this document conforms to), and this plan. Nothing else exists yet.
+This repository now holds its own live instantiation. `GOALS.md` (project
+boundaries — read it first), `AGENTS.md` (entry-point map, with the two cheap
+verification commands under Commands), `ARCHITECTURE.md` (components and the
+layer map), `docs/` (`PRINCIPLES.md`, `MATURITY.md` — still an unfilled
+skeleton copy until M6 — `DEBT.md`, `decisions/0001`–`0013` plus
+`DECISION_FORMAT.md`, `specs/index.md`, `capabilities/index.md` plus
+`CARD_FORMAT.md`), `plans/PLANS.md` and this plan, the `template/` payload,
+and an empty `skills/`. What does not exist yet: any skill file, any
+capability card, `MATURITY.md` content, and the `CLAUDE.md` shim.
 
 Terms used below:
 
@@ -389,6 +542,29 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   form `D<n>` never reused, plus an optional per-item Details section for
   anything not pick-up-able from its row. Closing an item deletes its row
   and section. M10's deferred-work entries use this shape.
+- **Structural correspondence test** (M5): template ↔ live structure is
+  compared by subsequence, not by diff. Take the template file's headings,
+  drop every heading containing a fill slot, and require the remainder to
+  appear in the live counterpart in the same order; extra live headings are
+  expected, since filled content adds them. Plain heading diff produces
+  false drift on any file whose headings are content. M6 edits both copies
+  of `MATURITY.md` and both `capabilities/index.md` files and must keep this
+  test passing; the rule is also recorded in `docs/DEBT.md` `D1`.
+- **Live verification commands** (M5): the two cheap checks are published
+  under Commands in `AGENTS.md` — `cmp template/plans/PLANS.md
+  plans/PLANS.md`, and a marker grep over exactly the eight live
+  skeleton-derived files. The grep's pattern is written with bracketed
+  final letters so it does not match its own command line, and its file set
+  deliberately excludes `docs/decisions/` and the two format documents,
+  which may quote markers freely. Any milestone adding a live
+  skeleton-derived artifact adds it to that list.
+- **Next free identifiers** (M5): decision records run `0001`–`0013`, so
+  the next is `0014` and numbers are never reused. Debt items run `D1`–`D2`,
+  so the next is `D3`. M10's deferred-work entries continue that sequence.
+- **Live-only files** (M5): correspondence runs template → live only.
+  `docs/decisions/NNNN-*.md` and `plans/active/*` are project content with
+  no template counterpart, and that is not drift; the reverse check does
+  not exist.
 
 ## Milestones
 
@@ -578,3 +754,17 @@ plan alone per `plans/PLANS.md`.
   doc-garden as its owner; M8's doc-garden scope amended accordingly.
   Reason: convention changes with plans in flight must trigger a mechanical
   audit, not depend on someone noticing.
+- 2026-09-17: M5 executed. Added four Interfaces & Dependencies contracts
+  (structural correspondence by subsequence, the two published live
+  verification commands and their file set, next free decision and debt
+  identifiers, live-only files), five Decision Log entries, and four
+  Surprises observations. Reason: M6 through M10 edit both copies of files
+  this milestone created and must keep the correspondence and fill checks
+  passing, and neither check is discoverable from the artifacts alone — the
+  subsequence rule in particular is the difference between a working drift
+  test and one that reports false drift on four of eleven files. No
+  milestone scope changed. M5's written acceptance is met with one named
+  carve-out: live `docs/MATURITY.md` is an unfilled skeleton copy because
+  M6 owns its content in both copies, so "every template skeleton has a
+  live counterpart" holds structurally while that one counterpart is not
+  yet filled.
