@@ -77,7 +77,21 @@ from repo content alone.
   finding beyond its acceptance — the installed procedures are outside every
   harness's auto-discovery root — registered as `D4` and covered by the
   skill's step 9 rather than left in the plan.
-- [ ] M10: Paper verification, first retro, close plan.
+- [x] (2026-09-17 06:24Z) M10: Paper verification, first retro, close plan. The
+  bootstrap flow was walked against a real greenfield copy rather than an
+  imagined one (`cp -R template/. $T/` plus the six procedures), which found
+  one overclaim in `skills/harness-init/SKILL.md` and fixed it in place.
+  `doc-garden`'s eight sweeps were run over this repository: one dangling
+  reference repaired in decision record `0015`, eight duplicated-prose pairs
+  removed, `D1`'s trigger sharpened, `D3` recorded as overdue with evidence,
+  and the remaining findings dispositioned. Deferred work added as `D5`–`D7`.
+  The retro routed four material lessons — `docs/PRINCIPLES.md` gained the
+  attribution clause, `docs/decisions/DECISION_FORMAT.md` (both copies) gained
+  the reference-repair clause, the payload gained a sixth card
+  `prose-duplication`, and `0016` graduated — with two no-changes recorded
+  against the question they failed. `docs/specs/bootstrap-flow.md` written and
+  indexed. Acceptance met with one named deviation: the sweep's fixes landed
+  as one commit rather than one commit per finding, recorded below.
 
 ## Decision Log
 
@@ -555,6 +569,63 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   to defer; `blueprint-eval` is where it gets answered. `0008` is not
   superseded because its decision is about file shape and content, which
   held. 2026-09-17.
+- Decision: The paper walk was run as a real copy rather than against an
+  imagined target. The milestone says "an imagined greenfield target"; the
+  session instead created the target — `cp -R template/. $T/` plus the six
+  procedure directories — and resolved every backticked path inside it.
+  Rationale: an imagined walk can only check the claims the walker thinks to
+  check, and the expensive failures are the ones nobody imagines. The copy
+  costs one command and turns "every reference resolves" from a judgement
+  into an observation, which is the same reason this project writes acceptance
+  as commands. Not graduated: the technique belongs to the card that specifies
+  the payload trial, and `docs/capabilities/blueprint-eval.md` already states
+  a stronger version of it. 2026-09-17.
+- Decision: The duplication sweep's fixes landed as one commit rather than one
+  commit per finding, against `skills/doc-garden/SKILL.md`'s own disposition
+  rule.
+  Rationale: eight of the twelve findings were one defect class — a pointer
+  restated as prose — and six of the eight fixes were in artifacts the same
+  milestone was already editing for other reasons, so per-finding commits
+  would have produced a chain of commits none of which could be reverted
+  independently anyway. Stated as a deviation rather than quietly done: the
+  rule is right for a gardening pass that runs on its own, and this pass ran
+  inside the milestone that closes the plan. The one-commit-per-finding rule
+  is not being weakened in the skill. 2026-09-17.
+- Decision: `prose-duplication` ships as a sixth generic card in the payload,
+  not as a live-only card and not as a prose rule.
+  Rationale: the one-owner-per-fact check has now been run by hand in four
+  consecutive milestones and found a real violation in three of them, which is
+  exactly the "invariant re-enforced by a human twice" that
+  `docs/capabilities/CARD_FORMAT.md` says is a check nobody wrote. It belongs
+  in the payload rather than only here because the invariant is a property of
+  any repository whose artifacts are prose, and because the sweep in
+  `skills/doc-garden/SKILL.md` that currently does it by hand ships to every
+  bootstrapped project. It carries no gating row in `docs/MATURITY.md`: the
+  check finds candidate pairs but cannot decide which copy is canonical, so no
+  human gate retires when it goes green. Not graduated as a decision record —
+  the card is the artifact that owns it. 2026-09-17.
+- Decision: The card's exclusion classes were derived from the sweep's own
+  output, and two of them were discovered only because the first draft was
+  run: format-governed siblings, and whole directories whose files restate by
+  construction (`plans/` and `docs/decisions/`).
+  Rationale: a first draft with four exclusion classes reported 29 pairs on
+  this tree, of which 27 were the card format's own section scaffolding or
+  byte-identical template ↔ live counterparts. A card that would have been
+  built from that draft is the card that gets switched off in a week, which is
+  the failure `CARD_FORMAT.md` names explicitly. Deriving the exclusions from
+  a run is what makes the remaining two findings meaningful. 2026-09-17.
+- Decision: `D3` is recorded as overdue with its evidence rather than paid
+  down, and `0016` accepts the two irreducible skill ↔ card overlaps instead
+  of resolving them.
+  Rationale: paying `D3` means instantiating five cards, five register rows
+  and the gating rows behind them — a plan of its own, and doing it inside the
+  milestone that closes this plan is exactly the scope widening
+  `skills/plan-execute/SKILL.md` forbids. The overlaps are accepted because
+  the reference rules make a pointer impossible in both directions, and the
+  alternatives were a new artifact created to satisfy a rule or a procedure
+  that breaks in any project that pruned the card; `0016` records the
+  reasoning because it will otherwise be re-litigated by the first agent that
+  runs the check. 2026-09-17.
 
 ## Surprises & Discoveries
 
@@ -848,24 +919,196 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   sentence, leaving "merging it is a decision, not a step." followed by
   "somebody will otherwise propose them"; both steps were restored from the
   written content and the file now reads 182 lines, the largest of the six.
+- Observation: The bootstrap flow's references survive a real copy, including
+  the procedures, which is the strongest thing paper verification could
+  establish and was cheaper than reading.
+  Evidence: `T=$(mktemp -d); cp -R template/. "$T/"; cp -R skills "$T/skills"`
+  produced 24 files; resolving every backticked candidate path inside the copy
+  left eight unresolved strings, all in the three legitimate classes —
+  `/tmp/<project>.sock`, `0007-single-writer-per-queue.md`,
+  `NNNN-short-slug.md`, `_FORMAT.md`, `docs/capabilities/<card-name>.md`,
+  `CARD_FORMAT.md`, `index.md`, `evidence-check.md`. Zero unresolved paths
+  came from the six procedure bodies. The payload's own step-10 checks also
+  pass out of the box: six card files, six register rows, five gating rows
+  each naming a card that exists.
+- Observation: The paper walk found exactly one overclaim, and it was a claim
+  about the payload rather than about the flow. `harness-init` told its reader
+  that each skeleton's guidance states how to shrink that file for a small
+  project; one of eight does.
+  Evidence: extracting the `GUIDANCE —` headings from all eight skeletons
+  returned `RIGHT-SIZING` only in `template/ARCHITECTURE.md`; the other seven
+  carry owns / must-not-absorb / anti-pattern and nothing about shrinking. The
+  sentence was corrected to say what is there, and to point at the skill's own
+  right-sizing section, which is where the rule actually lives.
+- Observation: The reference sweep found one real defect, and it was in the
+  one file class this repository had decided never to edit. Decision record
+  `0015` cited `MATURITY.md`, which resolves from neither the repository root
+  nor `docs/decisions/`.
+  Evidence: resolving the backticked paths across 37 live markdown files left
+  eleven unresolved strings, ten of them the known legitimate classes and one
+  a genuine miss. The repair forced the append-only question: the rule's point
+  is that reasoning is never rewritten, and a path repair changes no
+  reasoning, so `DECISION_FORMAT.md` now says so in both copies rather than
+  leaving the next agent to guess whether a dangling citation is fixable.
+- Observation: One-owner-per-fact was being violated eight times in the live
+  tree, and every violation was a pointer that had grown a copy of what it
+  pointed at — most of them in `AGENTS.md`, the file whose whole job is
+  pointing.
+  Evidence: intersecting eight-word windows over the live artifacts and
+  skills reported twelve pairs before the fixes and four after: `AGENTS.md`
+  had restated `GOALS.md`'s purpose sentence (13 windows), `ARCHITECTURE.md`'s
+  layer rule (16), and `D1`'s mechanism sentence (7); `GOALS.md` had restated
+  the convention's durable-context sentence (6); `docs/DEBT.md` had restated
+  the correspondence invariant it says it is not a copy of (8 against
+  `ARCHITECTURE.md`, 10 against the card); `skills/capability-build/SKILL.md`
+  had restated two rules from `CARD_FORMAT.md` (4). The four that remain are
+  an attributed restatement (×2), the two format documents' shared
+  boilerplate, and the artifact path list that `AGENTS.md` and
+  `ARCHITECTURE.md` must both spell out.
+- Observation: A duplication check written from the principle alone would have
+  been unusable, and only running it showed why. With the whole tree in scope
+  it reports the card format's section scaffolding on every card pair and 488
+  windows between two files a rule requires to be byte-identical.
+  Evidence: the first draft's four exclusion classes left 29 pairs on this
+  tree; adding same-format siblings, declared-correspondence counterparts, and
+  the two restate-by-construction directories (`plans/`, `docs/decisions/`)
+  left 3 of 435 pairs over 30 files and 21,890 windows. Two are the skill ↔
+  card pairs `0016` accepts (11 windows); the third is the six procedure names
+  listed in both `ARCHITECTURE.md` and `docs/specs/bootstrap-flow.md`, which
+  is the allowlist class the card describes.
+- Observation: `D3`'s trigger had already fired and nobody noticed, which is
+  the thing debt rows are supposed to prevent. Both defects this milestone
+  found are decided by cards the payload ships and this project chose not to
+  instantiate.
+  Evidence: the dangling reference is `doc-integrity`'s invariant; the eight
+  duplicated pairs are `prose-duplication`'s. Both had been in the tree for at
+  least one milestone. `D1`'s trigger was also mis-stated — as written it
+  fires on any one-sided commit, including the project-content edits that make
+  up most of the live half's history — and was sharpened to fire on a generic
+  change landing in one half only.
 
 ## Outcomes & Retrospective
 
-- To be written at completion.
+### Purpose against outcome
+
+The purpose was that an agent in any of three harnesses could be pointed at a
+new project, invoke a bootstrap procedure, and end up with a right-sized
+working harness — and that this would be visible by copying the payload into
+an empty directory, following a procedure by hand, and finding that every
+referenced artifact exists and every rule is executable from repository
+content alone. That is what closing the plan actually did, with a real copy
+rather than an imagined one: 24 files, every backticked path inside the copy
+resolving except the eight strings that fall in the three legitimate classes,
+and zero unresolved paths in the six procedure bodies. The payload also passes
+the self-consistency checks its own bootstrap procedure prescribes.
+
+What the plan delivered beyond its purpose is the thing it set out to be: this
+repository is client #1, filled from its own payload, and every milestone from
+M5 onward was executed by the procedures being written. M7 through M10 each
+found a real defect in the artifact set by running a check rather than by
+reading it, which is the entire thesis of the constraint layer arriving as
+specifications early.
+
+What it did not deliver is the one thing `GOALS.md` already listed as a known
+unknown: nobody has bootstrapped a different project from this payload, and no
+feature has been driven through the loop anywhere but here. The three-harness
+claim is verified as file shape and reference resolution, not as behavior, and
+M9 falsified the stronger reading of it — the procedures sit outside every
+harness's auto-discovery root. Both gaps are recorded where gaps get picked up
+cold: `D4` and `D7` in `docs/DEBT.md`, with the trial specified as
+`docs/capabilities/blueprint-eval.md`.
+
+### What remains open
+
+`docs/DEBT.md` carries seven rows. `D1`, `D2` and `D4` were opened by earlier
+milestones; `D3` is now overdue rather than deferred, because both defects
+this milestone found are decided by cards the payload ships and this project
+chose not to instantiate; `D5`, `D6` and `D7` were opened here for the
+unattended loop, the brownfield retrofit, and the live trial. Nothing in the
+register is a surprise to its own card: each row points at the specification
+and states only why the work is not being done and what ends the deferral.
+
+The first thing a successor plan should do is pay `D3` down, because it is the
+cheapest of the seven and it retires the two hand checks this session had to
+run twice.
+
+### Lessons routed, one owner each
+
+Four differences passed all three materiality questions.
+
+A restatement that cannot be avoided still needs an owner named in it. Routed
+to `docs/PRINCIPLES.md`, which now says that a forced restatement — a card
+stating the invariant it checks, a format document the shape it defines —
+names the owning file in the same section, and that nothing else earns one.
+This is what turned three of the four surviving duplication pairs from
+findings into legitimate cases.
+
+Append-only was blocking a repair it was never about. Routed to
+`docs/decisions/DECISION_FORMAT.md` in both copies: the rule governs a
+record's reasoning, and a reference inside a record that has stopped resolving
+is repaired in place because a citation nobody can follow protects nothing.
+
+One-owner-per-fact was being enforced by a script written from scratch in four
+consecutive sessions. Routed to a sixth generic card,
+`template/docs/capabilities/prose-duplication.md`, specced and unbuilt, whose
+exclusion classes are the ones the runs actually produced rather than the ones
+the principle suggests. It gates no rung, because the check finds candidate
+pairs and cannot decide which copy is canonical.
+
+Two overlaps are structurally irreducible: a portable procedure and a prunable
+card cannot name each other, so both state the shared fact. Routed to
+`docs/decisions/0016-skill-and-card-may-restate-one-fact.md`, which accepts
+them with measurements and states what the acceptance does not license.
+
+### No change, with the question that failed
+
+A session ran the cheap verification commands after its edits instead of
+before them (M7). No change: `skills/plan-execute/SKILL.md` already says to
+observe the starting state first. Fails question two — an edit that restates a
+rule already written costs every future reader and saves nothing.
+
+An edit anchored on remembered line numbers damaged two steps of a file that
+had already been rewritten in the same session (M9). No change: the only
+transferable statement is "re-read before editing", and no artifact in this
+set owns the mechanics of editing. Fails question three — as a line in a
+procedure it would be advice rather than something a reader applies to a
+concrete case, and creating an artifact to hold it is forbidden.
+
+Four of the ten completed milestones carried a named carve-out or substitution
+against their own written acceptance (M3, M5, M8, M10). No change: every one
+was stated against the acceptance it diverged from, in the session that caused
+it, which is exactly what the convention and
+`skills/plan-execute/SKILL.md` require. Fails question one — the divergence
+that would be worth a rule is an unnamed one, and there were none.
+
+M8 was authored with an option to split into two sessions and did not need it;
+every milestone fit one session. No change, question one: a milestone that fit
+is not a divergence to learn from.
+
+### What this pass could not decide
+
+Whether the payload is right-sized for a project that is not this one. Every
+judgement about that came from reading the artifacts rather than from watching
+somebody use them, and the two candidate failures are opposite: an artifact
+set too heavy for a small project, and a starter card set too thin for a real
+codebase. `blueprint-eval` is written to answer it; until it runs, the
+question stays open rather than answered optimistically.
 
 ## Context & Orientation
 
-This repository now holds its own live instantiation. `GOALS.md` (project
-boundaries — read it first), `AGENTS.md` (entry-point map, with the two cheap
-verification commands under Commands), `ARCHITECTURE.md` (components and the
-layer map), `docs/` (`PRINCIPLES.md`, the filled `MATURITY.md`, `DEBT.md`
-with four register rows, `decisions/0001`–`0015` plus `DECISION_FORMAT.md`,
-`specs/index.md`, `capabilities/index.md` plus `CARD_FORMAT.md` and this
-project's three cards), `plans/PLANS.md` and this plan, the `template/`
-payload with its five generic cards, `skills/` holding all six procedures —
-`harness-init`, `plan-author`, `plan-execute`, `doc-garden`, `retro` and
-`capability-build` — and the root `CLAUDE.md` shim. What does not exist yet:
-nothing the milestones below create except M10's closing work.
+This repository holds its own live instantiation, and every milestone of this
+plan is complete. `GOALS.md` (project boundaries — read it first),
+`AGENTS.md` (entry-point map, with the two cheap verification commands under
+Commands), `ARCHITECTURE.md` (components and the layer map), `docs/`
+(`PRINCIPLES.md`, the filled `MATURITY.md`, `DEBT.md` with seven register
+rows, `decisions/0001`–`0016` plus `DECISION_FORMAT.md`, `specs/index.md`
+with `specs/bootstrap-flow.md` as the first reflected spec,
+`capabilities/index.md` plus `CARD_FORMAT.md` and this project's three
+cards), `plans/PLANS.md`, the `template/` payload with its six generic cards,
+`skills/` holding all six procedures — `harness-init`, `plan-author`,
+`plan-execute`, `doc-garden`, `retro` and `capability-build` — and the root
+`CLAUDE.md` shim. Nothing below remains to be created; this file moves to
+`plans/completed/` as its last act.
 
 Terms used below:
 
@@ -1103,6 +1346,33 @@ Contracts that milestones establish and later fresh-context sessions rely on:
   mechanism today, and it works everywhere. Registered as `D4` in
   `docs/DEBT.md` with the live trial as its trigger; `harness-init` step 9
   tells a bootstrapping agent to bridge it in the environment it is in.
+- **Card set, final** (M10, supersedes the M6 count): the payload ships six
+  cards at `template/docs/capabilities/<name>.md` — `fast-verify`,
+  `evidence-check`, `doc-integrity`, `boundary-lint`, `isolated-env`,
+  `prose-duplication` — and this project owns three at
+  `docs/capabilities/<name>.md` — `template-live-drift`, `blueprint-eval`,
+  `loop-runner`. All nine are `specced`; none is built. `prose-duplication`
+  has a register row in the payload and no gating row in either
+  `docs/MATURITY.md`, because a check that reports candidate pairs without
+  deciding which copy is canonical retires no human gate.
+- **Duplication check, as run by hand** (M10): normalize each artifact to
+  lowercase word sequences with indented and fenced blocks stripped, take
+  eight-word windows, intersect pairwise. Exclusions, all observed to be
+  necessary on this tree: `plans/` and `docs/decisions/` out of the checked
+  set; pairs a declared correspondence requires to be copies; pairs whose
+  shape one format document defines; the two format documents against each
+  other; attributed restatements. `template/docs/capabilities/prose-duplication.md`
+  is the specification; a later session should run the card, not re-derive the
+  script.
+- **Next free identifiers** (M10, supersedes M9): decision records run
+  `0001`–`0016`, so the next is `0017`. Debt items run `D1`–`D7`, so the next
+  is `D8`. `D3` is overdue rather than deferred.
+- **Specs state** (M10): `docs/specs/bootstrap-flow.md` is the first
+  reflected spec and `docs/specs/index.md` is now a one-row table. The
+  reflection rule is satisfied for this plan: what an outside reader can now
+  observe — a payload plus six procedures that install by copying, and which
+  of the claims about them have been checked — is written there in the present
+  tense, and this plan is the archive of how it came to exist.
 
 ## Milestones
 
@@ -1374,3 +1644,19 @@ plan alone per `plans/PLANS.md`.
   fixed, because the fix is a payload change and the evidence for choosing
   one belongs to the live trial. M9's written acceptance is met without
   substitution; no milestone scope changed and no decision graduated.
+- 2026-09-17: M10 executed and the plan closed. Added four Interfaces &
+  Dependencies contracts (final card set, the duplication check as run,
+  next free identifiers, specs state), five Decision Log entries, six
+  Surprises observations, the full Outcomes & Retrospective, and a refreshed
+  Context & Orientation; graduated `0016`. Reason: this is the last revision,
+  so the file has to read as an archive rather than as a plan in flight —
+  which means the retrospective states purpose against outcome, every routed
+  lesson names its single owner, and every discarded one names the
+  materiality question it failed, so a successor plan does not re-derive
+  them. Two findings changed artifacts outside this plan's own text: the
+  duplication sweep removed eight single-owner violations from the live
+  artifacts, and the reference sweep repaired a dangling citation inside a
+  decision record, which forced `DECISION_FORMAT.md` in both copies to say
+  what append-only does and does not govern. M10's acceptance is met with one
+  named deviation, logged above: the sweep's fixes landed as one commit
+  rather than one per finding.
