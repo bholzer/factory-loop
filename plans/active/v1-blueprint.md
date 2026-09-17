@@ -223,6 +223,21 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   cost proportional to live debt — a register of resolved entries taxes
   every future reader identically to real debt, and version control already
   holds the history. 2026-09-17.
+- Decision: (post-M4 review) This plan was authored under the pre-adoption
+  lean convention; audited against the adopted `plans/PLANS.md` and found
+  conformant — all four mandatory living sections present, Purpose first,
+  Milestones distinct from Progress, revision notes maintained, contracts
+  in Interfaces & Dependencies. The skeleton-only sections it lacks (Plan
+  of Work, Concrete Steps, Artifacts and Notes) are covered by the
+  Milestones narrative and evidence-in-Surprises, as the 2026-09-16
+  adoption revision note already records; empty ceremonial sections will
+  not be added. Rule going forward: a change to `plans/PLANS.md` triggers a
+  conformance audit of every plan in `plans/active/`, recorded in each
+  plan's Decision Log; doc-garden owns this check (M8 scope amended).
+  Rationale: both executed milestones already ran under the adopted text —
+  the exposure was authoring-time only — but the audit currently happened
+  because a human worried, and a rule that fires on worry is not a rule.
+  2026-09-17/reviewer.
 
 ## Surprises & Discoveries
 
@@ -460,8 +475,10 @@ must never do; no rule text duplicated from PLANS.md (references instead).
 ### M8: Skills — doc-garden, retro, capability-build
 
 Create three skills. doc-garden: scan for docs↔code drift, completed plans
-lacking specs reflection, DEBT.md staleness, broken cross-links, and (in this
-repo) template↔live structural divergence; open smallest-possible fixes.
+lacking specs reflection, active plans nonconformant with the current
+`plans/PLANS.md` (mandatory sections, evidence discipline, revision notes),
+DEBT.md staleness, broken cross-links, and (in this repo) template↔live
+structural divergence; open smallest-possible fixes.
 retro: reconstruct intended vs. actual from plan evidence; route each
 material lesson to exactly one owner — doc, principle, capability card,
 skill, or no-change — with an explicit materiality test. capability-build:
@@ -555,3 +572,9 @@ plan alone per `plans/PLANS.md`.
   failing-case and remediation bar for `built`, `specs/index.md` carries
   the reflection rule under its own heading, and all seven docs files name
   their owner boundary.
+- 2026-09-17: Post-M4 review — audited this plan against the adopted
+  `plans/PLANS.md` (it was authored under the earlier lean convention),
+  found it conformant, and added the convention-change audit rule with
+  doc-garden as its owner; M8's doc-garden scope amended accordingly.
+  Reason: convention changes with plans in flight must trigger a mechanical
+  audit, not depend on someone noticing.
