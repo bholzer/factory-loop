@@ -17,14 +17,14 @@ What an outside reader sees, concretely: `tools/verify` exists and passes; `docs
 ## Progress
 
 - [x] (2026-09-17 15:23Z) M1 — `tools/verify` exists, aggregates the two checks this repository ran by hand, and is published in `AGENTS.md` with a 5-second budget; `fast-verify` instantiated and `enforced`; pre-commit hook wired and observed refusing a commit.
-- [ ] M2 — `template-live-drift` built and `enforced`; all three of its comparisons demonstrated failing; `D1` deleted from `docs/DEBT.md`.
+- [x] (2026-09-17 15:37Z) M2 — `template-live-drift` built and `enforced`; all three of its comparisons demonstrated failing through `./tools/verify` and restored; `plans-md-identity` deleted; `D1` deleted from `docs/DEBT.md` and `D9` added.
 - [ ] M3 — `doc-integrity` instantiated, built and `enforced`; allowlist seeded with the three deliberate mentions this tree already contains.
 - [ ] M4 — `prose-duplication` instantiated, built and `enforced`; the two known skill ↔ card pairs allowlisted with their live twins; any newly found pair routed.
 - [ ] M5 — `evidence-check` instantiated, built and `enforced`; both of its failing halves demonstrated against this plan file.
 - [ ] M6 — `boundary-lint` instantiated, built and `enforced`; the layer map carries the rule-id block the check binds to; the undecidable clause recorded as debt.
 - [ ] M7 — close-out: budget re-measured and published, behavior reflected into `docs/specs/`, authoring decisions graduated to `docs/decisions/`, `D3` deleted, plan moved to `plans/completed/`.
 
-Use timestamps to measure rates of progress. M1 was executed on 2026-09-17 in one session; M2 has not been started.
+Use timestamps to measure rates of progress. M1 and M2 were each executed in one session on 2026-09-17; M3 has not been started.
 
 ## Surprises & Discoveries
 
@@ -47,6 +47,18 @@ Three things were measured while authoring, and each one changed a milestone's c
 
 - Observation (M1): the clean run costs half a second, an order of magnitude under the plan's floor.
   Evidence: `time ./tools/verify` reported `real 0m0.500s` on the first clean run and `0s` in the aggregator's own whole-second summary. The budget contract says twice the observed run rounded up to five seconds, so the published budget is 5 seconds, and `tools/verify`'s summary line reads `(0s)` — the aggregator counts whole seconds, which is honest at this size and will need tenths only if a later check makes the run slow enough for the budget to bind.
+
+- Observation (M2): the authoring tally held exactly, and the heading arithmetic behind it is 54 template headings minus the 6 that carry a fill slot.
+  Evidence: `./tools/checks/template-live-drift` on a clean tree ends with `ok — 19 files under template/: 1 byte-identical, 10 by heading subsequence over 48 headings, 8 excluded.` The six dropped headings are line 1 of `template/AGENTS.md`, lines 61 and 66 of `template/docs/PRINCIPLES.md`, line 65 of `template/docs/DEBT.md`, and lines 53 and 59 of `template/ARCHITECTURE.md` — every one a section whose title is itself filled in on arrival.
+
+- Observation (M2): nothing under `template/` uses a fenced code block, so the fence guard in the heading extractor is a branch this tree never exercises.
+  Evidence: `grep -rn '```' template/` printed nothing. The guard stays, because a skeleton that fences an example would otherwise have its example headings read as required ones, but it is untested here and the first skeleton to fence anything is the first real test of it.
+
+- Observation (M2): deleting `tools/checks/plans-md-identity` did not delete what it knew.
+  Evidence: M1's finding that `cmp` reports no line number when one file is a prefix of the other still holds, so the two-file `awk` pass that locates the divergence was carried into `tools/checks/template-live-drift` rather than dropped with the script. The append failing case printed `first at line 175`, the same location M1 observed.
+
+- Observation (M2): acceptance clause 5's `grep -n 'D1' …` is a clean test today and will stop being one in M6.
+  Evidence: run after the deletion it printed nothing and exited 1. The pattern has no word boundary, so once M6 creates `D10` the same command matches that row. A later session checking this should use `grep -n 'D1\b'` or read the register directly.
 
 ## Decision Log
 
@@ -110,9 +122,29 @@ Three things were measured while authoring, and each one changed a milestone's c
   Rationale: the protocol says exit 2 is never a pass, and the recovery note in Idempotence and Recovery warns about the inverse state — a register row reading `enforced` while the aggregator does not run the check. A deleted or chmod-stripped script would otherwise make the aggregator print `2 of 2 checks passed` while running one, which is the failure mode the whole plan exists to remove.
   Date/Author: 2026-09-17, M1 session.
 
+- Decision: (M2) `tools/checks/template-live-drift` prints one line per pair, and the one-line rule in the check protocol under Interfaces and Dependencies is amended to admit it.
+  Rationale: the card's Acceptance and this milestone's acceptance clause 1 both require one line per pair naming the comparison applied, for the reason the card states — a silently skipped exclusion is how an exclusion list grows until the check covers nothing. The protocol's "exactly one line" was written for a check that examines a set and reports a total, and a specific card contract governs over a generic output shape. The cost is that a clean `./tools/verify` run prints 21 lines where it printed 3; the four cards still to be built all specify a single summary line, so the cost does not compound.
+  Date/Author: 2026-09-17, M2 session.
+
+- Decision: (M2) the exclusions are decided by path — `.gitkeep` by name, and any file under `template/docs/capabilities/` that is neither `index.md` nor a `*_FORMAT.md` — and an excluded file is out of every comparison, not only out of counterpart existence.
+  Rationale: the card excludes card files from counterpart existence and says `index.md` is not excluded; `CARD_FORMAT.md` also has a live counterpart, so the discriminator is "neither the register nor a format document". Excluding a card from existence alone would leave `docs/capabilities/fast-verify.md` compared structurally against the generic card it instantiates, asserting a correspondence the card denies: instantiation is a rewrite, not a fill.
+  Date/Author: 2026-09-17, M2 session.
+
+- Decision: (M2) the byte-identical pair is a literal in the script, `BYTE_IDENTICAL="plans/PLANS.md"`.
+  Rationale: which files are one file stored twice is a decision `ARCHITECTURE.md` makes, not a property of the tree, and there is nothing in the bytes to derive it from. A second zero-tolerance pair is a one-line edit beside a comment saying why the line exists.
+  Date/Author: 2026-09-17, M2 session.
+
+- Decision: (M2) prose repair extended to `docs/capabilities/fast-verify.md`, in the live half only.
+  Rationale: its Remediation message quoted `plans-md-identity`, which this milestone deletes, and its passing-case sentence said the command prints one line per check, which the decision above makes false. Both sentences were written in M1 against this repository's own check set, so correcting them is not a generic improvement: `template/docs/capabilities/fast-verify.md` says "a one-line summary naming each check that ran" and is untouched, keeping this plan's payload edits to the two that M3 and M4 own.
+  Date/Author: 2026-09-17, M2 session.
+
+- Decision: (M2) the drift card's Enforcement point is rewritten to name `./tools/verify` and `tools/hooks/pre-commit` instead of continuous integration, and to record that its byte-identity comparison subsumed the check that was deleted.
+  Rationale: the same reason as M1's enforcement-point decision — there is no continuous integration here to name — plus the old text described the pre-M1 state, "replaces the single `cmp` line that covers only the byte-identity case today", which this milestone makes false twice over.
+  Date/Author: 2026-09-17, M2 session.
+
 ## Outcomes & Retrospective
 
-M1 is executed; the remaining six milestones are not, so this section stays unwritten until M7. What M1 fixes for that comparison: the budget published in `AGENTS.md` is 5 seconds against an observed clean run of 0.5 seconds, and the one defect found while building was in the check rather than in the tree — `cmp`'s missing line number on a prefix difference, recorded in Surprises. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
+M1 and M2 are executed; the remaining five milestones are not, so this section stays unwritten until M7. What M1 fixes for that comparison: the budget published in `AGENTS.md` is 5 seconds against an observed clean run of 0.5 seconds, and the one defect found while building was in the check rather than in the tree — `cmp`'s missing line number on a prefix difference, recorded in Surprises. What M2 adds: the hand walk between the halves is gone from `docs/DEBT.md`, and building it found no defect in the tree at all — the authoring tally was confirmed rather than corrected, which is the first milestone here to report that. At M7 this section compares the result against the purpose above on four points — whether one command decides all six invariants, what each check does not decide, whether the time budget published in `AGENTS.md` held, and which of the defects found during building were pre-existing rather than introduced by this work.
 
 ## Context and Orientation
 
@@ -140,13 +172,13 @@ The **maturity ladder** in `docs/MATURITY.md` has four rungs from L0 (human-gate
 
 ### What exists today
 
-`docs/capabilities/` holds three cards this project wrote for itself — `template-live-drift`, `blueprint-eval`, `loop-runner` — all `specced`, plus `CARD_FORMAT.md` and the register `index.md`.
+`docs/capabilities/` holds the three cards this project wrote for itself — `template-live-drift`, `blueprint-eval`, `loop-runner` — plus the instantiated `fast-verify`, `CARD_FORMAT.md`, and the register `index.md`. As of M2, `fast-verify` and `template-live-drift` read `enforced` and the other two read `specced`; the register is where that is stated, and the sentence you are reading is orientation, not a second copy of it.
 
 `template/docs/capabilities/` holds six generic cards the payload ships: `fast-verify`, `evidence-check`, `doc-integrity`, `boundary-lint`, `prose-duplication`, and `isolated-env`. Five of the six state invariants that hold in this repository too. `isolated-env` does not apply: there is no toolchain and no runtime here.
 
-`AGENTS.md` publishes two commands under Commands. The first compares `template/plans/PLANS.md` with `plans/PLANS.md` byte for byte using `cmp`, where silence is a pass. The second greps a fixed set of live artifacts for the two authoring markers, where silence is also a pass; its pattern is written with the final letter of each marker word in brackets so that the command line does not match itself. That self-matching trick, and its limit — it cannot tell a real unfilled slot from a marker quoted in prose — is `D2` in `docs/DEBT.md`.
+`AGENTS.md` publishes one command under Commands, `./tools/verify` with a 5-second budget, plus the one-time `git config core.hooksPath tools/hooks` install line. The two hand commands it published before M1 are now `tools/checks/scaffolding-markers` and, since M2, the byte-identity comparison inside `tools/checks/template-live-drift`. The marker check's pattern is written with the final letter of each marker word in brackets so that the script does not match itself; that trick, and its limit — it cannot tell a real unfilled slot from a marker quoted in prose — is `D2` in `docs/DEBT.md`.
 
-`docs/DEBT.md` runs `D1` through `D7`. `D1` is the hand-checked correspondence between the two halves and carries the hand procedure this plan replaces. `D3` is the uninstantiated generic cards and is marked overdue. `D6` (no brownfield ratchet for `boundary-lint`) and `D7` (the blueprint has never been run) are not this plan's work and stay.
+`docs/DEBT.md` runs `D2` through `D9`. `D1` — the hand-checked correspondence between the two halves — was deleted in M2 when the check replaced it, and `D9` records the two questions that check cannot decide. `D3` is the uninstantiated generic cards and is marked overdue. `D6` (no brownfield ratchet for `boundary-lint`) and `D7` (the blueprint has never been run) are not this plan's work and stay.
 
 ### The invariants this plan mechanizes, and who owns each one
 
@@ -286,7 +318,7 @@ The work is the lifecycle `plans/PLANS.md` requires plus the two deletions this 
 
 ## Concrete Steps
 
-All commands run from the repository root; each script and each command below assumes it, and `cd "$(git rev-parse --show-toplevel)"` is how a script gets there rather than hard-coding a path. This section is updated as work proceeds. M1's transcripts below are **observed**, copied from the session that executed it on 2026-09-17; the M2-through-M7 transcripts are **expected**, written at authoring time against an implementation that does not yet exist.
+All commands run from the repository root; each script and each command below assumes it, and `cd "$(git rev-parse --show-toplevel)"` is how a script gets there rather than hard-coding a path. This section is updated as work proceeds. The M1 and M2 transcripts below are **observed**, copied from the sessions that executed them on 2026-09-17; the M3-through-M7 transcripts are **expected**, written at authoring time against an implementation that does not yet exist.
 
 M1, in order:
 
@@ -338,6 +370,44 @@ Observed: the full `plans-md-identity` remediation text and `fast-verify: 1 of 2
 with `git commit` exiting 1 and `git log --oneline -1` still naming the previous commit. Restored with `git reset HEAD template/plans/PLANS.md && git checkout -- template/plans/PLANS.md`. The hook was then seen passing on this milestone's own two commits, which is the enforcement point firing in its own context rather than from a shell.
 
 M2 through M6 each follow the same three steps: write `tools/checks/<card-name>`, add it to the check list in `tools/verify`, then run the card's passing case and every failing case it specifies, copying the real output into `Surprises & Discoveries`. The failing cases are quoted in each milestone's Acceptance above; run them exactly as written, and if a check does not fail on a violation, the check is wrong — do not adjust the card to match what was built.
+
+M2's transcripts below are **observed**, copied from the session that executed it on 2026-09-17. The clean run of `./tools/checks/template-live-drift` prints one line per pair — three shapes of line, abbreviated here — and then the total:
+
+    template-live-drift: AGENTS.md — subsequence, 3 headings.
+    template-live-drift: docs/capabilities/boundary-lint.md — excluded
+    (card file: the payload ships a starter register and a project keeps
+    its own).
+    template-live-drift: plans/active/.gitkeep — excluded (directory
+    placeholder).
+    template-live-drift: plans/PLANS.md — byte-identical.
+    template-live-drift: ok — 19 files under template/: 1 byte-identical,
+    10 by heading subsequence over 48 headings, 8 excluded.
+
+The three failing cases, each run through `./tools/verify` and each followed by a restore and a re-observed clean run at exit 0. Heading, in which `grep -v '^## Register$'` rewrote `docs/capabilities/index.md`:
+
+    template-live-drift: docs/capabilities/index.md is missing the heading
+    `## Register`, which template/docs/capabilities/index.md declares. Add
+    the heading to the live file, or remove it from the template if the
+    section is genuinely gone — a generic change belongs in both halves.
+    template-live-drift: 1 violation in 19 files under template/.
+    fast-verify: 1 of 2 checks failed.
+    exit=1
+
+Byte identity, after `printf 'drift\n' >> template/plans/PLANS.md`:
+
+    template-live-drift: template/plans/PLANS.md and plans/PLANS.md differ,
+    first at line 175. These two files are byte-identical by construction.
+    Copy the intended version over the other and re-run.
+
+Counterpart existence, after `printf '# Example\n' > template/docs/EXAMPLE.md`, where the total line counts 20 files because the violating file is one of them:
+
+    template-live-drift: template/docs/EXAMPLE.md has no live counterpart at
+    docs/EXAMPLE.md. Either instantiate it for this project, or — if it is a
+    card file or a directory placeholder — check it against the exclusions in
+    docs/capabilities/template-live-drift.md.
+    template-live-drift: 1 violation in 20 files under template/.
+
+The enforcement point was confirmed in both directions. `git add template/docs/EXAMPLE.md && git commit -m "should be refused"` printed the counterpart-existence remediation text, then `pre-commit: commit refused — ./tools/verify reported the violations above.`, exited 1, and left `git log --oneline -1` naming the previous commit; and the hook was seen passing on this milestone's own two commits.
 
 M7:
 
@@ -395,7 +465,7 @@ These contracts are what a later session cannot rediscover, so they are fixed he
 
 **Language.** POSIX `sh` with `awk`, `grep`, `sed`, `sort`, `find`, `cmp`, and `test`. No other dependency, no bashisms, no network. Every script starts with `#!/bin/sh`, runs with no arguments, and begins by changing to the repository root with `cd "$(git rev-parse --show-toplevel)" || exit 2` so that it behaves identically from a subdirectory and from a git hook.
 
-**Check protocol.** Exit 0 means the invariant holds, and the check prints exactly one line: `<check-name>: ok — <what was examined, with counts>`. Exit 1 means a violation, and the check prints one block per violation built from its card's remediation text with the real offender substituted — file, line, target, rule — then the count. Exit 2 means the check could not decide, and it prints `<check-name>: cannot run — <reason>` with the next action; `tools/verify` treats 2 as a failure and never as a pass. No check writes to the tree.
+**Check protocol.** Exit 0 means the invariant holds, and the check's last line is `<check-name>: ok — <what was examined, with counts>`; a check whose card requires per-unit reporting prints one name-prefixed line per unit before it, which as of M2 is `template-live-drift` alone. Exit 1 means a violation, and the check prints one block per violation built from its card's remediation text with the real offender substituted — file, line, target, rule — then the count. Exit 2 means the check could not decide, and it prints `<check-name>: cannot run — <reason>` with the next action; `tools/verify` treats 2 as a failure and never as a pass. No check writes to the tree.
 
 **Aggregator protocol.** `tools/verify` runs the checks in a fixed order written in the script — a literal list, never a glob, so that output order is stable — and streams each child's output unmodified, because a summary that swallows a remediation message fails `fast-verify`'s own acceptance. It ends with `fast-verify: <M> of <M> checks passed (<seconds>s).` and exit 0, or one line per failure plus `fast-verify: <N> of <M> checks failed.` and `Fix the violations reported above and re-run ./tools/verify.` and exit 1. The check list at the end of this plan's work is: `scaffolding-markers`, `template-live-drift`, `doc-integrity`, `prose-duplication`, `evidence-check`, `boundary-lint`.
 
@@ -433,3 +503,16 @@ These contracts are what a later session cannot rediscover, so they are fixed he
   `core.hooksPath` is set in the clone this session ran in, which is the
   install line `AGENTS.md` publishes. Milestone boundaries, acceptance
   counts, and contracts are unchanged.
+
+- 2026-09-17 (M2 execution): recorded M2 complete in `Progress`, added M2's
+  observed transcripts to `Concrete Steps`, four observations to `Surprises &
+  Discoveries`, and five decisions to the `Decision Log`; refreshed the three
+  stale paragraphs under `Context and Orientation` → `What exists today`,
+  which still described the pre-M1 command set and the now-deleted `D1`; and
+  amended the check protocol under `Interfaces and Dependencies` to admit
+  per-unit reporting. Reason: the card's Acceptance and M2's acceptance
+  clause 1 both require one line per pair, which the protocol's "exactly one
+  line" forbade — a conflict inside the plan that an executing session has to
+  resolve in writing rather than silently. Milestone boundaries and
+  acceptance counts are unchanged; the one contract that changed is named
+  above with its rationale in the `Decision Log`.
