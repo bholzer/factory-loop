@@ -76,13 +76,17 @@ project receives that directory's contents with no ancestor context, so an
 outward reference is a dangling reference by construction.
 
 Nothing under `skills/` may name a path that the payload does not provide.
-The allowed targets are the artifacts a bootstrapped project has —
-`AGENTS.md`, `GOALS.md`, `ARCHITECTURE.md`, `docs/PRINCIPLES.md`,
-`docs/MATURITY.md`, `docs/DEBT.md`, the three `docs/` directories and their
-format documents, `plans/PLANS.md`, `plans/active/`, `plans/completed/` —
-plus sibling skills by `skills/<name>/SKILL.md`. Directories are namable;
-the project-specific files inside them are not, because a decision record,
-a spec, a card, or a plan file exists only in the project that wrote it.
+The allowed targets are the artifacts a bootstrapped project actually
+receives, which is decided by resolving the reference inside `template/`
+rather than against a list anyone maintains by hand: `AGENTS.md`, `GOALS.md`,
+`ARCHITECTURE.md`, `docs/PRINCIPLES.md`, `docs/MATURITY.md`, `docs/DEBT.md`,
+the three `docs/` directories with their format documents and the two index
+files the payload ships — `docs/capabilities/index.md` and
+`docs/specs/index.md` — `plans/PLANS.md`, `plans/active/`,
+`plans/completed/`, plus the procedure set itself, `skills/` and sibling
+skills by `skills/<name>/SKILL.md`. Directories are namable; the
+project-specific files inside them are not, because a decision record, a
+spec, a card, or a plan file exists only in the project that wrote it.
 Skill bodies may not name `template/`, because a target project does not
 receive it, and may not name a harness-specific tool, because the same file
 must work in every harness.
@@ -100,10 +104,32 @@ The live root artifacts may name `template/` freely: the payload is this
 project's subject matter. This is the asymmetry that the first two rules
 create, and it is the only direction in which the two halves may touch.
 
-Nothing outside `plans/` may depend on a specific plan file. Plans reference
-artifacts; artifacts never reference plans. The one thing plans own that
-outside files need — the evidence promoting a capability card to `built` — is
-reached through the card's history, not by a link from the card.
+Nothing outside `plans/` may depend on a specific plan file — a file of work
+in flight under `plans/active/` or finished work under `plans/completed/`.
+The convention itself, `plans/PLANS.md`, is not a plan and is named freely;
+it is the contract every plan conforms to. Plans reference artifacts;
+artifacts never reference plans. The one thing plans own that outside files
+need — the evidence promoting a capability card to `built` — is reached
+through the card's history, not by a link from the card.
+
+Three of the four rules above are decidable from file content, and
+`tools/checks/boundary-lint` binds to the ids below rather than to this
+section's prose, so that rewording a paragraph cannot silently retire a rule.
+The check refuses to run — it does not pass — when this block is absent or
+when its ids differ in either direction from the ones the check implements.
+
+    no-outward-payload-reference — every path reference in a file under
+      template/ resolves inside the payload, and no file there mentions this
+      repository, the blueprint, or the procedure directory.
+    no-unprovided-skill-target — every path reference in a file under skills/
+      names something the payload ships or a procedure beside it, and no
+      skill body names the payload directory.
+    no-plan-file-dependency — no file outside plans/ references a plan file
+      under plans/active/ or plans/completed/ that exists.
+
+The fourth rule — a skill body may not name a harness-specific tool — has no
+id, because deciding it needs a list of every tool name in every harness that
+nobody can write. It stays a review job.
 
 ## Cross-cutting invariants
 
