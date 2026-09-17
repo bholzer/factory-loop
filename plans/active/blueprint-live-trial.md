@@ -60,7 +60,7 @@ Everything below was observed by running the command named in each entry, never 
 Observed during M1 execution, 2026-09-17, in commits `7361958` and `1187484`. Everything above the marker predates the driver.
 
 - Observation: the driver's counts came out identical to the numbers the authoring measurement predicted, in every one of the three parts, on the first run.
-  Evidence: `./tools/blueprint-eval new smoke` printed `copied 25 files — 19 payload files and 6 procedures — committed as "Receive the payload".`; `check <trial>/repo layout references` printed `layout: ok — 6 procedures, each with SKILL.md and matching frontmatter name.` and `references: ok — 144 of 146 references resolved inside the copy, 1 allowlist entry applied, 0 stale.`; `check <trial>/repo fill` exited 1 and ended `fill: 117 marker lines in 8 of 23 markdown files.` The seeded allowlist entry was the only one needed: nothing else in a fresh copy dangles, so the payload half of the trial starts from a clean copy rather than from a backlog.
+  Evidence: `./tools/blueprint-eval new smoke` printed `copied 25 files — 19 payload files and 6 procedures — committed as "Receive the payload".`; `check <trial>/repo layout references` printed `layout: ok — 6 procedures, each with SKILL.md and matching frontmatter name.` and `references: ok — 144 of 146 references resolved inside the copy, 1 allowlist entry applied, 0 stale.`; `check <trial>/repo fill` exited 1 and ended `fill: 117 marker lines in 8 of 23 markdown files.` The eight files it named are exactly the eight skeleton-derived artifacts — `AGENTS.md`, `ARCHITECTURE.md`, `GOALS.md`, `docs/DEBT.md`, `docs/MATURITY.md`, `docs/PRINCIPLES.md`, `docs/capabilities/index.md` and `docs/specs/index.md` — the same set `tools/checks/scaffolding-markers` scans in this repository, reached in the copy by a walk rather than by a list. Running all three parts in one invocation exits 1 and prints 128 lines in the order layout, fill, references. The seeded allowlist entry was the only one needed: nothing else in a fresh copy dangles, so the payload half of the trial starts from a clean copy rather than from a backlog.
 
 - Observation: one deleted payload file produces ten dangling references, not one, and the map entry M1's acceptance names is only the first of them. The failing case is therefore stronger than the acceptance clause that describes it.
   Evidence: with `template/docs/PRINCIPLES.md` deleted, `check <trial>/repo references` exited 1 with ten blocks — `AGENTS.md:49`, `GOALS.md:90`, `docs/MATURITY.md:58`, `docs/capabilities/prose-duplication.md:30` and `:79`, `skills/doc-garden/SKILL.md:50`, `skills/harness-init/SKILL.md:90`, `skills/plan-author/SKILL.md:38`, `skills/retro/SKILL.md:36` and `:88` — and the summary `references: 10 dangling references in 143 examined across 20 markdown files of the copy.` The same run's `new` line read `copied 24 files — 18 payload files and 6 procedures`, so the count line reports the deletion too. After `git checkout -- template/docs/PRINCIPLES.md` and a fresh copy, the part printed `ok — 144 of 146` again.
@@ -520,3 +520,14 @@ Anything about `loop-runner`, `D5`, or the rung above L0. The trial produces evi
   itself and a loose one would judge differently per harness, which is the
   divergence the criterion decision exists to prevent. No milestone
   boundaries, acceptance counts, or contracts changed.
+
+- 2026-09-17 (M1 execution): relabelled the driver's two transcripts under
+  Concrete Steps from expected to observed, with the trial path and the
+  commit ids of the run, and added the observed output of both scriptable
+  failing cases and of the two refusals. Reason: the section's own preamble
+  said nothing there had been run, which stopped being true the moment the
+  driver existed, and a later session comparing its output against an
+  expectation rather than against a recorded observation cannot tell a
+  regression from a prediction that was always wrong. No milestone
+  boundaries, acceptance counts, or contracts changed; M1's `Progress` entry
+  and the five new Surprises entries carry the rest of the evidence.
