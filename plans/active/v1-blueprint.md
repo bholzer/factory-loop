@@ -103,6 +103,31 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   context tax).
   Rationale: Their doc optimizes single long-context runs; ours optimizes
   fresh-context loops. Gaps real, bulk not. 2026-09-16.
+- Decision: Supersede the lean-PLANS.md backfill — adopt the OpenAI ExecPlan
+  document verbatim as the base of `plans/PLANS.md`, with surgical edits
+  only. Surgery performed: (1) heading de-branded ("Codex Execution Plans" →
+  "Execution Plans") for harness portability; (2) the implementing
+  instruction "do not prompt the user for 'next steps'; simply proceed to
+  the next milestone" replaced with execute-one-milestone-then-stop,
+  retaining resolve-ambiguities-autonomously and commit-frequently scoped
+  within the milestone — an in-place edit so no contradictory instruction
+  pair exists; (3) "Prototyping milestones" heading normalized from `#` to
+  `##` (structural typo in source) and stray "—-" sequences normalized to
+  "—"; (4) the skeleton's conditional "If PLANS.md is checked into the
+  repo…" line replaced with a direct reference to `plans/PLANS.md`, which is
+  always checked in here; (5) appended a marked House Rules section carrying
+  the three local deltas — context hygiene (sizing, one-milestone-stop,
+  split-on-overflow, plans-compose), evidence rules (observed-only,
+  append-only corrections), lifecycle (active/completed, specs reflection,
+  decision graduation) — with an explicit governing clause. Everything else,
+  including the Formatting section (self-resolving for file-based plans) and
+  the full skeleton, is verbatim.
+  Rationale: Their wording is battle-tested prompt text; ours was untested
+  synthesis. All of the earlier backfill's additions except the three House
+  Rules deltas turned out to be subsumed by the adopted text (ambiguity
+  resolution, prose-first, exact commands, Interfaces & Dependencies and
+  Idempotence & Recovery via the skeleton, spike milestones). User call.
+  2026-09-16.
 
 ## Surprises & Discoveries
 
@@ -303,3 +328,17 @@ All milestones are additive file creation or in-place markdown edits;
 re-running a milestone overwrites its own outputs and nothing else. If a
 session dies mid-milestone, Progress shows the split state; restart from the
 plan alone per `plans/PLANS.md`.
+
+## Revision Notes
+
+- 2026-09-16: Added the Interfaces & Dependencies section and a Decision Log
+  entry after review flagged the lean convention's gaps versus the OpenAI
+  ExecPlan document. Reason: cross-milestone contracts must live in the plan
+  for fresh-context restarts.
+- 2026-09-16: `plans/PLANS.md` replaced — OpenAI ExecPlan text adopted
+  verbatim as base with surgical edits plus appended House Rules; see the
+  superseding Decision Log entry for the full surgery list. Reason: adopt
+  battle-tested wording while preserving this repository's fresh-context
+  loop, evidence, and lifecycle rules. This plan already conforms: all
+  mandatory living sections exist, and its Milestones narrative covers the
+  skeleton's Plan of Work / Concrete Steps roles.
