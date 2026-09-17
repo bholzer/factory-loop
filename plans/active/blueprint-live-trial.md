@@ -18,14 +18,14 @@ The observation that makes this plan worth its cost is the one nobody can make f
 
 - [x] (2026-09-17 20:19Z) M1 — Make the trial runnable: `tools/blueprint-eval` built with its `new` and `check` subcommands, both scriptable failing cases demonstrated, the discovery criterion stated on the card, and the command published in `AGENTS.md` and `ARCHITECTURE.md`. All seven acceptance checks observed; commits `7361958` (driver and allowlist) and `1187484` (card, map, layer entry). Trial directories used and left in place for inspection: `smoke-20260917-151702`, `dangling-map-20260917-151721`, `dangling-restored-20260917-151726`, `missing-skill-20260917-151730`, `layout-restored-20260917-151735`, all under `$HOME/blueprint-trials`.
 - [x] (2026-09-17 20:45Z) M2 — Claude Code, bootstrap half: trial at `$HOME/blueprint-trials/claude-code-20260917-152930`, harness `2.1.274 (Claude Code)`, one driven bootstrap session, commits `b55f463` (payload) and `ae00403` (the session's own bootstrap). Observation 1 held and its discovery route is recorded below; observation 2 held — `fill: ok — no authoring scaffolding in 23 markdown files of the copy.` Carve-out against acceptance 2: the references part exited 1 with 33 dangling references, all of them the target's own reserved code paths (32) plus one absolute system path (1), so observation 3 is **not** met at bootstrap and is re-observed in M3 once the executed milestone has created `tally/core/`, `tally/store.py` and `tally/cli.py`; the Decision Log entry on judging that observation at the end of a trial states why, and M8 below carries the payload fix the finding earned. Second carve-out: the bootstrap session ran with `--model opus` because this machine's configured default model refused for billing reasons.
-- [ ] M3 — Claude Code, second half: author the target's first plan and execute its first milestone in a fresh session; record observations 4 and 5 and the harness's overall outcome.
+- [x] (2026-09-17 21:57Z) M3 — Claude Code, plan and execution half: two more driven sessions in `$HOME/blueprint-trials/claude-code-20260917-152930`, authoring at 8 minutes 3 seconds (commit `c82847f`, 881 lines of plan and nothing else) and execution at 4 minutes 35 seconds (commits `fa2d92f`, `2f3ba4b`, `a3df528`, `0110215`, all prefixed `M1:`), each a separate process with no resumption and each exiting 0. `tally` runs: `add build` twice, `add ship`, `report` printed `build 2` then `ship 1`, exit 0, and the copy's own published `./verify` printed `verify: 1 check passed (tests).` over seven passing tests in 0.359 seconds. Acceptance checks 1 through 6 observed; observations 4 and 5 held, the latter judged against milestone entries by the decision logged below. Carve-out against acceptance 7: the references part still exits 1, `references: 1 dangling reference in 161 examined across 21 markdown files of the copy.`, down from 33 — the survivor is `/tmp` cited by the copy's `docs/PRINCIPLES.md:17`, which is the reference definition's defect and not the target's, so observation 3 is **not** met for Claude Code and its fix moved into M8 as that milestone's fifth acceptance check. The full outcome record for this harness is under `Outcomes & Retrospective`.
 - [ ] M4 — omp, whole trial in one session: all five observations, the discovery record, and the overall outcome.
 - [ ] M5 — Codex CLI, whole trial in one session: all five observations, the discovery record, and the overall outcome.
 - [ ] M6 — The discovery failing case: rename the bootstrap procedure's file, observe one harness fail to find it, restore, and set `blueprint-eval`'s status in `docs/capabilities/index.md` to what the four preceding milestones actually observed.
 - [ ] M8 — Land the payload fix this trial earned: `skills/harness-init/SKILL.md` step 10 and its stop condition demand that every backticked path resolve, which contradicts the fourth legitimate class in `docs/capabilities/doc-integrity.md`; fix the procedure, then re-run the bootstrap half of every harness whose record was made against the pre-fix text, per the re-run rule in the Decision Log.
 - [ ] M7 — Close out: delete `D7`, rewrite `D4` with the observed discovery facts, update `GOALS.md`, `docs/MATURITY.md` and `docs/specs/`, graduate the durable decisions, and move this file to `plans/completed/`.
 
-Use timestamps to measure rates of progress. M1 and M2 are executed; M3 through M8 are open. M8 was appended by M2's session, which found a payload defect whose fix invalidates a bootstrap record, and it sits before M7 in the list because close-out is the last thing that happens and a fix landing after it would close a plan over a payload nobody re-trialled; it keeps the number 8 because M1 through M7 are already spent in this record. The first session to execute one of them adds the observation time to its entry in the shape `- [x] (YYYY-MM-DD HH:MMZ)`.
+Use timestamps to measure rates of progress. M1, M2 and M3 are executed; M4 through M8 are open, and the Claude Code trial is complete apart from the one reference M8 must clear. M8 was appended by M2's session, which found a payload defect whose fix invalidates a bootstrap record, and it sits before M7 in the list because close-out is the last thing that happens and a fix landing after it would close a plan over a payload nobody re-trialled; it keeps the number 8 because M1 through M7 are already spent in this record. M3's session added a fifth acceptance check to it rather than a ninth milestone, for the reason its decision entry gives. The first session to execute one of the open ones adds the observation time to its entry in the shape `- [x] (YYYY-MM-DD HH:MMZ)`.
 
 ## Surprises & Discoveries
 
@@ -106,6 +106,21 @@ Observed during M3 execution, 2026-09-17, in the same Claude Code trial reposito
 - Observation: the evidence discipline reached the target project at authoring time, not just at execution time: the authored plan labels its transcripts expected, except for one command the session actually ran, which it ran outside the copy because the copy has no code to run anything against.
   Evidence: the copy's `Surprises & Discoveries` holds one entry, that `python3 -m unittest discover -s tests -t .` exits with `ImportError: Start directory is not importable` unless `tests/__init__.py` exists, with the failure text and the passing `Ran 1 test in 0.070s` / `OK` both quoted and the location stated as a scratch directory outside the repository. Its M1 acceptance then requires the end-to-end test to be observed failing before the package exists and passing after, and requires the project's verification command to be observed failing on a deliberately broken assertion — the two-part demonstration the copy's own card format asks for, written by a session nobody told about that requirement.
 
+- Observation: the payload carried a feature to a running command. `tally` works from a terminal in the copy, which is the thing no amount of reading this repository could establish.
+  Evidence: in `<trial>/repo`, `python3 -m tally add build && python3 -m tally add build && python3 -m tally add ship && python3 -m tally report` printed two lines, `build 2` then `ship 1`, and exited 0. The store it created is inside the checkout at `.tally/entries.log`, holding the three lines `build`, `build`, `ship`; the copy's plan fixed that path as a contract and its `.gitignore` covers `.tally/`, so `git status --porcelain` printed nothing with the file present. `TALLY_STORE=$(mktemp -d)/s.tsv python3 -m tally report` then printed nothing and exited 0, so the default is an override rather than a hard-coded location. The project's own published command, `./verify` from the copy's root, printed `verify: running tests`, seven dots, `Ran 7 tests in 0.112s`, `OK` and `verify: 1 check passed (tests).`, exited 0, and took 0.359 seconds real under `time` against the sixty-second budget its own `AGENTS.md` publishes. That guide is 71 lines and its Commands section now names `./verify`, the budget and the observed time, where at bootstrap it said the project had no such command.
+
+- Observation: the executed milestone drove the dangling-reference count from 33 to 1, which settles the judgement M2 made about when observation 3 is judged — and the one survivor is the absolute-path class, not anything the target project got wrong.
+  Evidence: `./tools/blueprint-eval check <trial>/repo references` exited 1 with a single block, `the copy cites /tmp, which the copy does not contain (cited by docs/PRINCIPLES.md:17).`, and the summary `references: 1 dangling reference in 161 examined across 21 markdown files of the copy.` The cited line states the target's own store rule — the store lives inside the checkout unless `TALLY_STORE` names somewhere else — and lists `/tmp` among the constants outside the checkout that violate it. All 32 reserved-path citations resolved once the milestone created `tally/core/`, `tally/store.py` and `tally/cli.py`, and the examined count rose from 149 to 161 as the new plan and the new files added citations of their own. The routing M2 chose holds: the definition's owner is `docs/capabilities/doc-integrity.md` in both halves and M7 carries the change. What M3 adds to that routing is the consequence nobody had noticed — that change edits `template/`, which the re-run rule makes a payload edit invalidating every harness record, so it cannot be a close-out edit made after the trials are recorded. It lands with M8's fix or it becomes its own milestone.
+
+- Observation: the executed milestone's recorded evidence is distinguishable from the plan's own predictions by machine, which is what observation 4 asks for — but not by the presence of an expected message, only by output no prediction could have contained.
+  Evidence: `git diff c82847f 0110215 -- plans/active/first-working-tally.md` reports 171 insertions and 9 deletions in that one file, the only file the execution session's last commit touched in the plan directory. Three added lines appear zero times in the authoring blob and at least once after execution: `./verify  0.11s user 0.04s system 30% cpu 0.495 total`, `FAILED (failures=3, errors=1)`, and `Ran 7 tests in 0.104s`. The line that cuts the other way is `ModuleNotFoundError: No module named 'tally'`, which the authoring version already carried once as a prediction and the executed version carries twice — so an expected error string proves nothing about who observed it, and a wall-clock figure or a failure count proves it immediately. Judging observation 4 from git, as this milestone's acceptance requires, works; judging it by searching for the messages the plan predicted would not.
+
+- Observation: the session stopped after one milestone, and the tick count that proves it needs reading with the copy's own convention in hand: one milestone ticked, nine nested steps ticked under it, four milestones open.
+  Evidence: the copy's plan carries two top-level ticked entries — the authoring entry recorded above and `- [x] (2026-09-17 21:52Z) M1 — add and report work end to end` — nine ticked sub-entries, all of them M1's granular steps with their own timestamps from 21:43Z to 21:52Z, and four unticked entries, M2 through M5. `git -C <trial>/repo log --oneline` shows four commits prefixed `M1:` over the authoring commit and nothing else. None of the files the later milestones create exists: `ls tally/core` lists `__init__.py` and `counting.py` with no `labels.py`, there is no `tools/` directory for M4's checker, and `docs/specs/` holds only `index.md`. The header paragraph the session wrote above its Progress list says M2 through M5 have not been started and that the files they create do not exist, which is checkable and checked.
+
+- Observation: the executing session found a hole in its own plan's contract, fixed it, and wrote the deviation down rather than letting the tree carry it silently — with the state of the copy proving the fix rather than the claim.
+  Evidence: the plan it was executing specified `.gitignore` as the single line `.tally/`, which does not cover the `__pycache__` directories a test run leaves behind, and nine `.pyc` files were committed before the session noticed. `git show --stat a3df528` shows that commit as one insertion to `.gitignore` and nine binary deletions, its message reading `M1: keep compiled bytecode out of the tree`; the copy's `.gitignore` now holds `.tally/` and `__pycache__/`, its Decision Log carries the departure from the plan's letter with the reason for untracking rather than rewriting history, and its `Surprises & Discoveries` carries the observation with `git ls-files | grep -c pycache` printing `9` as the evidence. Running `./verify` in the copy and then `git status --porcelain` printed nothing, so the repeated-run hygiene the fix was for holds.
+
 ## Decision Log
 
 - Decision: the trial target is `tally`, a dependency-free Python command-line tool that records labels in a file inside its own checkout and prints counts, specified in full under Interfaces and Dependencies and identical in all three harnesses.
@@ -172,9 +187,31 @@ Observed during M3 execution, 2026-09-17, in the same Claude Code trial reposito
   Rationale: `skills/plan-execute/SKILL.md` forbids widening a milestone past its boundary, and the re-run rule above makes a mid-trial payload edit invalidate the very bootstrap record this milestone just wrote: the copy in `claude-code-20260917-152930` holds the pre-fix procedure text, so landing the fix now costs a fresh trial repository and a re-driven bootstrap before M3 can start. M3's subject is `plan-author` and `plan-execute`, which the fix does not touch, so the honest arrangement is a bootstrap record labelled as pre-fix, M3 continuing in the same copy, and one later milestone landing the fix together with the re-runs it invalidates.
   Date/Author: 2026-09-17, M2 execution session.
 
+- Decision: observation 5 is judged against the plan's milestone entries and the commit log, not against every ticked checkbox in `Progress`.
+  Rationale: the convention the payload ships requires every stopping point to be documented in `Progress` and makes checklists mandatory there, so a compliant target plan carries more ticks than milestones — the copy's plan has two top-level ticks and nine nested ones after one milestone, because the authoring session recorded its own stop and the executing session recorded nine granular steps. The clause exists to catch a session that ran two milestones, and the facts that decide that are which milestone entries are ticked and what the commits contain. Reading the clause literally would fail a target project for following the convention the payload gave it, which would make the observation a test of the payload's own inconsistency rather than of the session's discipline.
+  Date/Author: 2026-09-17, M3 execution session.
+
+- Decision: the absolute-path exclusion moves out of M7's routing paragraph and becomes M8's fifth acceptance check.
+  Rationale: M2 routed the finding to close-out when the only instance was one line of scratch prose. M3 observed it as the sole surviving dangling reference of a completed trial, which makes it the difference between observation 3 passing and failing in every harness, and it is a change under `template/` — the re-run rule turns that into a re-driven bootstrap. A close-out milestone cannot invalidate the three harness records above it and then close the plan over them. M8 already exists to land a payload fix and re-run what it invalidates, and its own third check asks for a trial whose dangling references are exactly the target's reserved paths, which is unreachable while the definition still extracts `/tmp`. Both fixes therefore land in one milestone and one re-run, and M7 keeps only the verification.
+  Date/Author: 2026-09-17, M3 execution session.
+
 ## Outcomes & Retrospective
 
-Nothing is complete yet, so this section holds no outcome. It is written at M7, and it owes the reader a comparison against the purpose stated above: whether a copy of the payload and the procedures, with no access to this repository, carried one feature to an executed milestone in each of the three harnesses; which of the card's five observations held in which harness; what the trial found that reading the payload could not have found; what was fixed in the payload as a result, and what was routed to `docs/DEBT.md` instead; and what the three harnesses reported about how they found the procedures, which is the input `D4` has been waiting for.
+The plan-level retrospective is written at M7, and it owes the reader a comparison against the purpose stated above: whether a copy of the payload and the procedures, with no access to this repository, carried one feature to an executed milestone in each of the three harnesses; which of the card's five observations held in which harness; what the trial found that reading the payload could not have found; what was fixed in the payload as a result, and what was routed to `docs/DEBT.md` instead; and what the three harnesses reported about how they found the procedures, which is the input `D4` has been waiting for. What is complete as of M3 is the first harness's trial, whose outcome record sits below; the milestones that run the other two harnesses add theirs beside it.
+
+### Claude Code
+
+Harness `2.1.274 (Claude Code)`, 2026-09-17, in the trial repository `$HOME/blueprint-trials/claude-code-20260917-152930`. Three sessions, each a separate non-interactive process with no `--continue` and no `--resume`, each invoked as `claude -p --model opus --dangerously-skip-permissions` with a brief from `logs/` and standard input closed, each exiting 0: bootstrap under M2 at 4 minutes 57 seconds, plan authoring at 8 minutes 3 seconds, milestone execution at 4 minutes 35 seconds. The copy ends the trial with a working `tally`: `python3 -m tally add` and `python3 -m tally report` run, `./verify` is published and passes, and seven tests exist where at bootstrap there was no code at all. Four of the card's five observations hold; the third does not, and its shortfall is a single reference.
+
+Observation one — the harness discovered every skill with no per-harness edit to any file — holds under the criterion the card carries, and it holds by way of the tree rather than the harness. The bootstrap session listed the files and read the bootstrap procedure in its second tool call, four minutes before it created the symlink that makes the procedures harness-visible, and this machine's own skills directory holds none of the six. That is the `D4` evidence, recorded in full by M2.
+
+Observation two — after bootstrap, the fill check over the copy's skeleton-derived artifacts comes back empty — holds: `fill: ok — no authoring scaffolding in 23 markdown files of the copy.`
+
+Observation three — every path reference inside the copy resolves inside the copy — fails, with one reference outstanding after the executed milestone: `references: 1 dangling reference in 161 examined across 21 markdown files of the copy.`, the survivor being `/tmp` cited by the copy's `docs/PRINCIPLES.md:17` while stating where the target keeps its store. It is down from 33 at bootstrap, 32 of which were the reserved code paths the executed milestone created. The shortfall belongs to the reference definition rather than to the target project: it extracts an absolute system path as a repository-relative reference, which this repository has now seen twice in two different trees, and the fix is a change to `docs/capabilities/doc-integrity.md` in both halves with its own acceptance.
+
+Observation four — the executed milestone's living sections carry output observed in that session rather than restated from the plan — holds, judged from git as this milestone's acceptance requires. The diff of the copy's plan file between the authoring commit and the execution commit adds `./verify  0.11s user 0.04s system 30% cpu 0.495 total`, a line the authoring version cannot contain and does not.
+
+Observation five — the session stopped after one milestone rather than continuing — holds: one milestone ticked with its own nine steps beneath it, four milestones open, four commits all prefixed `M1:`, and no file that a later milestone creates present in the copy.
 
 ## Context and Orientation
 
@@ -293,14 +330,15 @@ The status decision is the judgement this milestone owes. Three passing trials a
 
 Appended by M2's session, which observed the defect rather than predicted it. `skills/harness-init/SKILL.md` step 10 requires that every backticked repository-relative path across the filled artifacts resolve, and its stop condition requires those checks to have come back clean, while `template/docs/capabilities/doc-integrity.md` names as its fourth legitimate class a deliberate mention of a file that does not exist, carried as an allowlist entry with a reason. A bootstrapping project states its layering as path rules before the code exists — the payload asks for exactly that — so the procedure demands a state its own card declares both unattainable and fine. The Claude Code session split the difference by reporting its run as not clean and seeding a debt row; the next session may as easily read the step literally and either weaken the layer rules until they resolve or claim a clean run it did not have.
 
-Acceptance, four observable checks.
+Acceptance, five observable checks. The fifth was moved here from M7 by M3's session, which observed that the absolute-path class blocks this milestone's own third check and cannot wait for close-out.
 
 1. `skills/harness-init/SKILL.md` step 10 and its stop condition name the reserved-path class and what a session does with it — a debt row naming the paths and the allowlist seeds, not a rewritten artifact and not a silent pass — in words `template/docs/capabilities/doc-integrity.md` already uses for its fourth class. The step still requires the walk to be run and its result recorded, because the finding that survives here is that a session ran it, read it, and reported honestly.
 2. `./tools/verify` ends in `6 of 6 checks passed`, and `prose-duplication` still reports zero violations with no new allowlist entry: the new sentences state the class in the procedure's own words rather than restating the card's.
 3. A fresh trial repository built after the fix, bootstrapped in one harness with brief one, produces a filled artifact set whose dangling references are exactly the target's reserved paths, and a `docs/DEBT.md` row naming them — observed, with the trial path and the transcript line, not inferred from the fix.
 4. Every harness whose bootstrap record in this plan was made against the pre-fix text has that record either re-run against the fixed text, or labelled in `Progress` as describing a payload that no longer exists, with the shortfall named. As of M2 that is Claude Code alone; M4 and M5 add themselves to this list if they run before this milestone.
+5. The reference definition no longer treats an absolute system path as a repository-relative reference to resolve: `docs/capabilities/doc-integrity.md` states the exclusion in both halves, `tools/checks/doc-integrity` and `tools/blueprint-eval` implement it, and the references part over the trial repository of check 3 reports the target's reserved paths alone with no `/tmp` citation. A trial whose only residue is that citation is what M3 observed in Claude Code, and the exclusion is what lets check 3 above be met rather than carved out.
 
-The work. The fix is a few sentences in one procedure file, and its whole risk is scope: it is not an invitation to revisit step 10's other clauses, the card's four classes, or the driver's strict resolution, all of which the trial found working. The re-run obligation is the Decision Log's rule applied to this plan's own record, and it is why this milestone sits before close-out rather than after it.
+The work. The procedure fix is a few sentences in one file and the definition fix is one span-exclusion rule stated on a card and implemented in two scripts; the whole risk in both is scope, and neither is an invitation to revisit step 10's other clauses, the card's four classes, or the driver's strict resolution, all of which the trial found working. The re-run obligation is the Decision Log's rule applied to this plan's own record, and it is why this milestone sits before close-out rather than after it.
 
 ### M7 — Close the plan out
 
@@ -321,11 +359,11 @@ The work. `plans/PLANS.md`'s lifecycle section governs the order: write the retr
 
 One finding from authoring is routed here because this is the milestone that has `docs/DEBT.md` open anyway: the empty count in `tools/checks/evidence-check`'s summary line, recorded in Surprises. Decide it rather than carry it — either the one-line fix that initialises the counter, which is a cosmetic change to a check whose decision is unaffected and needs no failing-case demonstration, or a debt row saying why it was left. Record which, and do not let it widen into a pass over that check.
 
-A second finding is routed here by M2 for the same reason: the reference definition `docs/capabilities/doc-integrity.md` owns extracts an absolute system path as a reference to resolve, seen once in this repository during M1 and again in the trial copy, where `docs/PRINCIPLES.md` cites `/tmp`. M1 fixed its instance by rewriting a sentence, which a target project's prose does not allow. Decide it rather than carry it — either the card gains a fifth decidable exclusion for a span that begins with a slash, in both halves and with the two checks that implement the definition following it, or a debt row states why the allowlist is the answer instead. A card change carries its own failing case, so if that is the choice and it does not fit beside close-out, it is a plan of its own and this milestone names it.
+The second finding M2 routed here — the reference definition extracting an absolute system path as a reference to resolve, seen in this repository during M1 and again in the trial copy where `docs/PRINCIPLES.md` cites `/tmp` — has moved to M8 as its fifth acceptance check, by the decision M3 logged. It left because it is a change under `template/`, which the re-run rule turns into a re-driven bootstrap, and a close-out milestone cannot both invalidate the harness records above it and close the plan over them. What remains here is the verification: confirm the exclusion landed, that no `/tmp` citation survives in M8's trial, and that no allowlist entry was seeded in its place.
 
 ## Concrete Steps
 
-Every command below runs from this repository's root unless a working directory is named. `<trial>` stands for the path `./tools/blueprint-eval new` printed, which the milestone's `Progress` entry records so the next session can find it. The driver's two transcripts below were observed on 2026-09-17 during M1, with the trial path of that run. Of the harness invocations further down, the Claude Code bootstrap line is observed as of M2, also 2026-09-17; the two remaining Claude Code lines and both other harnesses are still labelled expected, because nothing has driven them yet.
+Every command below runs from this repository's root unless a working directory is named. `<trial>` stands for the path `./tools/blueprint-eval new` printed, which the milestone's `Progress` entry records so the next session can find it. The driver's two transcripts below were observed on 2026-09-17 during M1, with the trial path of that run. Of the harness invocations further down, all three Claude Code lines are observed — the bootstrap during M2 and the authoring and execution lines during M3, all on 2026-09-17 — and both other harnesses are still labelled expected, because nothing has driven them yet.
 
 Build a trial repository and check it.
 
@@ -354,13 +392,16 @@ Run the three driven sessions. Each is a separate process with no resumption, wh
     cd <trial>/repo && claude -p --model opus --dangerously-skip-permissions "$(cat ../logs/brief-bootstrap.md)" < /dev/null 2>&1 | tee ../logs/01-bootstrap.txt
     cd <trial>/repo && claude -p --model opus --dangerously-skip-permissions "$(cat ../logs/brief-author.md)"    < /dev/null 2>&1 | tee ../logs/02-author.txt
     cd <trial>/repo && claude -p --model opus --dangerously-skip-permissions "$(cat ../logs/brief-execute.md)"   < /dev/null 2>&1 | tee ../logs/03-execute.txt
-    # the first of these three is observed, 2026-09-17, in claude-code-20260917-152930: it ran
-    # for 4 minutes 57 seconds, exited 0, and committed ae00403 "Bootstrap the agent harness for tally".
+    # all three of these are observed, 2026-09-17, in claude-code-20260917-152930. The bootstrap
+    # ran 4 minutes 57 seconds, exited 0, and committed ae00403 "Bootstrap the agent harness for tally";
+    # the authoring line ran 8 minutes 3 seconds, exited 0, and committed c82847f, 881 lines of plan
+    # and nothing else; the execution line ran 4 minutes 35 seconds, exited 0, and committed four
+    # times, fa2d92f through 0110215, all prefixed "M1:". The two other harnesses are still expected.
     # --model opus and < /dev/null are both M2 findings rather than authoring choices: the same line
     # without them exited 0 in 5.7 seconds having done nothing but print that the configured default
     # model requires usage credits, and having warned that it waited 3 seconds for standard input.
     # The Decision Log records why a model flag is recorded with the invocation and not counted
-    # against the discovery observation. The other two lines are still expected, not observed.
+    # against the discovery observation.
 
     omp -p --auto-approve --cwd <trial>/repo "$(cat <trial>/logs/brief-bootstrap.md)" 2>&1 | tee <trial>/logs/01-bootstrap.txt
     # and the same shape for the authoring and execution briefs.
@@ -379,10 +420,19 @@ Read the result.
     # blueprint-eval references: 33 dangling references in 149 examined across 21 markdown files of the copy.
     #   32 of them cite tally/core/, tally/store.py or tally/cli.py, the layering the brief prescribed
     #   and the code the first milestone has not written yet; the 33rd cites /tmp from docs/PRINCIPLES.md:17.
+    # observed again after the executed milestone, 2026-09-17, still exit 1 but with one citation left:
+    # blueprint-eval references: the copy cites /tmp, which the copy does not contain (cited by docs/PRINCIPLES.md:17).
+    # blueprint-eval references: 1 dangling reference in 161 examined across 21 markdown files of the copy.
     cd <trial>/repo && git log --oneline
-    # observed in the Claude Code trial: b55f463 Receive the payload, then ae00403 Bootstrap the agent harness for tally.
+    # observed after all three Claude Code sessions: b55f463 Receive the payload, ae00403 Bootstrap the
+    # agent harness for tally, c82847f Author the ExecPlan, then fa2d92f, 2f3ba4b, a3df528 and 0110215, all M1.
     cd <trial>/repo && python3 -m tally add build && python3 -m tally add build && python3 -m tally add ship && python3 -m tally report
+    # observed, two lines and exit 0: build 2 then ship 1. The store is .tally/entries.log inside the
+    # checkout; TALLY_STORE=$(mktemp -d)/s.tsv python3 -m tally report then printed nothing, exit 0.
+    cd <trial>/repo && ./verify
+    # observed: verify: running tests / Ran 7 tests in 0.112s / OK / verify: 1 check passed (tests). — exit 0, 0.359s real.
     cd <trial>/repo && grep -n '^## ' plans/active/*.md
+    # observed: the copy's plan carries all four required living sections and five milestone headings.
     cd <trial>/repo && git show --stat HEAD
     ls -a <trial>/repo
     grep -rc 'harness-blueprint' <trial>/logs/
@@ -623,3 +673,21 @@ Anything about `loop-runner`, `D5`, or the rung above L0. The trial produces evi
   changed from seven to eight and two acceptance counts moved with the
   clause; no contract under Interfaces and Dependencies changed, and the
   briefs are byte-for-byte as specified.
+
+- 2026-09-17 (M3 execution): recorded the authoring and execution sessions of
+  the Claude Code trial in `Surprises & Discoveries`, opened
+  `Outcomes & Retrospective` with a per-harness record for Claude Code rather
+  than leaving the section empty until close-out, ticked M3 with its carve-out
+  against acceptance clause 7, relabelled all three Claude Code invocations
+  under Concrete Steps as observed and filled the read-the-result block with
+  what they printed, moved the absolute-path exclusion out of M7's routing
+  paragraph into M8 as that milestone's fifth acceptance check, and logged two
+  decisions: how observation 5 is judged, and why that fix cannot wait for
+  close-out. Reason: the trial's first harness is now complete apart from one
+  reference, and a section that says nothing is complete while a finished
+  harness record exists would misstate the plan's own state; the exclusion
+  moved because it is a change under `template/` and the re-run rule makes
+  such a change invalidate the harness records a close-out milestone would be
+  closing over. Milestone count unchanged at eight; M8's acceptance count
+  moved from four checks to five; no contract under Interfaces and
+  Dependencies changed, and the briefs are byte-for-byte as specified.
