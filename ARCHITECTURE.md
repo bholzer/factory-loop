@@ -43,10 +43,9 @@ about the payload.
 
 ### Skill layer
 
-- Lives in: `skills/<name>/SKILL.md`. Two exist —
-  `skills/plan-author/SKILL.md` and `skills/plan-execute/SKILL.md`; the
-  bootstrap, capability-building, doc-gardening, and retrospection
-  procedures the next entry names do not exist yet.
+- Lives in: `skills/<name>/SKILL.md`. Five exist — `plan-author`,
+  `plan-execute`, `doc-garden`, `retro`, and `capability-build`; the
+  bootstrap procedure the next entry names does not exist yet.
 - Owns: the reusable procedures an agent invokes — bootstrap, plan authoring,
   plan execution, capability building, doc gardening, retrospection.
 - Does not: carry rules that belong to an artifact. A skill references
