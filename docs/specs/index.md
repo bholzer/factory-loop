@@ -18,10 +18,8 @@ history lives in version control and in `plans/completed/`.
 
 ## Index
 
-No spec files exist yet. What this project offers an outside reader is the
-payload in `template/` and the skills that operate it, and neither is
-complete enough to describe in the present tense without describing a
-half-built thing. The first spec lands when the bootstrap flow can be
-followed end to end; it will cover what an agent running that flow in a
-target project gets, and this section becomes a table with one row per spec
-file and a narrow statement of what each one covers.
+One row per spec file, with a narrow statement of what that file covers.
+
+| Spec | Covers |
+| --- | --- |
+| `bootstrap-flow.md` | What this repository offers a target project, what a project has once the payload and the procedures are installed, and which of those claims have been observed |

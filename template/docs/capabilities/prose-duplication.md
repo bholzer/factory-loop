@@ -8,10 +8,14 @@ alphanumeric words, take every window of eight consecutive words, and require
 the window sets of any two artifacts to be disjoint.
 
 The checked set is `AGENTS.md`, every markdown artifact its map names,
-everything under `docs/`, and the convention at `plans/PLANS.md`. Plan files
-under `plans/active/` and `plans/completed/` are outside it: a plan quotes
-convention text, command transcripts, and the artifacts it is changing, and
-that quoting is what makes it self-contained.
+everything under `docs/`, and the convention at `plans/PLANS.md`. Two
+directories are outside it. Plan files under `plans/active/` and
+`plans/completed/` quote convention text, command transcripts, and the
+artifacts they change, and that quoting is what makes a plan self-contained.
+Records under `docs/decisions/` restate the rule each one installed, and the
+append-only rule in `docs/decisions/DECISION_FORMAT.md` forbids replacing a
+record's text with a pointer, so every record's copy is historical by
+construction.
 
 Eight words is the floor, not a preference. Shorter windows fire on ordinary
 English connective phrasing, and a check whose findings are mostly noise is
