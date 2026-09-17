@@ -54,8 +54,9 @@ about the payload.
 ### Check layer
 
 - Lives in: `tools/` — the aggregator `tools/verify`, one executable per
-  check under `tools/checks/`, allowlists under `tools/allow/`, and the
-  versioned hook `tools/hooks/pre-commit`.
+  check under `tools/checks/`, allowlists under `tools/allow/`, and
+  `tools/hooks/pre-commit`, the hook this repository keeps in version
+  control rather than in each clone.
 - Owns: the mechanical decisions this repository makes about itself. One
   check per card in `docs/capabilities/`, plus `scaffolding-markers`, whose
   invariant belongs to the marker definition rather than to a card.
@@ -121,6 +122,12 @@ reached through the card's history, not by a link from the card.
   order, and extra live headings are expected where filled content adds
   them. `plans/PLANS.md` is the zero-tolerance case: the two copies are
   byte-identical.
+- A live card sitting at a payload card's relative path is that card's
+  instantiation, and the two are copies of each other by construction: the
+  live one is the generic invariant rewritten for what this project actually
+  has. Shared prose between such a pair is that relationship, not
+  duplication. The rewriting is why the pair is still excluded from the
+  structural comparison above — an instantiation is not a fill.
 
 ## Known rough edges
 

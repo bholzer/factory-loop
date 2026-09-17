@@ -91,8 +91,9 @@ end.
 
 ## Per-stack hints
 
-No toolchain applies: this repository is markdown operated on with shell and
-git. `find template -type f`, `cmp` for the one byte-identical pair,
+No toolchain applies: `ARCHITECTURE.md` states that every artifact in this
+repository is markdown, operated on with shell and git only. So:
+`find template -type f`, `cmp` for the one byte-identical pair,
 `grep '^#'` piped through a subsequence walk for the rest, and `test -e` for
 counterpart existence. That is under fifty lines of `sh` with no dependencies,
 which matters because the check has to keep working in a repository that

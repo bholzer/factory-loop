@@ -93,10 +93,11 @@ forces the reader to re-derive everything the checker already knew.
 
 ## Per-stack hints
 
-No toolchain applies: this repository is markdown operated on with shell and
-git. One `awk` pass extracts every backticked span and link target from the
-checked set, and `test -e` decides each one from the repository root and then
-from the citing file's directory. Link checkers built for published sites
+No toolchain applies: `ARCHITECTURE.md` states that every artifact in this
+repository is markdown, operated on with shell and git only. One `awk` pass
+extracts every backticked span and link target from the checked set, and
+`test -e` decides each one from the repository root and then from the citing
+file's directory. Link checkers built for published sites
 (`lychee`, `markdown-link-check`) would miss most of what matters here,
 because nearly every reference in these artifacts is a backticked path rather
 than markdown link syntax.

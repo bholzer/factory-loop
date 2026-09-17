@@ -1,0 +1,258 @@
+#!/bin/sh
+# prose-duplication — no run of eight words appears in two artifacts.
+#
+# docs/capabilities/prose-duplication.md is the card. Each artifact is
+# normalized to its sequence of lowercase alphanumeric words after fenced
+# blocks, indented blocks and HTML comment blocks are stripped as quoted
+# material; every window of eight consecutive words is taken; a window held by
+# two artifacts is a finding unless one of the card's legitimate classes covers
+# it.
+#
+# Five classes are decided here: a pair at the same relative path across the two
+# halves, a pair of format documents, a pair whose files share the same sibling
+# *_FORMAT.md document, an attributed restatement — the window's section in
+# either file names the other file in backticks — and quoted material, which is
+# stripped before windowing. The judgement class is
+# tools/allow/prose-duplication.txt.
+#
+# Exit 0 holds, exit 1 is a violation, exit 2 means undecidable.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+LC_ALL=C
+export LC_ALL
+
+ALLOW=tools/allow/prose-duplication.txt
+
+# The named part of the checked set: the live artifacts at the repository root
+# plus the one plan file that is convention rather than work in flight.
+NAMED="AGENTS.md GOALS.md ARCHITECTURE.md CLAUDE.md plans/PLANS.md"
+
+absent=0
+for f in $NAMED; do
+	if [ ! -f "$f" ]; then
+		echo "prose-duplication: cannot run — $f is in the checked set and does not exist."
+		absent=$((absent + 1))
+	fi
+done
+for d in docs skills template; do
+	if [ ! -d "$d" ]; then
+		echo "prose-duplication: cannot run — $d/ is in the checked set and does not exist."
+		absent=$((absent + 1))
+	fi
+done
+if [ "$absent" -ne 0 ]; then
+	echo "Restore the file, or update the checked set in tools/checks/prose-duplication to match the artifacts this project actually has."
+	exit 2
+fi
+if [ ! -f "$ALLOW" ]; then
+	echo "prose-duplication: cannot run — the allowlist $ALLOW does not exist."
+	echo "Restore it from git history, or create it empty if this project no longer needs a judgement-class exception."
+	exit 2
+fi
+
+# The discovered part: both halves. Records under docs/decisions/ are out —
+# each one restates the rule it installed and DECISION_FORMAT.md forbids
+# replacing that text with a pointer — but the format document itself stays in,
+# because it is one of the pair the format-document class is about.
+files=$NAMED
+artifacts=0
+for f in $(find docs skills template -type f -name '*.md' | sort); do
+	case "$f" in
+	docs/decisions/*)
+		case "${f##*/}" in
+		*_FORMAT.md) ;;
+		*) continue ;;
+		esac
+		;;
+	esac
+	files="$files $f"
+done
+for f in $files; do
+	artifacts=$((artifacts + 1))
+done
+if [ "$artifacts" -eq 0 ]; then
+	echo "prose-duplication: cannot run — the checked set is empty."
+	echo "Correct the paths in tools/checks/prose-duplication; an empty scope passes forever."
+	exit 2
+fi
+
+awk -v ALLOW="$ALLOW" -v W=8 '
+	function dirof(p) {
+		if (p !~ /\//) { return "." }
+		sub(/\/[^\/]*$/, "", p)
+		return p
+	}
+	function relpath(p) {
+		sub(/^template\//, "", p)
+		return p
+	}
+	# The window is attributed when the section it starts in, in either file,
+	# cites the other file in backticks. Three ways a citation can name it: as
+	# a repository-relative path, as a bare sibling filename, and — from inside
+	# the payload, whose references resolve inside the copy a target project
+	# receives — as a path relative to template/.
+	function cites(citing, section, target,   m, d) {
+		m = ment[citing SUBSEP section]
+		if (m == "") { return 0 }
+		if (index(m, " " target " ")) { return 1 }
+		d = dirof(citing)
+		if (d != "." && substr(target, 1, length(d) + 1) == d "/") {
+			if (index(m, " " substr(target, length(d) + 2) " ")) { return 1 }
+		}
+		if (substr(citing, 1, 9) == "template/" && substr(target, 1, 9) == "template/") {
+			if (index(m, " " substr(target, 10) " ")) { return 1 }
+		}
+		return 0
+	}
+	BEGIN {
+		# Every file in the checked set whose name ends in _FORMAT.md is the
+		# format document for its own directory. Two files governed by the same
+		# format share the scaffolding that format imposes, not their own prose.
+		for (i = 1; i < ARGC; i++) {
+			p = ARGV[i]
+			base = p
+			sub(/.*\//, "", base)
+			if (base ~ /_FORMAT\.md$/) { fmt[dirof(p)] = base }
+		}
+		while ((getline line < ALLOW) > 0) {
+			allowline++
+			if (line ~ /^[ \t]*$/) { continue }
+			if (line ~ /^[ \t]*#/) { continue }
+			if (line !~ /  #/) {
+				print "prose-duplication: cannot run — " ALLOW " line " allowline " has no reason."
+				fatal = 1
+				continue
+			}
+			key = substr(line, 1, index(line, "  #") - 1)
+			allow[key] = 1
+			allowseen[key] = 0
+			allowkeys[++allown] = key
+		}
+	}
+	FNR == 1 { fence = 0; comment = 0; section = 0; words = 0 }
+	{
+		if ($0 ~ /^[ \t]*```/) { fence = !fence; next }
+		if (fence) { next }
+		# An indented block reproduces a transcript, a remediation message or a
+		# skeleton verbatim, so it is quoted material rather than prose.
+		if ($0 ~ /^(    |\t)/) { next }
+		# HTML comment blocks are authoring guidance, deleted when a skeleton is
+		# filled, so two unfilled skeletons are not duplicating each other.
+		s = $0
+		line = ""
+		while (s != "") {
+			if (comment) {
+				p = index(s, "-->")
+				if (p == 0) { s = ""; break }
+				s = substr(s, p + 3)
+				comment = 0
+			} else {
+				p = index(s, "<!--")
+				if (p == 0) { line = line s; s = ""; break }
+				line = line substr(s, 1, p - 1)
+				s = substr(s, p + 4)
+				comment = 1
+			}
+		}
+		if (line ~ /^#+ /) { section++ }
+		# Backticked filenames and paths in this section, for the attribution
+		# class. A bare sibling filename counts: it is how a file in a
+		# directory cites its neighbour.
+		n = split(line, part, "`")
+		for (i = 2; i <= n; i += 2) {
+			t = part[i]
+			if (t ~ /[ \t*<>{}]/) { continue }
+			if (t !~ /\// && t !~ /\.md$/) { continue }
+			ment[FILENAME SUBSEP section] = ment[FILENAME SUBSEP section] " " t " "
+		}
+		line = tolower(line)
+		gsub(/[^a-z0-9]+/, " ", line)
+		n = split(line, part, " ")
+		for (i = 1; i <= n; i++) {
+			if (part[i] == "") { continue }
+			words++
+			buf[words % W] = part[i]
+			secbuf[words % W] = section
+			if (words < W) { continue }
+			start = words - W + 1
+			win = buf[start % W]
+			for (j = start + 1; j <= words; j++) { win = win " " buf[j % W] }
+			examined++
+			if (!((win SUBSEP FILENAME) in seen)) {
+				seen[win SUBSEP FILENAME] = 1
+				holders[win] = holders[win] " " FILENAME
+				holdern[win]++
+				winsec[win SUBSEP FILENAME] = secbuf[start % W]
+			}
+			pos[win SUBSEP FILENAME] = pos[win SUBSEP FILENAME] " " start
+		}
+	}
+	END {
+		if (fatal) {
+			print "Every entry is one key, two spaces, a # and a one-line reason; an exception nobody justified is an exception nobody can review."
+			exit 2
+		}
+		for (win in holdern) {
+			if (holdern[win] < 2) { continue }
+			hn = split(holders[win], h, " ")
+			for (i = 1; i <= hn; i++) {
+				for (j = i + 1; j <= hn; j++) {
+					a = h[i]; b = h[j]
+					if (a > b) { a = h[j]; b = h[i] }
+					if (relpath(a) == relpath(b)) { continue }
+					abase = a; sub(/.*\//, "", abase)
+					bbase = b; sub(/.*\//, "", bbase)
+					if (abase ~ /_FORMAT\.md$/ && bbase ~ /_FORMAT\.md$/) { continue }
+					fa = fmt[dirof(a)]
+					if (fa != "" && fa == fmt[dirof(b)]) { continue }
+					if (cites(a, winsec[win SUBSEP a], b)) { continue }
+					if (cites(b, winsec[win SUBSEP b], a)) { continue }
+					key = a ":" b ":" win
+					if (key in allow) { allowseen[key] = 1; continue }
+					pair = a SUBSEP b
+					if (!(pair in shared)) { pairs[++pairn] = pair }
+					shared[pair]++
+					sp = split(pos[win SUBSEP a], pp, " ")
+					for (k = 1; k <= sp; k++) {
+						if (pp[k] == "") { continue }
+						if (example[pair] == "" || pp[k] + 0 < examplepos[pair] + 0) {
+							example[pair] = win
+							examplepos[pair] = pp[k] + 0
+						}
+						for (o = 0; o < W; o++) { cover[pair SUBSEP (pp[k] + o)] = 1 }
+					}
+				}
+			}
+		}
+		applied = 0; stale = 0
+		for (i = 1; i <= allown; i++) {
+			if (allowseen[allowkeys[i]]) { applied++ } else { stale++ }
+		}
+		for (c in cover) {
+			split(c, cp, SUBSEP)
+			covered[cp[1] SUBSEP cp[2]]++
+		}
+		# Insertion sort: the iteration order of an awk array is unspecified and
+		# a check whose output order moves between runs cannot be diffed.
+		for (i = 2; i <= pairn; i++) {
+			v = pairs[i]
+			for (j = i - 1; j >= 1 && pairs[j] > v; j--) { pairs[j + 1] = pairs[j] }
+			pairs[j + 1] = v
+		}
+		for (i = 1; i <= pairn; i++) {
+			split(pairs[i], pq, SUBSEP)
+			a = pq[1]; b = pq[2]
+			n = covered[pairs[i]]
+			print "prose-duplication: " a " and " b " share the window \"" example[pairs[i]] "\" (" n " words shared in total). One of the two owns this fact. Delete the copy, leave a reference to the owning file, name the owning file in the same section so the restatement reads as attributed, or — if the window is a proper-noun run, a path list or a section-name list both files must spell out — add \"" a ":" b ":" example[pairs[i]] "\" to " ALLOW " with a reason."
+		}
+		if (pairn == 0) {
+			print "prose-duplication: ok — " (ARGC - 1) " artifacts compared, " examined " eight-word windows examined, " applied " allowlist entries applied, " stale " stale."
+			exit 0
+		}
+		noun = "pairs"
+		if (pairn == 1) { noun = "pair" }
+		print "prose-duplication: " pairn " duplicated " noun " in " examined " windows across " (ARGC - 1) " artifacts."
+		exit 1
+	}
+' $files

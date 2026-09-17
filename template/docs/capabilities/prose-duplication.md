@@ -40,9 +40,13 @@ are decidable; the sixth is a judgement and is carried as an allowlist.
   format's, not either file's;
 - shared boilerplate between two format documents themselves, decidable by
   skipping pairs where both filenames end in `_FORMAT.md`;
-- quoted material: indented or fenced blocks, which exist to reproduce a
-  remediation message, a transcript, or a skeleton verbatim, are stripped
-  before windowing;
+- quoted material: indented blocks, fenced blocks, and HTML comment blocks,
+  which exist to reproduce a remediation message, a transcript, a skeleton,
+  or the authoring guidance a skeleton carries, are stripped before
+  windowing. Guidance comments are the case most easily missed: they are
+  scaffolding deleted when a file is filled, so two skeletons still carrying
+  the same guidance block verbatim are not duplicating each other, and a
+  project mid-bootstrap holds several of them at once;
 - a window that is a proper noun run, a path list, or a section-name list
   both files must spell out to name the same thing. This is the judgement
   class, carried as an allowlist of exact `fileA:fileB:window` triples, each
