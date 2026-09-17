@@ -135,6 +135,9 @@ Three things were measured while authoring, and each one changed a milestone's c
 - Observation (M7): the new spec's list of what a person still reads collided with the file that owns the rough edges, and routing it to the debt rows was shorter than the sentence it replaced.
   Evidence: the first draft of `docs/specs/mechanical-checks.md` restated the two undecidable correspondence questions and `./tools/verify` printed `prose-duplication: ARCHITECTURE.md and docs/specs/mechanical-checks.md share the window "about the same subject and whether a live"`. Replaced with one clause per debt row naming `D9`, `D10` and `D11` and nothing about what each one contains, after which `prose-duplication: ok — 45 artifacts compared, 32554 eight-word windows examined, 20 allowlist entries applied, 0 stale.` The check found the spec doing what a spec is most tempted to do — summarizing a neighbour — on its first run.
 
+- Observation (M7): the move was the last edit, and the hook's own run is the evidence for what the repository looks like after it.
+  Evidence: the run immediately before the `git mv` printed `evidence-check: plans/active/mechanical-gate-set.md — … 7 of 7 Progress entries complete, every one timestamped.`; the hook firing on the commit that carried the move printed `evidence-check: ok — no active plans under plans/active/, 4 sections required of each.` and `fast-verify: 6 of 6 checks passed (1s).` at exit 0. The empty-directory pass M5 exercised with a throwaway plan is now this repository's steady state, which is the one green line in the set that reports nothing about correctness.
+
 ## Decision Log
 
 - Decision: the checks live in a new live-only directory, `tools/`, and the payload gains nothing from this plan.
