@@ -158,6 +158,17 @@ Recorded here so the reasoning exists in-repo; durable ones graduate to
   Identity also makes this the one template file whose drift check is exact:
   `diff template/plans/PLANS.md plans/PLANS.md` must be empty, with no
   project-specific variance to reason about. 2026-09-16.
+- Decision: (post-M3 review) Accept that `template/plans/PLANS.md` does not
+  meet M3's acceptance clause "every template file states its ownership
+  boundary and at least one anti-pattern" — the byte-identity decision
+  correctly forbids annotating it, and identity is worth more than the
+  header. M3 remains complete with this named carve-out. Process lesson for
+  future sessions, and retro input for M10: when a decision narrows a
+  milestone's written acceptance, say so against the acceptance explicitly
+  in the same session — an unnamed deviation makes completion claims
+  unauditable. Also from review: use date+time Progress timestamps per the
+  skeleton (`2026-09-16 14:00Z`), not bare dates — rates of progress are
+  unmeasurable otherwise. 2026-09-16/reviewer.
 
 ## Surprises & Discoveries
 
