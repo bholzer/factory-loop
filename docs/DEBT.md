@@ -8,7 +8,7 @@
 | D4 | The installed procedures sit outside every harness's auto-discovery root | `skills/` against a harness's own skills location | Three live trials found the shortfall costs discovery latency and not access: no harness offered the arriving procedures at startup, and every bootstrap session reached the right one within its first two commands by reading the tree | The pick between the three candidate locations described below, which is a decision rather than a fix and no longer waits on anything to be observed |
 | D5 | The unattended outer loop is specced, not built | `docs/capabilities/loop-runner.md` | v1 is the watched phase: a human invokes each milestone session and judges after each whether iteration continues, which is how the failure domains get seen before they are automated away | Enough consecutive sessions whose stop rule held without human correction that the halt conditions are known, or L2 being wanted for another reason |
 | D6 | `boundary-lint` has no retrofit path for an existing codebase | `template/docs/capabilities/boundary-lint.md` against a brownfield target | Greenfield-first was the v1 scope choice in `GOALS.md`; a codebase that already violates its own layer map needs a baseline-and-ratchet story that no card here carries | The first bootstrap of this payload into a codebase whose declared layer map is already violated |
-| D8 | The only gate is skippable, and absent in a fresh clone | `tools/hooks/pre-commit` against a clone that has not run the install line | A hook is the strongest enforcement point a repository with no remote has; making it unskippable needs a place to run that the committer does not control, and there is none yet | The first remote or continuous-integration system this repository gets |
+| D8 | The only gate is skippable, and absent in a fresh clone | `tools/hooks/pre-commit` against a clone that has not run the install line | Overdue rather than deferred: the remote arrived and runs nothing, so the hook is still the only gate that exists, and putting the cheap command somewhere the committer does not control is a build task rather than a correction | Fired — `git remote -v` names `origin` and `main` has been pushed to it; what remains is a job on that remote, which is a plan's worth of work |
 | D9 | Two of the correspondence questions have no mechanism and stay a reading job | `docs/capabilities/template-live-drift.md`, read during the doc-garden pass | Neither question is decidable from text, so there is nothing to build: a heading list cannot tell whether two files discuss the same subject, and no comparison of what the payload ships can reveal what it failed to ship | A pair found structurally corresponding while saying different things, or a live-only artifact that a target project would have needed the payload to carry |
 | D10 | One clause of the layer map — a skill body may not name a harness-specific tool — has no mechanism | `docs/capabilities/boundary-lint.md`, read during review | Deciding it needs a list of every tool name in every harness, which nobody can write and which the next harness release would invalidate | A skill body found naming a harness-specific tool, or a harness whose tool vocabulary is small and stable enough to enumerate |
 | D11 | The two format documents are compared by heading subsequence though their class makes them one file stored twice | `tools/checks/template-live-drift`, `docs/capabilities/template-live-drift.md` | Widening the invariant of a card that already reads `enforced` requires the failing-case demonstration its own format asks for, which is a capability pass rather than a close-out edit; both pairs match today, so the gap is latent rather than active | The first wording difference between either pair of copies, or the next pass that opens that card for another reason |
@@ -113,6 +113,14 @@ requires a gating card to be `enforced` with no run in which the check was
 disabled or skipped, and a flag that silently turns the gate off makes that
 run unobservable. No rung may be claimed on this gate until the check also
 runs somewhere the committer does not control.
+
+The trigger has since fired, which is why this row now reads overdue. `git
+remote -v` names a fetch and push remote, and `git branch -avv` shows the
+local branch tracking its counterpart there, so the place to run a check the
+committer does not control now exists. Nothing runs there: the repository
+carries no job configuration of any kind. Until one does, the paragraph above
+stands unchanged and the row stays open with its reason changed from "there is
+nowhere to run it" to "nobody has wired it up yet".
 
 ### D9 — The part of correspondence a heading list cannot see
 

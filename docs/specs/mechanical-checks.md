@@ -29,8 +29,8 @@ into the budget would spend that budget on a subject that is usually missing.
 Beside those two is the one-time install line in that same section, which
 points git at the hook directory this repository keeps in version control.
 After it, a commit the command rejects is refused before it is written. That
-refusal is the whole gate: there is no remote here and nothing runs after a
-push, so what a committer can still do to get past it is `docs/DEBT.md` `D8`.
+refusal is the whole gate: nothing runs after a push, so what a committer can
+still do to get past it is `docs/DEBT.md` `D8`.
 
 ## What each check decides
 

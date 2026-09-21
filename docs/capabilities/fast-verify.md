@@ -29,7 +29,8 @@ when it exits nonzero. The hook is installed per clone with
 has no gate, and `--no-verify` bypasses the one it has, which is why
 `docs/DEBT.md` `D8` exists and why no rung is claimed on this gate.
 
-There is no continuous integration to name: this repository has no remote.
+There is no continuous integration to name: nothing runs on the remote this
+repository pushes to.
 The documentation-versus-gate identity is kept the cheap way — the hook
 invokes the published command by name rather than restating its steps, so
 there is only one definition to keep true.

@@ -40,8 +40,9 @@ under the heading is all this check can see.
 
 `./tools/verify` from the repository root, and the versioned hook
 `tools/hooks/pre-commit`, which runs that same command and refuses the commit
-when it exits nonzero. There is no continuous integration to name: this
-repository has no remote, and the gate's skippability is `docs/DEBT.md` `D8`.
+when it exits nonzero. There is no continuous integration to name: nothing runs
+on the remote this repository pushes to, and the gate's skippability is
+`docs/DEBT.md` `D8`.
 
 The hook is where this check earns most of its keep. A plan's record is
 cheapest to fix in the commit that changed the tree, and the failure mode the
