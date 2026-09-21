@@ -51,7 +51,7 @@ Failing cases, both required before the card is `built`:
   Progress entry with no timestamp, or a missing required section — and
   observe it refuse to start at all, naming the plan and the defect. The
   structural contract it defers to is the one specified in
-  `template/docs/capabilities/evidence-check.md`.
+  `docs/capabilities/evidence-check.md`.
 
 ## Remediation message
 

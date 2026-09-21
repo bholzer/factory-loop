@@ -51,9 +51,9 @@ whose `no-outward-payload-reference` rule decides it.
 
 Two things this card deliberately does not decide. Whether a document's
 content is still true — freshness — is not decidable from text and stays a
-review concern. Whether a plan carries its required sections belongs to the
-`evidence-check` card, `template/docs/capabilities/evidence-check.md`, because
-plans have their own structural contract and their own remediation.
+review concern. Whether a plan carries its required sections belongs to
+`docs/capabilities/evidence-check.md`, because plans have their own
+structural contract and their own remediation.
 
 ## Enforcement point
 
