@@ -46,9 +46,8 @@ contains twenty-three references that resolve to nothing and not one of them
 is a defect. The payload half under `template/` is out, because a reference
 written there must resolve inside the copy a target project receives rather
 than from this repository's root. That is a different question with a
-different answer, and it belongs to the payload's `boundary-lint` card at
-`template/docs/capabilities/boundary-lint.md`, which this project has not yet
-instantiated.
+different answer, and it belongs to `docs/capabilities/boundary-lint.md`,
+whose `no-outward-payload-reference` rule decides it.
 
 Two things this card deliberately does not decide. Whether a document's
 content is still true — freshness — is not decidable from text and stays a
