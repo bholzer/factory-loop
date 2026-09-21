@@ -32,11 +32,11 @@ A commit that edits `plans/PLANS.md` obliges an audit of every plan in
 `plans/active/` against the new text, and this pass owns that obligation.
 Check each plan for the sections the convention now requires, for evidence
 that meets its current bar, and for milestone acceptance still stated the
-way it now demands. Record the outcome in each plan audited, including the
-plans that needed nothing — an audit that leaves no trace gets run again by
-the next person who wonders whether it happened, and a rule that fires only
-when somebody worries is not a rule. Where the outcome is recorded inside a
-plan, and how a plan is revised without erasing its history, belong to
+way it now demands. Record the outcome in each plan audited, in the decision
+log `plans/PLANS.md` requires of it, including the plans that needed nothing
+— an audit that leaves no trace gets run again by the next person who wonders
+whether it happened, and a rule that fires only when somebody worries is not
+a rule. How a plan is revised without erasing its history belongs to
 `skills/plan-author/SKILL.md`.
 
 ## Read before sweeping
