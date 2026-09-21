@@ -17,8 +17,8 @@ exercised that sentence and resolved it three ways: one environment got a
 link, one got a link in a different place on a second run of the same
 environment, and one got nothing at all — correctly, because the only
 locations it reads are the machine owner's directories outside the
-repository. Nothing in the repository records which happened or why, and
-`docs/DEBT.md` carries the open question as `D4`.
+repository. Nothing in a bootstrapped repository records which happened or
+why, and `docs/DEBT.md` carries the open question as `D4`.
 
 After this work, a person reading `skills/harness-init/SKILL.md` finds a rule
 that covers all three cases instead of one case and an ellipsis, including
@@ -105,14 +105,15 @@ running the command named in the entry, in the repository root.
   Rationale: the first rejected candidate — configure each environment to
   scan the repository's procedure directory — needs a procedure body that
   names configuration files and keys belonging to particular environments,
-  which `ARCHITECTURE.md`'s fourth layer-map clause forbids and
+  which `ARCHITECTURE.md`'s `no-unprovided-skill-target` rule forbids, such a
+  path being one the payload does not ship, and
   `docs/decisions/0008-portability-lowest-common-denominator.md` decided
   against; and one of the three reads only roots outside any repository, so
   in-repository configuration cannot reach it at all. The second — move the
   canonical location into a dotted directory the environments share — fails
-  on the evidence that no such shared directory exists: the two links
-  observed were written under one environment's dotted directory, while the
-  third environment's roots were its own system and plugin caches. Moving
+  on the evidence that no such shared directory exists: the links observed
+  were written under two different dotted directories, while the third
+  environment's roots were its own system and plugin caches. Moving
   would also break the map line the bootstrap writes, the cross-references
   inside all six procedures, and the allowed-target list in
   `ARCHITECTURE.md`'s layer map, in exchange for a root that one environment
@@ -136,10 +137,11 @@ running the command named in the entry, in the repository root.
   procedure already ends with, and the requirement is written once, in step
   9, rather than added to step 10 or 11 as well.
   Rationale: the same environment resolved the clause two different ways on
-  two runs and the repository holds no record of either, so the next reader
-  cannot tell a deliberate choice from an accident. `docs/PRINCIPLES.md`'s
-  one-owner rule is why the sentence is not repeated in the report step: a
-  second statement of the same obligation is the pair that goes stale.
+  two runs and a bootstrapped repository holds no record of either, so the
+  next reader cannot tell a deliberate choice from an accident.
+  `docs/PRINCIPLES.md`'s one-owner rule is why the sentence is not repeated
+  in the report step: a second statement of the same obligation is the pair
+  that goes stale.
   Date/Author: 2026-09-21, plan authoring session.
 
 - Decision: `D12` is paid in the same milestone as the `D4` pick, by adding
@@ -261,7 +263,8 @@ keeps them findable when no convention applies."
 What three trials observed about that sentence, recorded in
 `docs/DEBT.md` `D4` and in the completed plan at
 `plans/completed/blueprint-live-trial.md`: no environment surfaced any of the
-six arriving procedures at startup, in any run, before or after bootstrap;
+six arriving procedures at startup in any run before a bootstrap installed
+anything;
 every bootstrap session nonetheless found the right procedure within its
 first two commands by listing the tree and reading a file; one environment's
 session wrote a link under a dotted directory and a later run of the same
@@ -361,8 +364,8 @@ M5 retires what the work paid for: `D4` and `D12` leave `docs/DEBT.md`
 entirely, `D13` loses its first half, the pick graduates to
 `docs/decisions/0026-…`, `docs/specs/bootstrap-flow.md` stops describing the
 question as open and describes the decided behavior instead, and `GOALS.md`
-and `docs/MATURITY.md` drop the claims the three runs made false. The card's
-status is re-affirmed as `specced` in writing.
+and `docs/MATURITY.md` state what withholds promotion after three more runs.
+The card's status is re-affirmed as `specced` in writing.
 
 A finding in any milestone is recorded, not smoothed over. If a trial exposes
 a defect in either half, fix it where it belongs and append a re-run
@@ -517,11 +520,11 @@ Acceptance:
    project gets, including which of the three outcomes each environment
    produced, and its "what has not been observed" paragraph is corrected to
    what remains true after three more runs.
-5. `GOALS.md`'s Known unknowns and `docs/MATURITY.md`'s Current rung no
-   longer claim that only one environment has carried a feature end to end
-   through the current payload, and both name what actually withholds
-   promotion. `docs/capabilities/index.md` still reads `specced` for
-   `blueprint-eval`, and this milestone's entry states that as a decision.
+5. `GOALS.md`'s Known unknowns and `docs/MATURITY.md`'s Current rung name
+   what still withholds promotion after three more runs — the failing case
+   nobody has designed — and neither is left offering the previous trial as
+   the current evidence. `docs/capabilities/index.md` still reads `specced`
+   for `blueprint-eval`, and this milestone's entry states that as a decision.
 6. `./tools/verify` exits 0 ending `fast-verify: 6 of 6 checks passed`, this
    file's `Outcomes & Retrospective` is written against the purpose at the
    top, and the file has moved to `plans/completed/`.
@@ -747,3 +750,23 @@ Identifiers this plan spends: `0026` for the decision record at M5. `0027` is
 spent only if a trial produces a second decision that binds future work on
 its own, and the reason goes in the Decision Log. Debt identifiers are never
 reused: `D4` and `D12` are retired, not reassigned.
+
+Revision note, 2026-09-21, doc-garden pass before execution: five statements
+in this plan were corrected against the tree, none of them a change of plan.
+The Purpose and the third Decision Log entry said nothing in the repository
+records which environment resolved step 9 which way; this repository does
+record it, in the completed trial plan and in `D4`, and the gap is that a
+bootstrapped repository keeps no such record, which is what step 9 now gains.
+The first Decision Log entry attributed the ban on naming environment
+configuration paths to the layer map's fourth clause, which is about tool
+names; the rule that decides a path is `no-unprovided-skill-target`. The same
+entry said two links were observed under one dotted directory; the record
+holds three link-writing sessions under two different dotted directories, and
+the conclusion — no directory all three environments read — is unchanged.
+Context said no environment surfaced the procedures before or after
+bootstrap; the bootstrapped copy carrying the link did surface all six, which
+the same paragraph states four sentences later. M5's fifth acceptance item
+asked two files to stop making a claim neither one makes; it now asks them
+for what they actually owe. The corrections were made here rather than left
+for the executing session because a stateless session reads this file as
+fact.
