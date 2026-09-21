@@ -914,6 +914,25 @@ reserves and the first milestone has not written yet — `tally/`,
 which is the composition this milestone's second acceptance item asks for,
 and the judged reading is the one after the executed milestone.
 
+Session 2, authoring. Same invocation shape with `brief-author.md` to
+`<trial>/logs/02-author.txt`. Started 18:12:02 CDT, exited 0 after 609
+seconds, committing `5b77a78` "Author the ExecPlan for tally's first working
+version" — one file, `plans/active/first-working-tally.md`, 1070 lines, five
+milestones.
+
+Step 8's new sentence had a visible effect, which is the second of the two
+observations this plan adds. The authored plan's Artifacts and Notes carries
+both of the command lines it depends on, each run to its first refusal with
+the point it reached beside it: "The two commands this plan depends on were
+run as far as they can go before the work exists, and both produced the
+refusal that proves they are wired to the right thing: `$ python3 -m tally
+add deploy` / `No module named tally` / `exit=1`" and `$ python3 -m unittest
+discover -s tests -t .` / `ImportError: Start directory is not importable:
+'tests'` / `exit=1`. The session went past the letter of the sentence and
+ran the discovery command in a scratch tree until it succeeded, which is how
+`tests/__init__.py` became a file its first milestone creates rather than a
+thing the implementing session would have discovered by failing.
+
 ## Interfaces and Dependencies
 
 The text contract for `skills/harness-init/SKILL.md` step 9. The step keeps
