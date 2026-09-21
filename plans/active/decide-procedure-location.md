@@ -853,6 +853,67 @@ verification command output; and the line the execution session added to the
 copy's plan file that it had observed rather than restated. Everything else
 stays in the transcript.
 
+### M3 record — omp, 2026-09-21
+
+Environment `omp/18.1.14`, trial at
+`/Users/<you>/blueprint-trials/omp-20260921-180411`, built by
+`./tools/blueprint-eval new omp`: "copied 25 files — 19 payload files and 6
+procedures — committed as \"Receive the payload\"." The three briefs were
+extracted by the `awk` line under Concrete Steps into `<trial>/logs/` and
+came to 62, 21 and 6 lines with `grep -c 'harness-blueprint'` printing 0 for
+each, which is the extraction check. The copy arrived with no environment
+configuration directory: `ls -a <trial>/repo` listed `.git`, the four
+artifacts and nothing else.
+
+Session 1, bootstrap. Invocation, one process, standard input closed, no
+resumption:
+
+    cd <trial>/repo && omp -p --auto-approve --cwd <trial>/repo "$(cat <trial>/logs/brief-bootstrap.md)" < /dev/null 2>&1 | tee <trial>/logs/01-bootstrap.txt
+
+Started 18:04:59 CDT, exited 0 after 362 seconds, committing `77fa463`
+"Bootstrap the agent harness for tally" over ten files — the nine filled
+artifacts plus `.omp/skills`.
+
+Discovery, judged under `0023`. The session was handed none of the copy's
+six procedures at startup, and found the right one by reading the tree: its
+first words were "I'll start by reading the repository's own procedures and
+skeleton artifacts.", its first tool call was `find . -type f -not -path
+'./.git/*' | sort`, and its third was a read of `skills/harness-init/SKILL.md`,
+before any other artifact. The brief named no procedure, no filename and no
+path. Nothing was created or edited anywhere to make the procedures visible.
+
+Step 9's outcome: a link, committed, and named in the report. The report
+said, of procedures: "this environment loads skills only from
+`<ancestor>/.omp/skills/*/SKILL.md` and a user-level directory outside the
+repository. Installed a committed relative symlink `.omp/skills ->
+../skills`, which leaves `skills/` where the map says it is." Of the first
+clause, which this plan did not touch: "this environment reads the
+repository's root `AGENTS.md` natively … No `CLAUDE.md`-style pointer file
+was installed; a second guide would be a second owner of every fact in the
+first." `ls -l <trial>/repo/.omp` shows `skills -> ../skills`, and the link
+is in the bootstrap commit.
+
+The probe pair, run in omp either side of the bootstrap, is what makes the
+link's effect an observation rather than a claim. In a fresh copy built for
+the purpose the session was given 20 skills from three roots, every one of
+them outside the copy, and said so of the copy's own: "None of those repo
+skills were loaded into this session — they are not in the startup
+manifest". In the bootstrapped copy the same prompt listed 26, the
+difference being exactly the six, attributed to
+`<trial>/repo/skills/<name>/SKILL.md`: capability-build, doc-garden,
+harness-init, plan-author, plan-execute, retro.
+
+The driver after the bootstrap: `layout: ok — 6 procedures, each with
+SKILL.md and matching frontmatter name.`, `fill: ok — no authoring
+scaffolding in 22 markdown files of the copy.`, and `references: 22 dangling
+references in 149 examined across 20 markdown files of the copy.`, exit 1.
+Every one of the 22 is a reserved `tally/` path the project's own debt row
+reserves and the first milestone has not written yet — `tally/`,
+`tally/core/`, `tally/store.py`, `tally/cli.py`, cited from `AGENTS.md`,
+`ARCHITECTURE.md`, `GOALS.md`, `docs/DEBT.md` and `docs/PRINCIPLES.md` —
+which is the composition this milestone's second acceptance item asks for,
+and the judged reading is the one after the executed milestone.
+
 ## Interfaces and Dependencies
 
 The text contract for `skills/harness-init/SKILL.md` step 9. The step keeps
