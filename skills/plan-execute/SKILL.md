@@ -53,8 +53,9 @@ and record both the ambiguity and the resolution. Ambiguity about the
 milestone's boundary is the exception: widening scope is not a resolution
 available to this session.
 
-Commit at each coherent step rather than once at the end, so a session that
-dies leaves landed work rather than a dirty tree.
+Commit at each coherent step rather than once at the end — `plans/PLANS.md`
+asks for frequent commits — so a session that dies leaves landed work rather
+than a dirty tree.
 
 Prove acceptance by running it. Every acceptance check the milestone states
 gets executed, and what it printed is what you record. An acceptance check you
@@ -79,14 +80,17 @@ by anyone later, which makes every other claim in the plan worth less.
 
 ## When the milestone will not fit
 
-Split it in place: the progress record shows what was completed and what
-remains, the split is logged as the decision it is, the work so far is
-committed, and the session ends. Do not push on with a context that has been
-summarized out from under you — evidence written from a summary of
-observations is a recollection, and the next session cannot tell which is
-which.
+Split it in place, in the shape `plans/PLANS.md` requires: the progress record
+shows what was completed and what remains, the split is logged as the decision
+it is, the work so far is committed, and the session ends. Do not push on with
+a context that has been summarized out from under you — evidence written from
+a summary of observations is a recollection, and the next session cannot tell
+which is which.
 
 ## Never
+
+The first two restate rules `plans/PLANS.md` owns; they are here because a
+session reads this file at the moment it is tempted to break them.
 
 - Never start a second milestone. Finishing early is not permission; the
   cadence that advances milestones is not operated from inside a session.
