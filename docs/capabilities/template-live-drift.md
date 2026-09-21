@@ -66,8 +66,8 @@ Failing cases, all three of which must be demonstrated before the card is
   Restore.
 - Append a line to `template/plans/PLANS.md` only, run the check, observe a
   nonzero exit naming both paths and the first differing line. Restore.
-- Create `template/docs/EXAMPLE.md`, run the check, observe a nonzero exit
-  naming the missing live counterpart `docs/EXAMPLE.md`. Delete the file.
+- Create template/docs/EXAMPLE.md, run the check, observe a nonzero exit
+  naming the missing live counterpart docs/EXAMPLE.md. Delete the file.
 
 ## Remediation message
 

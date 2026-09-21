@@ -4,7 +4,3 @@
 # two spaces, a # and a one-line reason. The key is <citing-path>:<reference>.
 # An entry that matches nothing is counted as stale in the passing summary, so
 # a mention that was fixed or deleted decays visibly instead of silently.
-
-docs/capabilities/blueprint-eval.md:skills/harness-init/README.md  # the failing case tells a builder to rename SKILL.md to this and observe the trial fail
-docs/capabilities/template-live-drift.md:docs/EXAMPLE.md  # the counterpart-existence failing case creates this pair and deletes it again
-docs/capabilities/template-live-drift.md:template/docs/EXAMPLE.md  # the other half of that same temporary pair

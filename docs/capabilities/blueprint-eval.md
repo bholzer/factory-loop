@@ -64,7 +64,7 @@ Record harness, version, date, and outcome in the plan that runs the trial.
 The card stays a specification and holds no results.
 
 Failing case: rename `skills/harness-init/SKILL.md` to
-`skills/harness-init/README.md`, re-run the trial in one harness, and observe
+skills/harness-init/README.md, re-run the trial in one harness, and observe
 it fail naming the harness and the skill that could not be discovered.
 Restore the name. A second failing case worth demonstrating, because it is the
 class of defect the trial exists to catch: delete one file from `template/`
