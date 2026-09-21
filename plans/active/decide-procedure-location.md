@@ -44,7 +44,12 @@ exclusions are argued in the Decision Log.
   and argued, the text contract for both procedure edits fixed, the trial
   briefs' extraction command verified, and the `./tools/verify` baseline
   observed. No procedure edited and no trial run.
-- [ ] M1 — Land the pick in the two procedures.
+- [x] (2026-09-21 22:56Z) M1 — Land the pick in the two procedures. Step 9's
+  second clause replaced and step 8's sentence added, both in commit
+  `5da4b4c`, with all six acceptance items observed and no carve-out.
+  `docs/DEBT.md` is deliberately unchanged: `D4` and `D12` are retired by M5,
+  after the trials say the pick survived contact. No trial has judged the new
+  text yet.
 - [ ] M2 — Claude Code: the whole trial against the edited procedures.
 - [ ] M3 — omp: the whole trial against the edited procedures.
 - [ ] M4 — Codex CLI: the whole trial against the edited procedures.
@@ -135,6 +140,38 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   procedures this plan edits printed nothing and exited 1; `./tools/blueprint-eval`
   with no subcommand printed its two usage lines and exited 2. Neither
   procedure this plan edits was among the files the garden pass touched.
+
+- Observation (M1, 2026-09-21): the two edits moved nothing a check measures
+  except the quantity of prose, which is the evidence that neither wording
+  introduced a path reference or a restatement somebody else owns.
+  Evidence: `./tools/verify` exited 0 in 0.59 seconds ending `fast-verify: 6
+  of 6 checks passed (0s).`; `doc-integrity` read 396 of 396 references in 51
+  artifacts and `boundary-lint` 495 references in 69 files — both identical
+  to the pre-edit reading taken at the start of this session — while
+  `prose-duplication` examined 35071 eight-word windows against 34958 before
+  the edit, the same 45 artifacts, the same 20 allowlist entries, 0 stale,
+  and `git status --porcelain tools/allow/` printed nothing.
+
+- Observation (M1): an unfilled copy built from the edited tree reads exactly
+  the three lines the reconciliation pass measured, so the +113 windows above
+  are the only difference the edits made to anything checkable.
+  Evidence: `./tools/blueprint-eval new decision-smoke` printed `copied 25
+  files — 19 payload files and 6 procedures` at
+  `/Users/<you>/blueprint-trials/decision-smoke-20260921-175628`, and
+  `check <trial>/repo` printed `layout: ok — 6 procedures, each with SKILL.md
+  and matching frontmatter name.`, `fill: 117 marker lines in 8 of 23
+  markdown files.` and `references: ok — 149 of 151 references resolved
+  inside the copy, 1 allowlist entry applied, 0 stale.`, exiting 1 on the
+  fill part as an unfilled copy must.
+
+- Observation (M1): the portability grep still decides clean after the edit,
+  which it can only do because both clauses describe what an environment
+  reads rather than naming one.
+  Evidence: `grep -niE '\b(claude|codex|omp)\b|\.[a-z]+/skills'
+  skills/harness-init/SKILL.md skills/plan-author/SKILL.md` printed nothing
+  and exited 1, as it did before the edit. `git diff` for the commit shows
+  13 changed lines in the bootstrap procedure, all inside step 9's second
+  clause, and 5 added lines in the authoring procedure, all inside step 8.
 
 ## Decision Log
 
@@ -254,6 +291,29 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   an authoring-time claim was run to its first refusal or to completion, and
   the point reached is recorded beside it under Concrete Steps.
   Date/Author: 2026-09-21, plan authoring session.
+
+- Decision: both candidate wordings under Interfaces and Dependencies were
+  adopted as written rather than improved, and the replacement was wrapped so
+  that the clause's first two lines stay byte-identical.
+  Rationale: the candidates already satisfy every content bullet the contract
+  states, so an improvement pass would have changed text nobody could then
+  compare against the contract that authorised it. The wrapping is what makes
+  M1's first acceptance item decidable by a different person: `git diff`
+  shows the changed lines beginning at "there without moving it" and ending
+  at "why nothing was", so the claim that the first clause and every other
+  step are untouched is read off the diff rather than argued.
+  Date/Author: 2026-09-21, M1 execution session.
+
+- Decision: `docs/specs/bootstrap-flow.md` was left describing step 9's old
+  behavior in this milestone, even though the procedure it describes changed
+  in this commit.
+  Rationale: M5 owns that file and needs the three trials' outcomes to write
+  it, and correcting it now would state which outcome each environment
+  produces before any environment has run against the new text — the exact
+  substitution of expectation for observation this plan's evidence rules
+  forbid. The cost is one milestone's window in which the spec is behind the
+  procedure, carried openly here rather than silently.
+  Date/Author: 2026-09-21, M1 execution session.
 
 ## Outcomes & Retrospective
 
@@ -590,6 +650,24 @@ The baseline, observed 2026-09-21 while authoring:
 
     claude --version ; codex --version ; omp --version
     # observed: 2.1.274 (Claude Code) / codex-cli 0.150.1 / omp/18.1.14
+
+M1, observed 2026-09-21 in this order, after the two edits and before the
+commit for the first two, after it for the last two:
+
+    ./tools/verify
+    # observed: exit 0, 0.59s wall, ending
+    # fast-verify: 6 of 6 checks passed (0s).
+
+    grep -niE '\b(claude|codex|omp)\b|\.[a-z]+/skills' skills/harness-init/SKILL.md skills/plan-author/SKILL.md
+    # observed: no output, exit 1 — unchanged by the edit.
+
+    ./tools/blueprint-eval new decision-smoke
+    # observed: trial at .../decision-smoke-20260921-175628, 25 files copied.
+
+    ./tools/blueprint-eval check <trial>/repo
+    # observed: exit 1 on the fill part alone, with the layout, fill and
+    # references summary lines matching the reconciliation pass exactly. The
+    # three lines are quoted under Surprises & Discoveries.
 
 Building a trial and extracting the briefs. The `awk` lines below were run
 while authoring, against `plans/completed/blueprint-live-trial.md`, and
