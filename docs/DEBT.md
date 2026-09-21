@@ -5,14 +5,15 @@
 | ID | Item | Where | Why deferred | Trigger to pay it down |
 | --- | --- | --- | --- | --- |
 | D2 | The scaffolding check cannot tell a quoted marker from a real slot | `tools/checks/scaffolding-markers` | No file in the checked set needs to quote a marker, so keeping the marker definition to one owner is currently enough | The first live artifact in the checked set that has to quote a marker in its prose |
-| D4 | The installed procedures sit outside every harness's auto-discovery root | `skills/` against a harness's own skills location | The file shape is portable and `AGENTS.md`'s map makes each procedure reachable by path, so an agent can always read one; only automatic surfacing is missing, and where to put the files is a per-harness configuration question that a live trial answers better than a guess | The first harness whose configuration cannot reach `skills/`, or the live trial specced in `docs/capabilities/blueprint-eval.md` |
+| D4 | The installed procedures sit outside every harness's auto-discovery root | `skills/` against a harness's own skills location | Three live trials found the shortfall costs discovery latency and not access: no harness offered the arriving procedures at startup, and every bootstrap session reached the right one within its first two commands by reading the tree | The pick between the three candidate locations described below, which is a decision rather than a fix and no longer waits on anything to be observed |
 | D5 | The unattended outer loop is specced, not built | `docs/capabilities/loop-runner.md` | v1 is the watched phase: a human invokes each milestone session and judges after each whether iteration continues, which is how the failure domains get seen before they are automated away | Enough consecutive sessions whose stop rule held without human correction that the halt conditions are known, or L2 being wanted for another reason |
 | D6 | `boundary-lint` has no retrofit path for an existing codebase | `template/docs/capabilities/boundary-lint.md` against a brownfield target | Greenfield-first was the v1 scope choice in `GOALS.md`; a codebase that already violates its own layer map needs a baseline-and-ratchet story that no card here carries | The first bootstrap of this payload into a codebase whose declared layer map is already violated |
-| D7 | The blueprint has never been run; evaluation is paper-only | `docs/capabilities/blueprint-eval.md` | The owners scoped v1 to paper verification. A trial needs a target project, two or more harnesses, and one feature driven through the loop end to end — its own unit of work, not a milestone tail | Any of: a project bootstrapped from this payload for real, a harness whose configuration cannot reach `skills/` (`D4`), or a payload change whose effect reading cannot predict |
 | D8 | The only gate is skippable, and absent in a fresh clone | `tools/hooks/pre-commit` against a clone that has not run the install line | A hook is the strongest enforcement point a repository with no remote has; making it unskippable needs a place to run that the committer does not control, and there is none yet | The first remote or continuous-integration system this repository gets |
 | D9 | Two of the correspondence questions have no mechanism and stay a reading job | `docs/capabilities/template-live-drift.md`, read during the doc-garden pass | Neither question is decidable from text, so there is nothing to build: a heading list cannot tell whether two files discuss the same subject, and no comparison of what the payload ships can reveal what it failed to ship | A pair found structurally corresponding while saying different things, or a live-only artifact that a target project would have needed the payload to carry |
 | D10 | One clause of the layer map — a skill body may not name a harness-specific tool — has no mechanism | `docs/capabilities/boundary-lint.md`, read during review | Deciding it needs a list of every tool name in every harness, which nobody can write and which the next harness release would invalidate | A skill body found naming a harness-specific tool, or a harness whose tool vocabulary is small and stable enough to enumerate |
 | D11 | The two format documents are compared by heading subsequence though their class makes them one file stored twice | `tools/checks/template-live-drift`, `docs/capabilities/template-live-drift.md` | Widening the invariant of a card that already reads `enforced` requires the failing-case demonstration its own format asks for, which is a capability pass rather than a close-out edit; both pairs match today, so the gap is latent rather than active | The first wording difference between either pair of copies, or the next pass that opens that card for another reason |
+| D12 | An expected command line in a plan is never parsed before the session that has to run it | `skills/plan-author/SKILL.md`, step 8 | The repair is one sentence in an arriving procedure, and editing a procedure invalidates every recorded result that judged a session following it, so the sentence costs a re-driven session in each supported harness and wants a pass that is driving them anyway | The next pass that edits the authoring procedure for another reason, or the next run of the live trial |
+| D13 | The live-trial card has no promotion evidence: one harness has carried a feature through the payload as it stands, and the breakage that should catch a broken procedure set catches nothing | `docs/capabilities/blueprint-eval.md` | Both halves cost driven sessions rather than edits, and the second half is a design nobody has an observation for — every harness watched so far reached the procedures by reading the files, so a wrong entry-point filename removed nothing any of them was using | Any change under `template/` or `skills/`, which this card already gates, or any attempt to record a status above `specced` for it |
 
 ## Details
 
@@ -45,16 +46,37 @@ skill, one `SKILL.md`, `name` matching the directory, a one-line
 automatically reads them from a root it chooses itself, not from a
 repository-root `skills/`: one of the three scans an ancestor dotted
 directory for `skills/*/SKILL.md` and reaches anywhere else only through a
-configured extra directory. So the six procedures here are readable by path
-and listed in `AGENTS.md`'s map, and that is the whole mechanism today.
+configured extra directory. Three live trials have now measured that, and the
+sentence understates it: none of the three harnesses offered the arriving
+procedures to a session at startup.
 
-Three ways to pay it down, and choosing between them wants evidence from a
-real session rather than reasoning: configure each harness to scan `skills/`;
-move the canonical location into whichever dotted directory the harnesses
-share and keep the map pointing at it; or have the bootstrap procedure place
-a link into the environment's own root, which is what its step 9 already
-tells it to do. The first two would change what the payload installs, so both
-are decisions, not fixes.
+Each trial copied the payload into a fresh repository outside this tree, drove
+a bootstrap session in it, and — in two of the three — asked a separate
+read-only session to name every procedure it had been handed and where each
+one came from. What came back was the machine owner's own roots: twenty names
+in one harness, twenty-four in the other, and none of the six that had just
+arrived. Every bootstrap session found the right procedure regardless, inside
+its first two commands, by listing the files and reading one. That is the map
+mechanism working, minutes before any harness configuration existed in the
+copy at all.
+
+The link the bootstrap procedure already places is the one candidate with a
+controlled measurement behind it. In the harness probed on both sides, the
+bootstrapped copy carrying a link into the location that harness reads named
+all six at startup, where the same copy before the link named none. In a
+second harness the link was written and never probed. In the third the
+session installed nothing at all and the copy finished the trial with no
+harness configuration of any kind, because the roots that harness reads are
+the machine owner's directories rather than anywhere inside a project, so
+writing one would configure the machine instead of the repository.
+
+The three candidates therefore stand unchanged and the choice between them is
+now informed rather than speculative: configure each harness to scan
+`skills/`; move the canonical location into whichever dotted directory the
+harnesses share and keep the map pointing at it; or keep the per-environment
+link, which ships already and is the only candidate anyone has watched work.
+The first two change what the payload installs, so both are decisions, not
+fixes. What is no longer missing is the evidence.
 
 ### D6 — No brownfield path for a dependency check
 
@@ -147,3 +169,57 @@ the stricter comparison. The demonstration is what makes this a pass of its
 own rather than an edit made in passing: a card reading `enforced` whose
 invariant widens has to be observed failing on a real difference first, which
 `docs/capabilities/CARD_FORMAT.md` requires of any status claim.
+
+### D12 — A command line nobody parsed until it mattered
+
+`skills/plan-author/SKILL.md` tells an author to reread the plan as the
+session that will execute it, and a plan under `plans/PLANS.md` is required
+to carry the exact commands a later session runs. Neither says that the
+command itself has to be tried. One authoring pass here composed a driver
+invocation for an external program out of flags each of which was read from
+that program's own help output, and the composition was rejected by argument
+parsing on first contact: two of the flags are mutually exclusive. A review
+pass read the same line and confirmed it the same way, by recognising the
+flags.
+
+The candidate repair is one sentence: an expected invocation is run until the
+first refusal the environment can produce without doing the work — argument
+parsing, authentication, a version banner — and the point it reached is
+written beside it. The reason it is a row and not an edit is the cost of
+editing an arriving procedure. Any recorded result about a session that
+followed that procedure describes the text as it stood, so a one-sentence
+change retires three such records and buys them back only by driving three
+more sessions. That is a pass of its own, and the trigger names the two
+occasions that would be paying the cost anyway.
+
+The generalisation is what makes the row worth keeping rather than merging
+into the next plan's preamble. Three separate defects in one piece of work
+shared a shape: a statement about how parts behave together, checked one part
+at a time. The unparseable command line is the cheapest of the three to
+prevent, which is why it is the one with a written remedy.
+
+### D13 — A trial that ran, and a promotion that cannot follow yet
+
+`docs/capabilities/blueprint-eval.md` asks for five observations per supported
+harness and a demonstrated failing case before its status may move. The trial
+has run in all three harnesses and neither condition is met.
+
+The first half is bookkeeping. A defect the trial found was repaired partway
+through, and only the first session of each affected run was driven again, so
+two of the three records describe a payload that has since changed. Exactly one
+harness has taken a feature from an empty repository to an executed milestone
+against the current text. Paying it down is two runs of three sessions each,
+roughly half an hour of unattended session time per harness, plus the reading.
+
+The second half is a design problem and the reason this row exists rather than
+a note in a goal. The case the card specifies is to rename a procedure's
+entry-point file and watch a harness fail to find it. That was run. The harness
+bootstrapped the repository anyway: it listed the files, read the renamed one,
+and followed it, because no harness observed in the trial reached a procedure
+through a loader in the first place. So the case tests the driver, which does
+report the wrong layout, and tests nothing about the harness. A replacement has
+to break something a session cannot route around by reading — and nobody has
+watched a harness fall into such a breakage, which is exactly the kind of
+unobserved clause the trial exists to catch. Until one exists, the card's
+harness-side promotion bar is unmeetable, and recording a status above
+`specced` would be claiming a gate nobody has seen close.

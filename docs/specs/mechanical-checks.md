@@ -2,8 +2,9 @@
 
 ## What a reader can run
 
-One command decides everything a machine decides here. `AGENTS.md` publishes it
-under Commands together with the time it is allowed to take, and
+Two commands, and only the first of them runs on every edit. `./tools/verify`
+decides everything a machine decides about this repository itself. `AGENTS.md`
+publishes it under Commands together with the time it is allowed to take, and
 `docs/capabilities/fast-verify.md` is the card that says what it owes whoever
 runs it: the executables under `tools/checks/` in an order written down rather
 than globbed, each one's own output passed through untouched, and a nonzero exit
@@ -12,7 +13,20 @@ A clean pass ends in one line counting the checks and the seconds spent, and
 those seconds have stayed an order of magnitude inside the published figure
 since the first check landed.
 
-The second thing to run is the one-time install line in that same section, which
+`./tools/blueprint-eval` is the other one, and its subject is not this
+repository. It builds a throwaway git repository outside this tree from both
+halves and then reads that copy back: whether the procedures arrived in the
+shape every supported harness expects, whether any authoring scaffolding
+outlived the bootstrap, and whether the copy's own paths lead anywhere inside
+the copy. `docs/capabilities/blueprint-eval.md` is its card, and those three
+questions are the part of it a machine can settle — the rest is a person
+starting an agent in that copy and reading what it did. It is deliberately not
+one of the executables the cheap command runs. What it examines exists only
+while a trial is under way — a project's own answers written over the
+skeletons, in a directory that never appears in a commit here — so wiring it
+into the budget would spend that budget on a subject that is usually missing.
+
+Beside those two is the one-time install line in that same section, which
 points git at the hook directory this repository keeps in version control.
 After it, a commit the command rejects is refused before it is written. That
 refusal is the whole gate: there is no remote here and nothing runs after a

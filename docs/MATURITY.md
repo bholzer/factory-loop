@@ -19,11 +19,29 @@ below now read `enforced` in `docs/capabilities/index.md`. Two things are
 missing on top of that status: the twenty consecutive green landed changes the
 promotion rule requires, and a gate the committer cannot switch off, which
 `docs/DEBT.md` `D8` records this one as not being. Of the L2 rows,
-`doc-integrity` and `boundary-lint` read `enforced` too, while
-`blueprint-eval` needs a live trial this project has deliberately parked and
-`loop-runner` gates a rung two steps away. `prose-duplication` is enforced
-and appears in no row at all: its card gates no rung deliberately, because a
-shared window tells a reader where to look and not what to do about it.
+`doc-integrity` and `boundary-lint` read `enforced` too, and `loop-runner`
+gates a rung two steps away. `prose-duplication` is enforced and appears in
+no row at all: its card gates no rung deliberately, because a shared window
+tells a reader where to look and not what to do about it.
+
+`blueprint-eval` has had the live trial it was waiting for — three harnesses,
+one small feature carried through each — and still reads `specced`. Of the
+five things that trial had to observe, one failed in two of the three
+harnesses, and the deliberate breakage that would show the procedure half
+catching anything came back clean: the harness bootstrapped a copy whose
+entry-point file had been renamed out from under it, by reading the file.
+`docs/DEBT.md` `D13` carries what those two shortfalls cost to clear.
+
+The same row carries a ceiling, which is why it is written down here rather
+than left for a later session to rediscover. Three quarters of what the card
+claims is a person invoking a harness and reading what came back, so the
+honest maximum for it is `built`, and `enforced` is unreachable by
+construction. The promotion rule below wants every gating card of a rung at
+`enforced`, so this row cannot be satisfied as the table stands: an L2 claim
+has to say what it did about that — gate on the scriptable part alone, or
+retire the row and name the human judgement that stays. Neither is chosen
+here. What is settled is that promoting the card to clear the path would be
+a status nobody observed.
 
 ## Rungs
 

@@ -39,9 +39,32 @@ and all six procedures reference only paths the copy provides. This
 repository is itself the filled form of that payload, which is what makes
 divergence between the two halves visible at all.
 
-Not established: nobody has bootstrapped a different project from it, and no
-feature has been driven through the plan loop anywhere but here. The trial
-that would settle it is specified in `docs/capabilities/blueprint-eval.md`
-and tracked as `D7` in `docs/DEBT.md`. Until it runs, every claim on this
-page is about a tree of files that has been read, copied, and checked — not
-about a project that has lived with it.
+Established by running the flow somewhere else, on 2026-09-17 and
+2026-09-21: a different project can be bootstrapped from this payload, and a
+feature can be driven through the plan loop with no access to this tree. The
+trial built a git repository outside this repository from both halves, gave
+an agent the owner answers a file cannot supply, and let it work. It ran
+three times, once in each supported harness, with three separate sessions
+each time — fill the artifacts, author a plan, execute that plan's first
+milestone — and each run ended with a small command-line tool that records
+labels and prints counts, a test suite behind a command the project chose
+and published itself, and a plan whose later milestones were left open. The
+three projects picked three different names for their stored data and three
+different names for their verification command, and answered identically at
+the terminal.
+
+What the runs cost, as a sizing figure for anyone repeating it: eighteen to
+thirty minutes of driven session time per harness for the three sessions
+together, unattended.
+
+Not established, and worth naming precisely because the rest now is. No
+harness has been watched failing when the procedure set arrives damaged —
+the one deliberately broken copy was bootstrapped anyway, because every
+harness reached the procedures by reading the tree rather than through a
+loader, so a wrong filename removed nothing any of them was using. Two of
+the three runs judged a payload that has since been corrected and only their
+first session was driven again, so exactly one harness has carried a feature
+end to end through the payload as it stands. Every target was greenfield and
+every target was the same tool, so nothing here says how the payload lands
+on an existing codebase — `docs/DEBT.md` `D6` owns that — or on a project
+shaped unlike a single-user command-line program.

@@ -45,6 +45,11 @@ read_plan() {
 	awk '
 	BEGIN {
 		n = split("Progress|Surprises & Discoveries|Decision Log|Outcomes & Retrospective", req, "|")
+		# Assigned here so that a plan with nothing ticked yet — the state
+		# every plan is in on the day it lands — reports 0 rather than an
+		# empty field in the summary line.
+		complete = 0
+		open = 0
 	}
 	{
 		if ($0 ~ /^[ \t]*```/) { fence = !fence; next }

@@ -81,9 +81,16 @@ A project bootstrapped from this blueprint has:
 
 ## Known unknowns
 
-- Evaluation is paper-only in v1. A live-trial process (bootstrap a toy repo
-  in ≥2 harnesses, drive one feature through the loop) is specced as a
-  capability card, unbuilt.
+- Evaluation is no longer paper-only. A copy of the payload and the
+  procedures was driven through bootstrap, plan authoring and one executed
+  milestone in all three harnesses, and each copy ended with a working
+  command-line tool that its own published command tests;
+  `docs/specs/bootstrap-flow.md` carries the dates and what was measured.
+  What stays open is the other side of that card: no harness has been
+  observed failing when the arriving procedure set is broken, and nobody has
+  designed a breakage one could fail. `blueprint-eval` therefore holds at
+  `specced`, with `docs/DEBT.md` `D13` carrying what promoting it still
+  costs.
 - How `boundary-lint` retrofits onto a large existing codebase.
 - Whether `capability-build` eventually needs per-stack reference material or
   stays fully generic.
