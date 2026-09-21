@@ -54,9 +54,11 @@ gives, and it reads the payload against the live tree and never the reverse.
 
 `docs/capabilities/doc-integrity.md` owns whether the paths the live artifacts
 write down can be followed. A reference is a backticked span or a link target
-carrying a directory separator; quoted material is not a citation, plan files
-are outside the checked set entirely, and a mention that must not resolve lives
-in `tools/allow/doc-integrity.txt` with the reason it is there.
+that carries a directory separator and does not open with one — an absolute
+path names a location on the machine, not one here; quoted material is not a
+citation, plan files are outside the checked set entirely, and a mention that
+must not resolve lives in `tools/allow/doc-integrity.txt` with the reason it is
+there.
 
 `docs/capabilities/prose-duplication.md` owns whether the same sentence has been
 written down twice. It compares runs of eight words across both halves after
