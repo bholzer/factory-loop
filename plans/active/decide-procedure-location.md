@@ -55,8 +55,9 @@ Use timestamps to measure rates of progress.
 
 ## Surprises & Discoveries
 
-Everything below was observed while authoring this plan on 2026-09-21, by
-running the command named in the entry, in the repository root.
+Everything below was observed in the repository root, by running the command
+named in the entry. The first five entries were observed while authoring this
+plan on 2026-09-21; an entry added by a later pass names that pass.
 
 - Observation: the repository is green and fast before any of this work, so a
   later failure is this plan's doing rather than inherited.
@@ -95,6 +96,45 @@ running the command named in the entry, in the repository root.
   Evidence: `./tools/blueprint-eval` printed its two usage lines and exited
   2. The trial root it would use on this machine resolves to
   `/Users/<you>/blueprint-trials`, from `${BLUEPRINT_TRIAL_ROOT:-$HOME/blueprint-trials}`.
+
+- Observation (reconciliation pass, 2026-09-21, after the doc-garden pass
+  landed): the baseline above has moved, and the whole move is that pass
+  rather than anything this plan did.
+  Evidence: `./tools/verify` still exits 0, now ending `fast-verify: 6 of 6
+  checks passed (0s).` in 0.52 seconds, with `doc-integrity: ok — 396 of 396
+  references resolved in 51 artifacts, 2 format documents skipped, 0
+  allowlist entries applied, 0 stale.`, 34958 eight-word windows examined by
+  `prose-duplication` over the same 45 artifacts and the same 20 allowlist
+  entries, and 495 references examined by `boundary-lint` over the same 69
+  files. Run from a worktree at the commit this plan was authored on, the
+  same command reproduced the older numbers exactly — 390 of 393 with three
+  allowlist entries applied, 34670 windows, 491 references — which is what
+  identifies the difference as the garden pass's work, the three deleted
+  allowlist entries included. M1's run is compared against these numbers,
+  not against the entry above.
+
+- Observation (same pass): the unfilled-copy numbers M1's fifth acceptance
+  item compares against moved in one part and held in the other two.
+  Evidence: `./tools/blueprint-eval new garden-reconcile` followed by `check
+  <trial>/repo` printed `layout: ok — 6 procedures`, `fill: 117 marker lines
+  in 8 of 23 markdown files.` and `references: ok — 149 of 151 references
+  resolved inside the copy, 1 allowlist entry applied, 0 stale.`, exiting 1
+  on the fill part as an unfilled copy must. The same two commands from the
+  authoring commit's worktree printed 144 of 146, with the layout and fill
+  lines identical. Three of the files a trial copies were edited by the
+  garden pass — `template/AGENTS.md`, `skills/doc-garden/SKILL.md` and
+  `skills/plan-execute/SKILL.md` — and their diff adds five lines carrying a
+  backticked reference and removes none, which is exactly the five the copy
+  gained.
+
+- Observation (same pass): the other three authoring-time observations
+  survive the garden pass unchanged, so only the two above needed a second
+  reading.
+  Evidence: the `awk` extraction printed 62, 21 and 6 lines with `grep -c
+  'harness-blueprint'` printing 0 for each; the portability grep over the two
+  procedures this plan edits printed nothing and exited 1; `./tools/blueprint-eval`
+  with no subcommand printed its two usage lines and exited 2. Neither
+  procedure this plan edits was among the files the garden pass touched.
 
 ## Decision Log
 
@@ -409,11 +449,14 @@ Acceptance, all observable by a different person:
 5. A trial built from this state with `./tools/blueprint-eval new
    decision-smoke` passes the layout and references parts and fails only the
    fill part, which is what an unfilled copy must do. Record the three
-   summary lines and the file counts; the previous record's numbers for an
-   unfilled copy were `layout: ok — 6 procedures`, `fill: 117 marker lines in
-   8 of 23 markdown files.` and `references: ok — 144 of 146 references
-   resolved inside the copy, 1 allowlist entry applied, 0 stale.`, and a
-   difference is a finding to explain rather than a failure by itself.
+   summary lines and the file counts; measured against the tree as it stands
+   after the garden pass, under Surprises, an unfilled copy reads `layout:
+   ok — 6 procedures`, `fill: 117 marker lines in 8 of 23 markdown files.`
+   and `references: ok — 149 of 151 references resolved inside the copy, 1
+   allowlist entry applied, 0 stale.`, and a difference is a finding to
+   explain rather than a failure by itself. The two edits this milestone
+   makes carry no path reference in either candidate wording, so a moved
+   references count means the wording introduced one.
 6. `docs/DEBT.md` is unchanged: `D4` and `D12` are still there, and this
    milestone's Progress entry says why — the rows are retired by M5, after
    the trials.
@@ -770,3 +813,28 @@ asked two files to stop making a claim neither one makes; it now asks them
 for what they actually owe. The corrections were made here rather than left
 for the executing session because a stateless session reads this file as
 fact.
+
+Second revision note, 2026-09-21, reconciliation after the doc-garden pass:
+the pass that corrected the five statements above landed two more commits of
+its own afterwards, so this file was read against the tree as it now stands.
+No part of the plan's argument changed and no citation stopped resolving —
+the repository's reference check reads 396 of 396, this file included. What
+moved was measurement, in both places this plan carries a number somebody
+else produced. The `./tools/verify` baseline under Surprises is left where it
+was observed, with a re-observation recorded beside it, because an
+authoring-time reading is evidence about that moment and not a claim about
+today. M1's fifth acceptance item is an expectation rather than a
+record, so its unfilled-copy reference count was replaced with the measured
+one and the older figure survives in the entry that explains it. Both
+differences were attributed by re-running the two commands from a worktree at
+this plan's authoring commit, which reproduced the original numbers exactly.
+The rest of the sweep found nothing to fix, and says so here so that the next
+reader does not run it again: `docs/DEBT.md`'s `D4`, `D12` and `D13` still
+say what the Decision Log says they say, `docs/specs/bootstrap-flow.md` still
+describes automatic surfacing as not working and points at `D4` for why,
+`GOALS.md`'s Known unknowns and `docs/MATURITY.md`'s Current rung still owe
+exactly what M5's fifth item asks of them, `docs/capabilities/index.md` still
+reads `specced` for `blueprint-eval`, `ARCHITECTURE.md` still leaves the
+tool-name clause to review as `D10`, and every capability card this file
+cites is the live one rather than the payload's copy — which is the
+misrouting the same garden pass found three times elsewhere in the tree.
