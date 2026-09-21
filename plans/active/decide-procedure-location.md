@@ -58,9 +58,20 @@ exclusions are argued in the Decision Log.
   by hand either — the limit is account-wide, not per-invocation. Evidence
   under Surprises; the substitution of M3 for this session is in the
   Decision Log.
-- [ ] M3 — omp: the whole trial against the edited procedures. In progress
-  this session (started 2026-09-21 23:04Z): trial built, briefs extracted,
-  fresh-copy probe run. Driven sessions under way.
+- [x] (2026-09-21 23:29Z) M3 — omp: the whole trial against the edited
+  procedures, at `omp-20260921-180411`. All seven acceptance items observed
+  and both of this plan's own additions with them: three driven sessions,
+  each a separate process with standard input closed, exiting 0 in 362, 609
+  and 363 seconds — 22.2 minutes of driven time against the 29 the previous
+  run took; step 9's outcome was a committed link `.omp/skills ->
+  ../skills`, named in the report; step 8's sentence produced two command
+  lines in the authored plan carrying their refusal points; and the copy
+  reached `python3 -m tally report` printing counts with its own `./verify`
+  passing 13 tests. One carve-out, recorded as a finding rather than a
+  shortfall: the post-execution references part exits 1 on a single
+  reference the copy's own later milestone creates, where M2's item 2 asks
+  for the composition rather than a clean exit. The M3 addition about
+  reproducibility came back half-true and is written up as such.
 - [ ] M4 — Codex CLI: the whole trial against the edited procedures.
 - [ ] M5 — Close out: retire `D4` and `D12`, halve `D13`, graduate the
   decision, reflect the behavior.
@@ -204,14 +215,31 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   Evidence: `ls -a <trial>/repo` lists `.git`, `AGENTS.md`,
   `ARCHITECTURE.md`, `GOALS.md`, `docs`, `plans`, `skills` and nothing else.
   The probe in a fresh copy built for the purpose
-  (`omp-probe-20260921-180423`) answered with 19 registered skills from
-  three roots — `/Users/<you>/.claude/skills/`,
+  (`omp-probe-20260921-180423`) reported 19 registered skills and then
+  listed 20 names — an arithmetic slip inside its own answer, which touches
+  none of the six — from three roots,
+  `/Users/<you>/.claude/skills/`,
   `/Users/<you>/.claude/plugins/cache/claude-plugins-official/atlassian/…/skills/`
   and `/Users/<you>/.claude/plugins/marketplaces/bholzer/plugins/bholzer/skills/`
   — all outside the copy, and stated: "This repo has its own `skills/`
   directory … **None of those repo skills were loaded into this session** —
   they are not in the startup manifest". Stored at
   `<probe-trial>/logs/probe-fresh.txt`.
+
+- Observation (M3): the edited clause fixed which kind of outcome a session
+  takes and made it reportable, but it did not make the location
+  reproducible, because this environment reads more than one
+  repository-internal root and the clause deliberately names none.
+  Evidence: this run installed `.omp/skills -> ../skills`, committed in the
+  bootstrap commit. The completed trial records two earlier sessions in the
+  same environment, one writing `.omp/skills` and the next writing
+  `.claude/skills` pointing at `../skills`. All three are locations the
+  environment loads from and all three satisfy the clause; what changed is
+  that this run's report names what it installed and where, which is the
+  obligation the edit added and which the earlier records show being left to
+  the operator to reconstruct. So the reproducibility M3 asks about holds
+  for the outcome and not for the path, and naming a path is exactly what
+  the layer map forbids a procedure to do.
 
 ## Decision Log
 
@@ -895,7 +923,8 @@ is in the bootstrap commit.
 
 The probe pair, run in omp either side of the bootstrap, is what makes the
 link's effect an observation rather than a claim. In a fresh copy built for
-the purpose the session was given 20 skills from three roots, every one of
+the purpose the session named 20 skills from three roots (reporting the
+total as 19, its own slip), every one of
 them outside the copy, and said so of the copy's own: "None of those repo
 skills were loaded into this session — they are not in the startup
 manifest". In the bootstrapped copy the same prompt listed 26, the
@@ -932,6 +961,55 @@ discover -s tests -t .` / `ImportError: Start directory is not importable:
 ran the discovery command in a scratch tree until it succeeded, which is how
 `tests/__init__.py` became a file its first milestone creates rather than a
 thing the implementing session would have discovered by failing.
+
+Session 3, execution. Same invocation shape with `brief-execute.md` to
+`<trial>/logs/03-execute.txt`. Started 18:22:19 CDT, exited 0 after 363
+seconds, committing five times, `9928f4b` "Milestone 1: failing end-to-end
+CLI test, observed before any source exists" through `4653c2b` "Milestone 1:
+complete the plan's living sections with observed evidence", tree clean
+after.
+
+The copy carries a feature to a running command. In `<trial>/repo`:
+
+    $ python3 -m tally add build && python3 -m tally add build && python3 -m tally add ship && python3 -m tally report
+    build 1
+    build 2
+    ship 1
+    build 2
+    ship 1
+    exit=0
+
+    $ ./verify
+    .............
+    Ran 13 tests in 0.096s
+    OK
+    verify: 1 of 1 checks passed (tests).
+    exit=0
+
+`./verify` is the verification command the copy's own `AGENTS.md` publishes,
+written by the executed milestone; it did not exist when the milestone
+started.
+
+The driver after the executed milestone: `layout: ok — 6 procedures, each
+with SKILL.md and matching frontmatter name.`, `fill: ok — no authoring
+scaffolding in 23 markdown files of the copy.`, and `references: 1 dangling
+reference in 169 examined across 20 markdown files of the copy.`, exit 1.
+The 22 reserved `tally/` paths resolved once the code existed. The residue
+is one forward reference of the project's own making — the copy's
+`ARCHITECTURE.md:78` cites `tools/boundary_lint.py`, which that project's
+own third milestone creates — so it is the copy's debt, not the payload's,
+and it is recorded here rather than allowlisted in this repository.
+
+The last two card observations. The copy's plan file gained 325 lines
+between the authoring commit `5b77a78` and the execution commit `4653c2b`,
+among them output the authoring version could not have held: `exit=127` for
+the pre-work `./verify`, `AssertionError: 1 != 0 : …No module named tally`
+from the test observed failing before any source existed, `Ran 13 tests in
+0.095s`, and `real 0m0.628s` for `time ./verify` against that plan's
+published 60-second budget. And the session stopped after one milestone: the
+copy's `Progress` shows seven ticked boxes, all timestamped, and the first
+unticked box is `Add validate_label and InvalidLabel to
+tally/core/__init__.py`, which belongs to its Milestone 2.
 
 ## Interfaces and Dependencies
 
