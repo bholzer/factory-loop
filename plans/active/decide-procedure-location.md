@@ -50,8 +50,17 @@ exclusions are argued in the Decision Log.
   `docs/DEBT.md` is deliberately unchanged: `D4` and `D12` are retired by M5,
   after the trials say the pick survived contact. No trial has judged the new
   text yet.
-- [ ] M2 — Claude Code: the whole trial against the edited procedures.
-- [ ] M3 — omp: the whole trial against the edited procedures.
+- [ ] M2 — Claude Code: the whole trial against the edited procedures. Not
+  started: on 2026-09-21 at 18:02 CDT the environment refused every
+  non-interactive invocation with `You've hit your session limit · resets
+  8:20pm (America/Chicago)`, exit 1, on three models, and the account has no
+  API key to fall back to, so no session could be driven and none was driven
+  by hand either — the limit is account-wide, not per-invocation. Evidence
+  under Surprises; the substitution of M3 for this session is in the
+  Decision Log.
+- [ ] M3 — omp: the whole trial against the edited procedures. In progress
+  this session (started 2026-09-21 23:04Z): trial built, briefs extracted,
+  fresh-copy probe run. Driven sessions under way.
 - [ ] M4 — Codex CLI: the whole trial against the edited procedures.
 - [ ] M5 — Close out: retire `D4` and `D12`, halve `D13`, graduate the
   decision, reflect the behavior.
@@ -172,6 +181,37 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   and exited 1, as it did before the edit. `git diff` for the commit shows
   13 changed lines in the bootstrap procedure, all inside step 9's second
   clause, and 5 added lines in the authoring procedure, all inside step 8.
+
+- Observation (M3 session, 2026-09-21): one of the three environments cannot
+  be driven at all right now, and the refusal is account-wide rather than
+  something a flag answers, so M2 could not be started and was not started.
+  Evidence: in a fresh trial copy, `claude -p --model opus
+  --dangerously-skip-permissions "…"` printed `You've hit your session limit
+  · resets 8:20pm (America/Chicago)` and exited 1 in 4 seconds; the same
+  invocation with `--model sonnet` and with `--model haiku` printed the same
+  line and exited 1; `ANTHROPIC_API_KEY` is unset, so there is no
+  non-subscription path. Local clock at the time: `2026-09-21 18:02:54 CDT`,
+  which puts the reset 2h17m out. `omp -p --auto-approve` and `codex exec -m
+  gpt-5.6-sol --approve-for-me` each answered a one-word prompt and exited 0
+  in the same minute, so the limit is this environment's, not the machine's.
+  The trial built for M2 at `claude-code-20260921-180229` is abandoned
+  unused, per this plan's rule that trials are never reused.
+
+- Observation (M3): the copy arrives with no environment configuration
+  directory, and in omp a fresh copy surfaces none of its six procedures —
+  every root the environment read lies outside the copy, which is the
+  addition M3's acceptance asks the probes for.
+  Evidence: `ls -a <trial>/repo` lists `.git`, `AGENTS.md`,
+  `ARCHITECTURE.md`, `GOALS.md`, `docs`, `plans`, `skills` and nothing else.
+  The probe in a fresh copy built for the purpose
+  (`omp-probe-20260921-180423`) answered with 19 registered skills from
+  three roots — `/Users/<you>/.claude/skills/`,
+  `/Users/<you>/.claude/plugins/cache/claude-plugins-official/atlassian/…/skills/`
+  and `/Users/<you>/.claude/plugins/marketplaces/bholzer/plugins/bholzer/skills/`
+  — all outside the copy, and stated: "This repo has its own `skills/`
+  directory … **None of those repo skills were loaded into this session** —
+  they are not in the startup manifest". Stored at
+  `<probe-trial>/logs/probe-fresh.txt`.
 
 ## Decision Log
 
@@ -314,6 +354,21 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   forbid. The cost is one milestone's window in which the spec is behind the
   procedure, carried openly here rather than silently.
   Date/Author: 2026-09-21, M1 execution session.
+
+- Decision: this session executed M3 rather than M2, leaving M2 untouched
+  and owed, and the milestone order among M2, M3 and M4 is declared
+  independent.
+  Rationale: M2's environment refused every invocation for a quota that
+  resets 2h17m after the session began, on every model and with no API key
+  to fall back on, so the alternatives were an idle wait of that length or a
+  milestone recorded as split with nothing in it. The three trial milestones
+  depend on M1 and on nothing else — they build separate throwaway
+  repositories, share no state, and their acceptance items are per
+  environment — so running them out of order costs nothing and loses no
+  evidence. The one-milestone-per-session rule is kept: exactly one was
+  executed. What the substitution does cost is that M5 cannot run until M2
+  is driven, which is unchanged by the order.
+  Date/Author: 2026-09-21, M3 execution session.
 
 ## Outcomes & Retrospective
 
