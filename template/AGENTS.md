@@ -83,8 +83,8 @@ GUIDANCE
 -->
 
 - Multi-file or multi-session work requires an ExecPlan per `plans/PLANS.md`.
-- Execute one milestone per session. Update the plan's living sections
-  (Progress, Decision Log, Surprises) with observed evidence. Stop.
+- Execute one milestone per session. Update every living section
+  `plans/PLANS.md` requires, with observed evidence. Stop.
 - Never report a planned command as passing evidence. Run it, record what you
   observed.
 - Decisions with lasting effect go in the plan's Decision Log; durable ones
