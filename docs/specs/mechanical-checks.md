@@ -62,9 +62,8 @@ there.
 
 `docs/capabilities/prose-duplication.md` owns whether the same sentence has been
 written down twice. It compares runs of eight words across both halves after
-stripping quoted material, and the classes it treats as legitimate — copies a
-declared correspondence requires, text a shared format imposes, a restatement
-that names its owner — are enumerated on the card.
+stripping quoted material. Which shared windows are legitimate — five of them
+decidable, one a judgement — is enumerated on the card and nowhere else.
 
 `docs/capabilities/evidence-check.md` owns whether work in flight is recorded:
 the four living sections a plan is required to carry are present with something
