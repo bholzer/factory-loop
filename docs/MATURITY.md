@@ -32,16 +32,12 @@ catching anything came back clean: the harness bootstrapped a copy whose
 entry-point file had been renamed out from under it, by reading the file.
 `docs/DEBT.md` `D13` carries what those two shortfalls cost to clear.
 
-The same row carries a ceiling, which is why it is written down here rather
-than left for a later session to rediscover. Three quarters of what the card
-claims is a person invoking a harness and reading what came back, so the
-honest maximum for it is `built`, and `enforced` is unreachable by
-construction. The promotion rule below wants every gating card of a rung at
-`enforced`, so this row cannot be satisfied as the table stands: an L2 claim
-has to say what it did about that — gate on the scriptable part alone, or
-retire the row and name the human judgement that stays. Neither is chosen
-here. What is settled is that promoting the card to clear the path would be
-a status nobody observed.
+The same row carries a ceiling that collides with the promotion rule below.
+`docs/decisions/0024-blueprint-eval-can-never-read-enforced.md` fixes that
+card's maximum status at `built` and states why, so the L2 rung cannot be
+claimed while this table asks every gating card of a rung for `enforced`.
+That record also names the two honest exits from the bind and forbids the
+third; neither exit is taken here, and the row stands as a blocker.
 
 ## Rungs
 
