@@ -84,6 +84,11 @@ constrains:
    only this file and a checkout: every path repository-relative and real,
    every term of art defined where it is first used, every choice already
    made. Anything you would have to ask about is a hole to fill now.
+   An expected command line is run before it is written down, as far as the
+   first refusal the environment can produce without doing the work —
+   argument parsing, authentication, a version banner — and the point it
+   reached is recorded beside it. A line composed from individually correct
+   flags is not a line anyone has run.
 9. Commit the plan by itself, and report: its path, the milestone count, what
    the first milestone is, and what you deliberately left out of the plan.
 

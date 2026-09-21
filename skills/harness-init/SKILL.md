@@ -130,10 +130,15 @@ so a removed one dangles references inside the ones that remain.
    not. It owns no content of its own: a second guide is a second owner of
    every fact in the first. Second, if that environment loads procedures only
    from a location of its own choosing, make the installed set reachable
-   there — by its configuration where one exists, otherwise by a link — and
-   change nothing about the files themselves. Their location is the
-   environment's convention; the map's reference by path is what keeps them
-   findable when no convention applies.
+   there without moving it: by that environment's own configuration where it
+   reads one from inside this repository, otherwise by a link created there
+   and committed with the rest of the installation. Where every location it
+   reads lies outside this repository, install nothing — a bootstrap
+   configures the repository it runs in, never the machine it runs on — and
+   leave the map's reference by path as the route, which is the one every
+   environment can follow. Whichever of the three happened, name it in the
+   report this procedure ends with: what was installed and where, or why
+   nothing was.
 10. **Verify by running, not by reading.** Walk every backticked
     repository-relative path across the filled artifacts and record what the
     walk reported; both finish searches come back empty; each card file has a
