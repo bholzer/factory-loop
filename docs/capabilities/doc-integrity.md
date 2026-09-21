@@ -41,9 +41,9 @@ reported, and all four are decidable:
 Two parts of the tree are outside the checked set, each for a reason that is
 not convenience. Plan files under `plans/active/` and `plans/completed/` are
 out, because a plan names the files it will create before they exist and the
-files it deleted after they are gone: the completed plan in this repository
-contains twenty-three references that resolve to nothing and not one of them
-is a defect. The payload half under `template/` is out, because a reference
+files it deleted after they are gone: the plans in this repository hold
+hundreds of references that resolve to nothing and not one of them is a
+defect. The payload half under `template/` is out, because a reference
 written there must resolve inside the copy a target project receives rather
 than from this repository's root. That is a different question with a
 different answer, and it belongs to `docs/capabilities/boundary-lint.md`,
