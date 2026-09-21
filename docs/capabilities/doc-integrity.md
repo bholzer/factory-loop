@@ -9,7 +9,12 @@ bracket, or brace. Those exclusions are what keep the check from reporting
 things that were never references: a command quoted whole, a glob such as
 `skills/*/SKILL.md`, and a placeholder-bearing path such as
 `skills/<name>/SKILL.md`. A bare filename with no directory is not a path
-reference either, and is not in the set.
+reference either, and is not in the set. Neither is a path that begins with a
+slash: it names a location on the machine rather than one in this repository —
+a principle stating where a tool writes its scratch files names /tmp that way
+— and testing it from the repository root asks a question nobody wrote. It is
+excluded at extraction rather than allowlisted, because the allowlist is for
+judgements and this one is decidable from the first character.
 
 The checked set is the live artifact half: `AGENTS.md`, `GOALS.md`,
 `ARCHITECTURE.md`, `CLAUDE.md`, everything under `docs/`, `plans/PLANS.md`,

@@ -4,9 +4,13 @@
 
 Every path reference in this repository's markdown artifacts resolves to a
 file or directory that exists. A reference is a repository-relative path
-written in backticks or used as a markdown link target. The checked set is
-`AGENTS.md`, every artifact its map names, everything under `docs/`, and the
-plan convention document `plans/PLANS.md`.
+written in backticks or used as a markdown link target. Repository-relative is
+what puts a path in the set: an absolute one, starting at the filesystem root
+— the scratch directory a constraint tells a tool to write into, say — points
+outside the project altogether, so it is dropped where references are
+extracted rather than carried as an exception to resolution. The checked set
+is `AGENTS.md`, every artifact its map names, everything under `docs/`, and
+the plan convention document `plans/PLANS.md`.
 
 Four classes of non-resolving reference are legitimate and must not be
 reported:

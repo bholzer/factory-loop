@@ -3,9 +3,10 @@
 #
 # docs/capabilities/doc-integrity.md is the card. A reference is a backticked
 # span or a markdown link target that contains a slash and none of space, tab,
-# `*`, angle bracket, or brace — those exclusions are what keep commands,
-# globs, and placeholder-bearing paths out of the set. A reference resolves if
-# it exists from the repository root or from the citing file's own directory.
+# `*`, angle bracket, or brace, and that does not begin with a slash — those
+# exclusions are what keep commands, globs, placeholder-bearing paths and
+# absolute machine locations out of the set. A reference resolves if it exists
+# from the repository root or from the citing file's own directory.
 #
 # Three narrowings the card states, all decidable here: files whose own name
 # ends in _FORMAT.md are skipped whole, fenced and indented blocks are quoted
@@ -79,6 +80,7 @@ refs=$(awk '
 	function consider(t) {
 		if (t == "") { return }
 		if (t !~ /\//) { return }
+		if (t ~ /^\//) { return }
 		if (t ~ /[ \t*<>{}]/) { return }
 		print FILENAME "\t" FNR "\t" t
 	}

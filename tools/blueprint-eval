@@ -317,15 +317,18 @@ part_references() {
 	fi
 
 	# A reference is a backticked span or a markdown link target containing a
-	# slash and none of space, tab, asterisk, angle bracket, brace or colon.
-	# The colon keeps a file:line locator and a URL out of the set, neither of
-	# which is a path inside the copy. Fenced and indented blocks are quoted
-	# material: a remediation transcript names the file its own failing case
-	# creates, which must not exist.
+	# slash and none of space, tab, asterisk, angle bracket, brace or colon,
+	# and not beginning with a slash. The colon keeps a file:line locator and a
+	# URL out of the set; the leading slash keeps an absolute path out, which
+	# names a place on the machine running the trial rather than one inside the
+	# copy. Fenced and indented blocks are quoted material: a remediation
+	# transcript names the file its own failing case creates, which must not
+	# exist.
 	refs=$(cd "$copy" && awk '
 		function consider(t) {
 			if (t == "") { return }
 			if (t !~ /\//) { return }
+			if (t ~ /^\//) { return }
 			if (t ~ /[ \t*<>{}:]/) { return }
 			print FILENAME "\t" FNR "\t" t
 		}
