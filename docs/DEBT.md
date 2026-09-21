@@ -138,6 +138,19 @@ finding a case the reading catches — which is evidence for what a mechanism
 would have to decide — or concluding that the reading has caught nothing over
 enough passes to retire the row.
 
+The first pass to do the reading caught three, all in one shape: a live card
+stating something about this project's own register that the tree contradicts
+— that a card had not been instantiated when it had, and twice that the
+contract a plan is held to lives in the payload's card rather than in the
+live one beside it. A heading walk cannot see any of them, and the reference
+checker resolves the payload path happily, because the file it names does
+exist. Two thirds of that is mechanizable and the row now says so: a live
+card citing `template/docs/capabilities/<name>.md` where
+`docs/capabilities/<name>.md` exists is a misrouting decidable from two path
+tests. What stays a reading job is the other third — whether a claim about
+instantiation state is still true — and that is why the row stands rather
+than becoming a check today.
+
 ### D10 — The layer-map clause a tool list cannot decide
 
 `tools/checks/boundary-lint` decides three of the four rules in
