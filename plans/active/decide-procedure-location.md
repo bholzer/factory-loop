@@ -58,6 +58,17 @@ exclusions are argued in the Decision Log.
   by hand either — the limit is account-wide, not per-invocation. Evidence
   under Surprises; the substitution of M3 for this session is in the
   Decision Log.
+- [ ] M2, second attempt (2026-09-21, this session) — Claude Code: in
+  flight. The quota above cleared when the operator re-authenticated the
+  account at about 18:36 CDT, ahead of the 8:20pm reset, and the environment
+  has moved to `2.1.278 (Claude Code)` since this plan recorded `2.1.274`.
+  Trial at `claude-code-20260921-183718`. Done so far: briefs extracted at
+  62/21/6 lines, the fresh-copy probe, the bootstrap session exiting 0 in
+  373 seconds with `.claude/skills -> ../skills` committed and named in its
+  report, the bootstrapped-copy probe surfacing all six, and the driver's
+  three parts after the bootstrap. Remaining: the authoring session, the
+  execution session, the `tally` run, and the driver after the executed
+  milestone.
 - [x] (2026-09-21 23:29Z) M3 — omp: the whole trial against the edited
   procedures, at `omp-20260921-180411`. All seven acceptance items observed
   and both of this plan's own additions with them: three driven sessions,
@@ -241,6 +252,40 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   for the outcome and not for the path, and naming a path is exactly what
   the layer map forbids a procedure to do.
 
+- Observation (M2, 2026-09-21): the quota that stopped M2 two hours earlier
+  was not waiting on its stated reset — re-authenticating the account
+  cleared it, and the environment came back a version later than the one
+  this plan baselined.
+  Evidence: at 18:35:11 CDT `claude -p --model sonnet
+  --dangerously-skip-permissions "Reply with the single word: ok"` still
+  printed `You've hit your session limit · resets 8:20pm (America/Chicago)`
+  and exited 1 in 3.4 seconds. The operator re-authenticated; at 18:37
+  `claude --version` printed `2.1.278 (Claude Code)` against the `2.1.274`
+  recorded while authoring, and the fresh-copy probe ran to completion and
+  exited 0. The invocation is unchanged, so the refusal was the account's
+  state rather than anything about the flags or the payload.
+
+- Observation (M2): a trial for M4 was built and abandoned unused when the
+  environment answered again, which is the never-reuse rule costing one
+  command rather than one decision.
+  Evidence: `./tools/blueprint-eval new codex-cli` built
+  `codex-cli-20260921-183529` and the three briefs were extracted into it at
+  62, 21 and 6 lines before the re-authentication. Nothing was driven in it
+  and nothing was copied out of it; M4 rebuilds from scratch. It is the
+  second trial this plan has abandoned, after `claude-code-20260921-180229`.
+
+- Observation (M2): this environment resolved step 9 to the same outcome omp
+  did — a committed link — through a different directory, which is the
+  second half of the evidence that the clause fixes the kind of action and
+  not the path.
+  Evidence: the bootstrap report reads "It reads skills from
+  `.claude/skills/`, a location inside this repository, so the installed set
+  is reached by a committed symlink there rather than being moved", and `ls
+  -l <trial>/repo/.claude` shows `skills -> ../skills` inside commit
+  `0448553`. M3's run wrote `.omp/skills`. Two environments, one rule, two
+  paths, both named in their reports — which is what the edit asked for and
+  the most it can ask for without naming a directory the layer map forbids.
+
 ## Decision Log
 
 - Decision: the procedures keep their canonical location at
@@ -397,6 +442,19 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   executed. What the substitution does cost is that M5 cannot run until M2
   is driven, which is unchanged by the order.
   Date/Author: 2026-09-21, M3 execution session.
+
+- Decision: this session started M4 and switched to M2 when the operator
+  re-authenticated the blocked environment mid-session, abandoning the
+  Codex CLI trial it had already built.
+  Rationale: M2 is the first unfinished milestone and the only one whose
+  environment had ever refused, so running it the moment it could be run
+  removes the plan's only observed risk of not finishing; M4's environment
+  has refused nothing and can be driven in any later session. The switch
+  cost one unused trial directory and roughly a minute of setup, because
+  trials are never reused and the one built for Codex CLI could not be
+  repointed. The one-milestone-per-session rule is kept: no session of the
+  Codex CLI trial was driven, so exactly one milestone was executed here.
+  Date/Author: 2026-09-21, M2 execution session.
 
 ## Outcomes & Retrospective
 
@@ -1010,6 +1068,75 @@ published 60-second budget. And the session stopped after one milestone: the
 copy's `Progress` shows seven ticked boxes, all timestamped, and the first
 unticked box is `Add validate_label and InvalidLabel to
 tally/core/__init__.py`, which belongs to its Milestone 2.
+
+### M2 record — Claude Code, 2026-09-21
+
+Environment `2.1.278 (Claude Code)`, trial at
+`/Users/<you>/blueprint-trials/claude-code-20260921-183718`, built by
+`./tools/blueprint-eval new claude-code`: "copied 25 files — 19 payload
+files and 6 procedures — committed as \"Receive the payload\"." The three
+briefs were extracted by the `awk` line under Concrete Steps into
+`<trial>/logs/` and came to 62, 21 and 6 lines with `grep -c
+'harness-blueprint'` printing 0 for each, which is the extraction check. The
+copy arrived with no environment configuration directory: `ls -a
+<trial>/repo` listed `.git`, `AGENTS.md`, `ARCHITECTURE.md`, `GOALS.md`,
+`docs`, `plans`, `skills` and nothing else.
+
+Session 1, bootstrap. Invocation, one process, standard input closed, no
+resumption:
+
+    cd <trial>/repo && claude -p --model opus --dangerously-skip-permissions "$(cat <trial>/logs/brief-bootstrap.md)" < /dev/null 2>&1 | tee <trial>/logs/01-bootstrap.txt
+
+Started 18:39:00 CDT, exited 0 after 373 seconds, committing `0448553`
+"Bootstrap the agent harness for tally" over ten files — the nine filled
+artifacts plus `.claude/skills`, with `docs/capabilities/prose-duplication.md`
+deleted as a card the session argued this project would not build. `git
+status --porcelain` in the copy printed nothing afterwards.
+
+Discovery, judged under `0023`. The session was handed none of the copy's
+six procedures at startup and found the right one by reading the tree; its
+report's first sentence names it: "Bootstrap complete and committed as
+`0448553`. Following `skills/harness-init/SKILL.md`; nothing was re-copied
+and no existing file was overwritten". The brief named no procedure, no
+filename and no path. Nothing was created or edited anywhere to make the
+procedures visible.
+
+Step 9's outcome: a link, committed, and named in the report — the same
+branch of the new clause omp took, reached through a different dotted
+directory. The report said: "It reads skills from `.claude/skills/`, a
+location inside this repository, so the installed set is reached by a
+committed symlink there rather than being moved; `cat
+.claude/skills/harness-init/SKILL.md` resolves. Nothing was configured
+outside the repository." Of the first clause, which this plan did not touch:
+"This environment loads `AGENTS.md` as project instructions on its own, so
+no second root guide was written — a second guide would be a second owner of
+every fact in the first." `ls -l <trial>/repo/.claude` shows `skills ->
+../skills`, and the link is in the bootstrap commit.
+
+The probe pair, run in Claude Code either side of the bootstrap. In a fresh
+copy built for the purpose (`claude-probe-20260921-183718`) the session
+listed only the machine owner's own procedures — user, synced-bundle and
+plugin directories, every one of them outside the copy — and said so of the
+copy's own: "this repo has its own skills/ directory (plan-author,
+plan-execute, capability-build, retro, harness-init, doc-garden) that was
+not loaded — it sits at repo/skills/, not repo/.claude/skills/." In the
+bootstrapped copy the same prompt listed 78, and the six appear as their own
+group attributed to the copy: "PROJECT (6) —
+`<trial>/repo/skills/<name>/` (the loader picks these up via
+`repo/.claude/skills`, which is a symlink to `../skills`)": capability-build,
+doc-garden, harness-init, plan-author, plan-execute, retro. Stored at
+`<trial>/logs/probe-fresh.txt` and `<trial>/logs/probe-bootstrapped.txt`.
+
+The driver after the bootstrap: `layout: ok — 6 procedures, each with
+SKILL.md and matching frontmatter name.`, `fill: ok — no authoring
+scaffolding in 22 markdown files of the copy.`, and `references: 20 dangling
+references in 145 examined across 20 markdown files of the copy.`, exit 1.
+Every one of the 20 is a reserved `tally/` path — `tally/cli.py`,
+`tally/store.py`, `tally/core/`, cited from `ARCHITECTURE.md`,
+`docs/DEBT.md` and `docs/PRINCIPLES.md` — which this project's own `D2`
+reserves and its first milestone has not written yet. That is the
+composition this milestone's second acceptance item asks for; the judged
+reading is the one after the executed milestone.
 
 ## Interfaces and Dependencies
 
