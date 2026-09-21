@@ -134,12 +134,26 @@ so a removed one dangles references inside the ones that remain.
    change nothing about the files themselves. Their location is the
    environment's convention; the map's reference by path is what keeps them
    findable when no convention applies.
-10. **Verify by running, not by reading.** Every backticked repository-relative
-    path across the filled artifacts resolves; both finish searches come back
-    empty; each card file has a register row and each register row a card
-    file; every gating row names a card that exists; and the verification
-    command now published in the map runs in this repository. Commit the
-    installation.
+10. **Verify by running, not by reading.** Walk every backticked
+    repository-relative path across the filled artifacts and record what the
+    walk reported; both finish searches come back empty; each card file has a
+    register row and each register row a card file; every gating row names a
+    card that exists; and the verification command now published in the map
+    runs in this repository. Commit the installation.
+
+    That walk does not come back empty here, and it is not meant to. The
+    artifacts you just filled describe a project whose code is not written
+    yet: the layering the owners stated, the module paths it is stated in
+    terms of, the directories the first plan will create. Those paths are
+    reserved rather than broken, which is the same judgement a reference
+    check hands to a person and takes back as an allowlist key with a
+    reason. Leave them written — an artifact reworded to cite only what
+    exists today describes a project the owners did not describe — and open
+    a row in `docs/DEBT.md` naming them, the keys that would excuse them to
+    a reference check running here already, and what ends the deferral,
+    which is the code arriving. The failure this step exists to catch is the
+    third option: a walk run, read, and reported as though it had come back
+    clean.
 11. **Report.** What was created; what came from interview answers rather than
     from evidence in the tree; what was omitted and why; what went into the
     debt register; and what happens next — the project's first plan under
@@ -176,8 +190,9 @@ so a removed one dangles references inside the ones that remain.
 ## Stop condition
 
 Stop when the artifacts exist and are filled, the procedures are installed,
-the entry point resolves, the checks in step 10 have been run and came back
-clean, and all of it is committed. Report what was created, what was
+the entry point resolves, the checks in step 10 have been run and their
+results recorded — clean, or with the reserved paths carried as a debt row —
+and all of it is committed. Report what was created, what was
 deliberately omitted with its reason, and what was deferred; then name the
 next step without taking it. The first plan is authored in its own session, by
 the procedure that owns authoring.
