@@ -228,7 +228,7 @@ inventing one.
   question, per the Decision Log.
   The post-evidence `./tools/verify` passed first try: exit 0 in 2.79s
   ending `fast-verify: 7 of 7 checks passed (3s).`
-- [ ] M9 — Close out (completed, 2026-09-22 16:19Z: `D14` row and Details
+- [x] (2026-09-22 16:19Z) M9 — Close out (`D14` row and Details
   deleted with every other identifier unchanged — `grep -n 'D14'
   docs/DEBT.md` prints nothing, exit 1; `D16` and `D17` opened carrying
   the M7 and M8 owner questions with their gated pricing;
@@ -243,8 +243,14 @@ inventing one.
   2.77s ending `fast-verify: 7 of 7 checks passed (3s).`, doc-integrity
   542 of 542 in 60 artifacts, prose-duplication 51 artifacts over 42241
   windows with 20 allowlist entries applied and none added. The first
-  post-write verify failed 1 of 7 — see Surprises. Remaining:
-  retrospective, move to `plans/completed/`.)
+  post-write verify failed 1 of 7 — see Surprises. Then, 16:21Z: this
+  file moved to `plans/completed/` by git mv, and `./tools/verify` on
+  the moved tree exited 0 in 2.76s ending
+  `fast-verify: 7 of 7 checks passed (2s).`, evidence-check reporting
+  "ok — no active plans under plans/active/"; retrospective written
+  below; the staleness reading of `docs/specs/index.md` found none — the
+  check-protocol and mechanical-checks rows still describe files this
+  plan last touched at M1, and the bootstrap-flow row was rewritten.)
 
 M6, M7 and M8 are order-independent: each builds its own throwaway trial
 repository and shares no state with the others. If one harness refuses to
@@ -732,9 +738,52 @@ command named in each entry.
 
 ## Outcomes & Retrospective
 
-Nothing executed yet. This section is written at close-out against the
-Purpose above, and earlier if a milestone materially changes what the plan
-can deliver.
+(2026-09-22 16:21Z, M9 session, written at close-out against the
+Purpose.)
+
+Delivered, and observable in the tree. A reader opening
+`docs/guide/index.md` — reachable from the `AGENTS.md` map — is routed
+by role and task to the four pages the plan promised, each pointing at
+the files that own its facts. The check conformance contract is live at
+`docs/specs/check-protocol.md` instead of buried in a completed plan's
+archive. The operator's three constant prompts exist in the repository,
+verbatim, in `docs/guide/operating.md`. The bootstrap procedure asks the
+optional provenance question and owes one report statement per step 9
+clause, and three re-driven bootstrap sessions — one per supported
+harness, all 2026-09-22 — paid the blueprint-eval gate on those edits.
+`D14` fell on the evidence its repair fired three times in three.
+`docs/specs/bootstrap-flow.md` describes the present flow; decision 0028
+records why the guide is live-only with a recorded pointer; every
+milestone's closing verify exited 0 ending
+`fast-verify: 7 of 7 checks passed`.
+
+Divergences, each recorded where it happened rather than absorbed:
+adopting's sizing figure is the spec's three-session number, not the
+per-session range the milestone text asked for (M3, Decision Log); the
+omp re-run installed nothing where its acceptance expected a committed
+link (M7); the Codex CLI provenance pointer arrived backticked (M8). The
+last two were scored on substance, left un-re-rolled so the record stays
+evidence rather than selection, and routed forward: they are now `D16`
+and `D17`, priced and batched for the next gated round.
+
+Left open, deliberately. `D16` and `D17` wait on owner rulings plus a
+round that is re-driving bootstraps anyway; `blueprint-eval` stays
+`specced` with `D13` carrying why; no rung moved; `GOALS.md` and
+`template/` were never touched.
+
+Lessons worth carrying. First drafts collided with the duplication check
+in four sessions of nine — three shared sentences, one shared filename —
+and every repair was rewording or a bare-number citation, never a new
+allowlist entry; writing prose fresh against named owners is cheaper
+than negotiating with the check afterwards. Reading trial results out of
+the tree rather than the report caught the one recorded pointer whose
+session never mentioned it, and the re-runs produced three different
+report grammars for the same two-clause obligation — shape varies,
+substance is what gets scored. The batching lesson held in numbers:
+landing both procedure edits in one commit before the gated round kept
+the bill at three driven sessions instead of six. And the gate earned
+its cost both ways: the re-runs it forced are also what surfaced the two
+wording gaps now registered as debt.
 
 ## Context and Orientation
 
