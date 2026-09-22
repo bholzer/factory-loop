@@ -92,6 +92,13 @@ so a removed one dangles references inside the ones that remain.
    Ask them in one pass. An answer nobody has becomes a recorded unknown —
    invented goals are worse than missing ones, because every future piece of
    work then gets graded against a fiction.
+   One question is optional and asked in the same pass: where the artifact
+   set and procedures being installed came from, and where that upstream
+   keeps its guide for adopters. When the owners name a location, record it
+   as one line in `GOALS.md` under scope, phrased as a location outside
+   this repository — a URL or a checkout path — so no reference walk here
+   is ever asked to resolve it; when they do not, write nothing, because
+   provenance nobody supplied is provenance invented.
 3. **Propose, then execute the answer.** State which artifacts will exist,
    which cards are kept, and which are left out with the reason for each.
    Right-sizing is the owners' call; this pass makes it visible before it
@@ -136,9 +143,12 @@ so a removed one dangles references inside the ones that remain.
    reads lies outside this repository, install nothing — a bootstrap
    configures the repository it runs in, never the machine it runs on — and
    leave the map's reference by path as the route, which is the one every
-   environment can follow. Whichever of the three happened, name it in the
-   report this procedure ends with: what was installed and where, or why
-   nothing was.
+   environment can follow. The report this procedure ends with answers the
+   two clauses separately: for the first, the entry-point file that was
+   added or the reason the environment needed none; for the second, what
+   was installed and where, or why nothing was. Installing nothing is an
+   outcome, and it gets its own sentence rather than being left to be
+   inferred from the other clause's answer.
 10. **Verify by running, not by reading.** Walk every backticked
     repository-relative path across the filled artifacts and record what the
     walk reported; both finish searches come back empty; each card file has a

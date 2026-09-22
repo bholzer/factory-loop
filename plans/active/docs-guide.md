@@ -104,8 +104,20 @@ inventing one.
   the build procedure at lines 7, 27, 53 and 71, and the protocol spec
   at line 38. The first post-write verify passed: the only draft of
   this plan so far that collided with nothing.
-- [ ] M5 — Both `skills/harness-init/SKILL.md` edits landed in one commit:
-  the per-clause step 9 reporting rule and the optional provenance question.
+- [x] (2026-09-22 14:59Z) M5 — both `skills/harness-init/SKILL.md` edits
+  landed in one commit: step 9's final reporting sentence replaced by the
+  per-clause rule and step 2's interview paragraph extended with the
+  optional provenance question, both candidate wordings adopted verbatim,
+  203 → 213 lines by `wc -l`. Observed: `./tools/verify` exit 0 in 2.74s
+  wall ending `fast-verify: 7 of 7 checks passed (3s).`, prose-duplication
+  comparing 51 artifacts over 41474 windows with 20 allowlist entries
+  applied and none added, boundary-lint reporting no banned mention in the
+  6 procedures, doc-integrity 528 of 528; the acceptance grep for harness
+  names and dotted skill paths printed nothing, exit 1, unchanged from the
+  baseline under Concrete Steps; `docs/DEBT.md` untouched — `git status`
+  showed only the skill file modified before this plan update. The first
+  post-write verify passed: the second draft in this plan to collide with
+  nothing.
 - [ ] M6 — Claude Code bootstrap re-run against the edited procedure,
   provenance answer supplied, all observations recorded.
 - [ ] M7 — omp bootstrap re-run, provenance answer withheld, the
@@ -377,6 +389,15 @@ command named in each entry.
   carries the re-runs' bootstrap wall times anyway — is where it gains a
   live owner, and adopting can point at it then.
   Date/Author: 2026-09-22, M3 session.
+- Decision: M5 adopted both candidate wordings verbatim and placed the
+  optional provenance question at the end of step 2's paragraph, after the
+  recorded-unknown rule, as continuation lines of the same numbered item.
+  Rationale: the contract fixes content and permits only phrasing
+  improvement, and none was needed; appending after the recorded-unknown
+  rule leaves the required question list and the rule governing it
+  contiguous, and the question's closing clause — write nothing when
+  nobody answers — reads as that rule's echo for the optional case.
+  Date/Author: 2026-09-22, M5 session.
 
 ## Outcomes & Retrospective
 
