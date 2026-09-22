@@ -23,9 +23,13 @@ promotion rule requires, and a gate the committer cannot switch off, which
 `docs/DEBT.md` `D8` records this one as not being. Of the L2 rows,
 `doc-integrity` and `boundary-lint` read `enforced` too, and `loop-runner`
 now does as well: its stop rule is decided on every commit here, which is a
-smaller claim than the rung that card gates. `prose-duplication` is enforced
-and appears in no row at all: its card gates no rung deliberately, because a
-shared window tells a reader where to look and not what to do about it.
+smaller claim than the rung that card gates. The loop itself starts only when
+a person starts it, runs for a number of iterations that person chose, and
+ends at a plan boundary they read, so the row below stands as written and the
+judgement it describes is still being made by hand. `prose-duplication` is
+enforced and appears in no row at all: its card gates no rung deliberately,
+because a shared window tells a reader where to look and not what to do
+about it.
 
 `blueprint-eval` has now had its live trial twice — three harnesses each
 time, one small feature carried through each — and still reads `specced`.

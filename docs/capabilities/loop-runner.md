@@ -25,12 +25,17 @@ one-milestone-per-session rule removes.
 ## Enforcement point
 
 The runner itself, since nothing else can observe its own stop rule, checked
-by a self-test over a fixture plan that runs in continuous integration
-alongside the other checks. Nothing enforces it today:
-`docs/capabilities/index.md` carries the status and `docs/MATURITY.md` names
-the rung that requires it. `GOALS.md` records why it is parked for v1 — the
-failure domains of unattended iteration are not yet understood, and a loop
-that runs while nobody is watching is the worst place to discover them.
+by a self-test over fixture plans. That self-test is
+`tools/checks/loop-runner`, which drives scratch repositories through the
+loop with a stub standing in for a harness; `./tools/verify` runs it, and
+`tools/hooks/pre-commit` turns away work it rejects. No job on the remote is
+named here, for the reason
+`docs/decisions/0017-enforcement-point-is-the-cheap-command-and-the-hook.md`
+gives. `docs/capabilities/index.md` carries the status and `docs/MATURITY.md`
+names the rung that requires it — a rung this does not claim, because
+`GOALS.md` records the boundary the tool was built inside: somebody starts
+each run, caps it at an iteration count they chose, and reads the result
+where the plan ends.
 
 ## Acceptance
 

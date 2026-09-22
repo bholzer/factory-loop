@@ -63,8 +63,11 @@ A project bootstrapped from this blueprint has:
   Plans compose; they don't nest.
 - No harness-specific tool invocations in skill bodies. Skills are procedures
   over files, shell, and git.
-- No background automation in v1. `loop-runner` and recurring GC agents are
-  specced and parked at L2 on the maturity ladder.
+- No unattended automation in v1. The watched runner `tools/loop-runner`
+  drives milestone sessions under an explicit iteration limit, halts on
+  anything unexpected, and leaves a human reviewing at plan boundaries;
+  running it with nobody watching, scheduling it, and recurring GC agents
+  stay out of scope, and building it claims no maturity rung.
 - No `PROMPTS.md`. Reusable workflow entry points are what skills are.
 
 ## Constraints
