@@ -22,6 +22,6 @@ One row per spec file, with a narrow statement of what that file covers.
 
 | Spec | Covers |
 | --- | --- |
-| `bootstrap-flow.md` | What this repository offers a target project, what a project has once the payload and the procedures are installed, and which of those claims have been observed — including what three live trials in three harnesses settled and what they left open |
+| `bootstrap-flow.md` | What this repository offers a target project, what the bootstrap interview asks and records — the optional provenance question included — what a project holds once payload and procedures are installed, and the observed record behind those claims: the 2026-09-22 per-harness bootstrap re-runs, the reachability outcome and report shape each harness produced, which older records they superseded, and what stays unobserved |
 | `check-protocol.md` | The contract any check conforms to — invocation, exit meanings and output shapes, the allowlist file format, the aggregator's ordering and streaming, and how the published time budget is set |
 | `mechanical-checks.md` | The three commands a reader can run and how they differ in subject, what each of the seven checks decides, and which of this repository's claims are still read by a person |

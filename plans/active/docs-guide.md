@@ -228,9 +228,23 @@ inventing one.
   question, per the Decision Log.
   The post-evidence `./tools/verify` passed first try: exit 0 in 2.79s
   ending `fast-verify: 7 of 7 checks passed (3s).`
-- [ ] M9 — Close out: `D14` deleted, `docs/specs/bootstrap-flow.md` current,
-  decision 0028 graduated, retrospective written, file moved to
-  `plans/completed/`.
+- [ ] M9 — Close out (completed, 2026-09-22 16:19Z: `D14` row and Details
+  deleted with every other identifier unchanged — `grep -n 'D14'
+  docs/DEBT.md` prints nothing, exit 1; `D16` and `D17` opened carrying
+  the M7 and M8 owner questions with their gated pricing;
+  `docs/specs/bootstrap-flow.md` updated — interview section with the
+  optional provenance question and both observed branches, per-clause
+  step 9 reporting, the 2026-09-22 re-run outcomes per harness with
+  probe results and wall times, the pre-edit round labelled superseded
+  on its bootstrap half under decision 0025's scoping;
+  `docs/specs/index.md` bootstrap-flow row rewritten to match;
+  `docs/decisions/0028-the-adopter-guide-is-live-only-and-a-client-records-a-pointer.md`
+  written in the four-field format. Observed: `./tools/verify` exit 0 in
+  2.77s ending `fast-verify: 7 of 7 checks passed (3s).`, doc-integrity
+  542 of 542 in 60 artifacts, prose-duplication 51 artifacts over 42241
+  windows with 20 allowlist entries applied and none added. The first
+  post-write verify failed 1 of 7 — see Surprises. Remaining:
+  retrospective, move to `plans/completed/`.)
 
 M6, M7 and M8 are order-independent: each builds its own throwaway trial
 repository and shares no state with the others. If one harness refuses to
@@ -407,6 +421,21 @@ command named in each entry.
   shapes to describe.
   Evidence: transcript line 15772, quoted under Artifacts and Notes,
   beside the M6 and M7 quotes.
+- Observation (M9 session, 2026-09-22 16:19Z): the fourth first-draft
+  duplication collision of this plan, and the first whose shared window
+  was a citation rather than a sentence. The first post-write
+  `./tools/verify` failed 1 of 7: `D16`'s details and
+  `docs/guide/adopting.md` both spelled the 0026 record's full filename,
+  a 14-word normalized run holding seven overlapping windows.
+  Attribution could not carry it — neither section cites the other file
+  — and the allowlist convention is one entry per window. Citing the
+  record by bare number cleared the whole run in one wording change,
+  which `docs/decisions/DECISION_FORMAT.md` sanctions: the number is the
+  stable citation.
+  Evidence: the failing run's remediation line, window key "docs
+  decisions 0026 installed procedures stay put and" (14 words shared in
+  total); the re-run exited 0 in 2.77s ending
+  `fast-verify: 7 of 7 checks passed (3s).`
 
 ## Decision Log
 
@@ -660,6 +689,46 @@ command named in each entry.
   re-arm the blueprint-eval gate mid-plan and invalidate the three
   re-runs just recorded.
   Date/Author: 2026-09-22, M8 session.
+- Decision: the two owner questions the re-runs raised land as debt rows
+  — `D16` for step 9's install-nothing condition, `D17` for step 2's
+  backtick-vulnerable phrasing — rather than as procedure edits or as
+  questions parked in this plan.
+  Rationale: repairing either wording edits an arriving procedure, which
+  re-arms the blueprint-eval gate and spends the three bootstrap records
+  this plan just drove; and a question recorded only in a completed plan
+  is unreachable from the live tree, because nothing outside `plans/`
+  may cite a plan file. The register keeps a deferral discoverable with
+  its pricing attached, and the identifiers decision above reserved
+  `D16` upward for exactly this case. Two rows rather than one: the
+  defects are separable and differently sized, and their trigger cells
+  bind them to the same gated round so the batching lesson holds.
+  Date/Author: 2026-09-22, M9 session.
+- Decision: M9's duplication collision was resolved by citing decision
+  0026 by bare number in `D16`'s details — not by allowlisting, and not
+  by respelling the filename.
+  Rationale: the window was the record's own filename, which is the
+  allowlist's path-run class, but the run holds seven overlapping
+  windows and the allowlist takes one keyed entry per window;
+  `docs/decisions/DECISION_FORMAT.md` makes the bare number a stable
+  citation, so one wording change removed the run and the register lost
+  nothing a reader needs, the details paragraph beside it already citing
+  the spec that spells the path out.
+  Date/Author: 2026-09-22, M9 session.
+- Decision: the spec keeps the previous round's three-session
+  observations and its 20-to-29-minute sizing figure, now labelled as
+  made against the pre-edit bootstrap text, and
+  `docs/guide/adopting.md` is not edited by this milestone.
+  Rationale: decision 0025's scoping retires only the round's
+  bootstrap-session records, which the spec now says the re-runs
+  supersede; the authoring and execution evidence, the naming
+  divergence, and the discovery observation stay attributed to the
+  round that produced them. Each claim `docs/guide/adopting.md` leans
+  on the spec for — the three named harnesses, the copy-then-edit
+  install description, the discovery observation, all three
+  reachability outcomes with link locations, the three-session sizing
+  figure — was re-read against the updated text and remains backed, so
+  no guide edit belongs inside this milestone's boundary.
+  Date/Author: 2026-09-22, M9 session.
 
 ## Outcomes & Retrospective
 

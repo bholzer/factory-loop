@@ -11,8 +11,9 @@
 | D10 | One clause of the layer map — a skill body may not name a harness-specific tool — has no mechanism | `docs/capabilities/boundary-lint.md`, read during review | Deciding it needs a list of every tool name in every harness, which nobody can write and which the next harness release would invalidate | A skill body found naming a harness-specific tool, or a harness whose tool vocabulary is small and stable enough to enumerate |
 | D11 | The two format documents are compared by heading subsequence though their class makes them one file stored twice | `tools/checks/template-live-drift`, `docs/capabilities/template-live-drift.md` | Widening the invariant of a card that already reads `enforced` requires the failing-case demonstration its own format asks for, which is a capability pass rather than a close-out edit; both pairs match today, so the gap is latent rather than active | The first wording difference between either pair of copies, or the next pass that opens that card for another reason |
 | D13 | The live-trial card's failing case is one every harness routes around | `docs/capabilities/blueprint-eval.md` | The breakage the card specifies was demonstrated and the harness bootstrapped the copy regardless, by reading the tree; designing one that bites needs an observation nobody has made yet, and the five passing observations it was paired with are now recorded for all three harnesses | A session watched following a procedure its harness handed it at startup, rather than one it found by reading the files |
-| D14 | Step 9's reporting obligation goes unanswered by the outcome that installs nothing | `skills/harness-init/SKILL.md`, step 9 | Three trials were just spent judging the current wording, and changing it retires all three records at once, so a reworded clause costs three more driven trials and wants a pass that is running them anyway | The next pass that edits the bootstrap procedure for another reason, or the next run of the live trial |
 | D15 | The commit shape a driven run requires is written down only where a run has already been driven | `skills/plan-execute/SKILL.md` against `docs/capabilities/loop-runner.md` | The loop driver holds every commit of an iteration to touching the plan, while the execution procedure asks for a commit at each coherent step, so a session that lands its work and then its record stops a run that was otherwise going fine; settling it means editing an arriving procedure, and `docs/decisions/0025-a-payload-fix-mid-trial-invalidates-the-harness-results-before-it.md` prices that in retired trial evidence | A second project driven by the loop, or the next pass that opens the execution procedure for another reason |
+| D16 | Step 9's install-nothing branch turns on locations a session cannot observe from where it runs | `skills/harness-init/SKILL.md`, step 9 | The candidate repair rewords a clause of an arriving procedure, which re-arms the trial gate and, under `docs/decisions/0025-a-payload-fix-mid-trial-invalidates-the-harness-results-before-it.md`, retires the three bootstrap records driven on 2026-09-22; it also needs an owner ruling on what a session can be asked to decide about its own harness | The next gated pass that opens the bootstrap procedure, or the next live-trial round — `D17` is priced by the same re-runs and pays down in the same round |
+| D17 | The provenance line's phrasing rule leans on a citation convention the target never receives | `skills/harness-init/SKILL.md`, step 2 | The repair is one clause, but it lands in the same gated procedure `D16` names, and spending three re-driven bootstraps on a backtick alone buys almost nothing | The gated round that pays `D16` |
 
 ## Details
 
@@ -179,32 +180,43 @@ read its way around. Until someone observes it, the harness-side promotion bar
 is unmeetable, and recording a status above `specced` would be claiming a gate
 nobody has seen close.
 
-### D14 — A clause that produced the right action and no sentence about it
+### D16 — A branch condition decided from silence
 
-Step 9 of `skills/harness-init/SKILL.md` names three ways an arriving
-procedure set becomes reachable in the harness the bootstrap is running in,
-the third being to install nothing where every location that harness reads
-lies outside the repository, and it requires whichever happened to be named in
-the report the procedure ends with. Three trials judged that text. The two
-harnesses that installed a link both reported it. The third took the third
-outcome correctly and reported nothing about it: the single sentence in its
-report bearing on step 9 answers the step's other clause, about a second root
-guide, with that clause's own reason. So the action was right and the record a
-later reader would rely on is absent.
+Step 9 of `skills/harness-init/SKILL.md` installs nothing for procedure
+reachability when every location the running harness loads procedures from
+sits outside the repository. The 2026-09-22 re-runs watched a session take
+that branch in the one harness whose earlier bootstraps had both gone the
+other way: the skills it was handed at startup all came from machine-level
+directories, the in-repository location the same harness had accepted
+links under before was invisible because nothing was there to load, and
+the session concluded the branch applied. Whatever the right answer was,
+startup evidence could not have supplied it — it shows where the loaded
+skills came from, not where a harness is willing to look.
+`docs/specs/bootstrap-flow.md` records the run and the probe that
+corroborated it.
 
-The reading that explains the omission is that one reporting sentence sits at
-the end of a step whose two clauses ask for different things, and a session
-with nothing to install for the second reads its answer to the first as having
-discharged the obligation. The candidate repair is to give each clause its own
-reporting requirement, trading one sentence of procedure length for a rule
-that fires three times in three rather than two.
+The rule itself is not the defect: decision 0026 keeps the map's path
+route working whichever branch fires. The open
+question for the owners is whether the branch should be reworded to turn
+on something a session can decide from where it stands, or whether
+run-to-run variance between a committed link and nothing at all is an
+acceptable cost of the shorter sentence. Either ruling edits an arriving
+procedure, so it waits for the round the register prices it into.
 
-The reason this is a row and not an edit is the cost of touching an arriving
-procedure, which
-`docs/decisions/0025-a-payload-fix-mid-trial-invalidates-the-harness-results-before-it.md`
-fixes: every recorded result describing a session that followed the old text
-is retired by the change. Three such records were produced the same day this
-row was written, so rewording now spends them and buys back an hour and a half
-of driven session time in re-runs, to close a gap that cost one absent
-sentence in one harness. The trigger names the two occasions that would be
-paying that cost anyway.
+### D17 — A phrasing rule whose protection stays behind
+
+The optional provenance question in step 2 of
+`skills/harness-init/SKILL.md` routes a named upstream into the target's
+`GOALS.md` under scope, worded as a location outside that repository so
+that no reference walk run there is ever pointed at it. What makes that
+wording protective here is a convention of this repository's own —
+`docs/decisions/0021-a-path-that-must-not-resolve-is-not-backticked.md`,
+under which backticks mark the citations a checker chases — and nothing
+the target receives states it. On 2026-09-22 one of the two sessions
+handed an upstream answer recorded it backticked, satisfying every clause
+the procedure states, and the trial driver's reference walk flagged both
+mentions; the other session's unbackticked paragraph drew no flag.
+
+The candidate repair is one clause in the routing sentence making the
+unbackticked form explicit, and it waits beside `D16` for the next gated
+round rather than re-arming the trial gate by itself.
