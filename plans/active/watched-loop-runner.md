@@ -19,7 +19,7 @@ This is the watched runner, not unattended autonomy. A human still chooses the l
 ## Progress
 
 - [x] (2026-09-22 01:59Z) Plan authored: preflight recorded under Artifacts and Notes (verify green in 0.60s, harness version banners), interface and message contracts settled, milestones cut.
-- [ ] M1 — `tools/loop-runner` exists; passing, halting, and refusing behavior each observed by hand against scratch fixtures; `AGENTS.md`, `ARCHITECTURE.md`, and `docs/specs/mechanical-checks.md` name the new command.
+- [x] (2026-09-22 02:40Z) M1 — `tools/loop-runner` written and exercised by hand against four scratch fixtures: the passing case (exit 0, two commits each touching the plan, two timestamped ticks, third entry untouched), the split halt (exit 1 after iteration 2), the committed-nothing halt (exit 1 after iteration 1, session exit 0), the stale-record refusal and the dirty-tree refusal (exit 2, stub never invoked), and the inside-this-worktree refusal (exit 2); `AGENTS.md`, `ARCHITECTURE.md`, `docs/specs/mechanical-checks.md` and the covers row in `docs/specs/index.md` name the new command; `./tools/verify` green at 6 of 6; committed as `79dfbc0`.
 - [ ] M2 — `tools/checks/loop-runner` self-test encodes the card's three scenarios, runs under `./tools/verify` inside the budget, has been seen to fail against a sabotaged runner, and the index row moves off `specced`.
 - [ ] M3 — a real harness drives two milestones of a real plan in a smoke checkout outside this tree, watched, with the transcript and commit shapes recorded here.
 - [ ] M4 — close-out: `D5` deleted, `GOALS.md` non-goal reworded, `docs/MATURITY.md` narrative updated, card's Enforcement point rewritten, decision graduated, plan moved to `plans/completed/`.
@@ -30,6 +30,12 @@ This is the watched runner, not unattended autonomy. A human still chooses the l
   Evidence: `claude --version` → `2.1.278 (Claude Code)`, `codex --version` → `codex-cli 0.150.1`, `omp --version` → `omp/18.1.14`, observed 2026-09-21 while authoring. Harness version drift between authoring and M3 is expected and is why M3 re-records the banner on its day.
 - Observation: the verification budget has room for a self-test that builds scratch git repositories.
   Evidence: `./tools/verify` observed 2026-09-21, `fast-verify: 6 of 6 checks passed (0s)`, wall time 0.60 seconds against the five-second budget in `docs/capabilities/fast-verify.md`.
+- Observation: a refusal that has already created its log directory makes the operator's retry impossible, because a log directory is never reused.
+  Evidence: the first hand-run against the stale-record fixture printed the refusal and left `logsC` behind; the fix creates the directory when the first session is about to run instead, and the same invocation now prints the same refusal while `ls -d` on the log path reports no such file. The dirty-tree refusal was re-run afterwards and leaves nothing either.
+- Observation: the loop stops at plan completion before reaching the limit — a path no acceptance clause names, but one the summary had to word.
+  Evidence: fixture A with `--limit 3`, after two milestones had already landed, ran a single iteration and printed `1 of 3 iterations advanced …` followed by `The plan has no unticked entries left.`, exit 0.
+- Observation: the stub's own artifacts have to live outside the target repository, or the zero-commit fixture stops being one.
+  Evidence: the stub writes `brief-received.txt` and `sentinel` to the scratch root rather than into the checkout, so after fixture D's session `git status --porcelain` there is empty and `git log --oneline` shows only the baseline commit — the absent commit is the only trace that session left, which is exactly what the halt reports. The brief log still grew to five entries over the A, B and D runs, which is what proves a session ran at all.
 
 ## Decision Log
 
@@ -90,9 +96,31 @@ This is the watched runner, not unattended autonomy. A human still chooses the l
   guards the failure most likely in real use.
   Date/Author: 2026-09-22, reviewer.
 
+- Decision: an entry's identity across two revisions is its text normalised — lowercased, with any parenthesised date and all punctuation stripped — and never its position in the list; a flip is a key complete at the end revision that was not complete at the start.
+  Rationale: a session that rewords an entry while ticking it is doing what `plans/PLANS.md` asks (the split shape "completed: X; remaining: Y" is the convention's own), and position-based matching turns every inserted or split entry into a false halt. Stripping the date is what lets the ticked form of an entry match its own unticked form one revision earlier.
+  Date/Author: 2026-09-22 / M1 session.
+
+- Decision: the log directory is created when the first session is about to run, not when the run starts.
+  Rationale: observed during M1's hand-runs, recorded above. A refusal is the operator's cue to fix the target and re-issue the same command; a directory left behind by the refusal makes that second command refuse for a reason the operator never caused.
+  Date/Author: 2026-09-22 / M1 session.
+
+- Decision: two refusal vocabularies — `loop-runner: cannot run — …` when the invocation itself is impossible (usage, a target that is not a git worktree, a target inside this worktree, a log directory that already exists), and `loop-runner: refusing to start.` when the invocation is fine and the target's record is not (uncommitted changes, an unresolvable plan, a stale record).
+  Rationale: the card's message contract fixes the second shape's wording and `tools/blueprint-eval` fixes the first; keeping them distinct tells the reader at a glance whether to edit the command line or the plan.
+  Date/Author: 2026-09-22 / M1 session.
+
+- Decision: the covers row for `mechanical-checks.md` in `docs/specs/index.md` was edited in M1, though the plan assigned that file to M2.
+  Rationale: the row said two commands are what a reader can run, which the third command makes false in the commit that lands it; the check count in the same row still reads six and stays M2's to change. Shipping a commit whose own index contradicts it costs more than touching one clause early.
+  Date/Author: 2026-09-22 / M1 session.
+
+- Decision: the fixture stub writes its brief log and its sentinel outside the target repository.
+  Rationale: recorded above as an observation. It also keeps M2's check able to assert both halves of the silent-refusal scenario — a session was invoked, and the checkout it ran in is untouched — without the stub's own bookkeeping being the thing that dirties the tree.
+  Date/Author: 2026-09-22 / M1 session.
+
 ## Outcomes & Retrospective
 
-Nothing yet. Authored 2026-09-21; no milestone has been executed.
+M1, 2026-09-22. The runner exists and does the thing the card describes: pointed at a scratch checkout with a three-milestone plan and a stub harness, it advanced two milestones, left one commit per iteration touching the plan, ticked each entry with a timestamp, left the third alone, and printed a summary naming all of it. The three failure classes the card requires were each produced rather than argued: a milestone that could not complete halted the run with the entry text and the log path, a session that exited 0 having committed nothing halted it on the absent commit, and a plan carrying an undated completed entry was refused before any session started — proven by a sentinel the stub touches on every invocation, which stayed absent. Two behaviors the card does not name were settled by running them: the loop stops early when the plan runs out of unticked entries, and a refusal now leaves no log directory behind, so the operator's retry can reuse the same path.
+
+What remains for the rest of the plan is unchanged: the stop rule is exercised only by hand, so nothing re-checks it on a later edit (M2), no real harness has been driven through it (M3), and every document that still describes a world without a runner — `GOALS.md`, `docs/MATURITY.md`, the card's Enforcement point, `docs/DEBT.md` row `D5` — is M4's. The one lesson worth carrying: the fixtures are what made the design decidable, and writing them before the runner would have been cheaper than writing them alongside it, because each halt message got its wording from watching the fixture that produces it.
 
 ## Context and Orientation
 
@@ -207,32 +235,54 @@ Observed while authoring, 2026-09-21, from the repository root:
     git status --porcelain | wc -l
     # observed: 0 before this plan file was created
 
-Expected (labelled so; nothing below has been run, and M1 runs each line before recording it):
+Observed during M1, 2026-09-22, from the repository root. Scratch is `$T` from `mktemp -d`; fixtures A, B, C and D and the stub were rebuilt there from their first commits so that every line below ran against the committed runner:
 
-    # M1 fixture setup, in a scratch directory outside the worktree
-    S=$(mktemp -d)
-    mkdir -p "$S/A/plans/active" && cd "$S/A" && git init -q
-    # write plans/active/fixture.md as fixture A (shape below), commit
-    # write $S/stub-session (contract below), chmod +x
-    cd <repository root>
+    ./tools/loop-runner
+    # observed: the usage line, exit 2
 
-    ./tools/loop-runner run "$S/A" --limit 2 --logs "$S/logs" -- "$S/stub-session"
-    # expected: exit 0; two iterations; summary naming both entries,
-    # commits, and $S/logs; third entry untouched
+    ./tools/loop-runner run "$T/A" --limit 2
+    # observed: "cannot run — no session command: everything after -- is the
+    # harness invocation each iteration runs.", exit 2
 
-    ./tools/loop-runner run "$S/B" --limit 3 --logs "$S/logsB" -- "$S/stub-session"
-    # expected: exit 1 after iteration 2; halt message naming
-    # plans/active/fixture.md, the M2 entry text, what was not observed,
-    # and the resume path
+    ./tools/loop-runner run "$T/A" --limit 2 --logs "$T/logsA" -- "$T/stub-session"
+    # observed: exit 0; two iterations; "2 of 2 iterations advanced
+    # plans/active/fixture.md", both entries named with commits 132243f and
+    # ab1dce9 and their logs; "1 Progress entry remains unticked."
 
-    ./tools/loop-runner run "$S/C" --limit 1 --logs "$S/logsC" -- "$S/stub-session"
-    # expected: exit 2; refusal naming the unstamped completed entry;
-    # $S/sentinel absent
+    git -C "$T/A" log --name-only --oneline
+    # observed: two new commits above the baseline, each listing
+    # plans/active/fixture.md; one.txt and two.txt hold their words, three.txt
+    # does not exist, both ticked entries carry (2026-09-22 02:36Z)
 
-    ./tools/loop-runner run "$S/D" --limit 2 --logs "$S/logsD" -- "$S/stub-session"
-    # expected: exit 1 after iteration 1; the committed-nothing message —
-    # session exited 0, no commit — naming <logs>/01-iteration.txt;
-    # fixture D's Progress unchanged
+    ./tools/loop-runner run "$T/B" --limit 3 --logs "$T/logsB" -- "$T/stub-session"
+    # observed: exit 1 after iteration 2; the halt names the plan, the M2
+    # entry text, "the session exited 1 and left 1 commit; no Progress entry
+    # became complete", the log, and the resume path; M3 untouched
+
+    ./tools/loop-runner run "$T/D" --limit 2 --logs "$T/logsD" -- "$T/stub-session"
+    # observed: exit 1 after iteration 1; "did not advance: the session exited
+    # 0 and produced no commit."; fixture D still at its baseline commit with
+    # its Progress unchanged
+
+    rm -f "$T/sentinel"
+    ./tools/loop-runner run "$T/C" --limit 1 --logs "$T/logsC" -- "$T/stub-session"
+    # observed: exit 2; "has a completed Progress entry with no timestamp at
+    # line 8"; $T/sentinel absent, so no session was invoked, and $T/logsC was
+    # never created
+
+    : > "$T/A/stray"
+    ./tools/loop-runner run "$T/A" --limit 2 --logs "$T/logsA2" -- "$T/stub-session"
+    # observed: exit 2; "has uncommitted changes."; the stray file was deleted
+    # afterwards and fixture A is clean again
+
+    ./tools/loop-runner run . --limit 1 -- true
+    # observed: exit 2; "is inside this repository's worktree."
+
+    ./tools/verify ; git status --porcelain
+    # observed: fast-verify: 6 of 6 checks passed (0s), wall 0.55s; only the
+    # five intended paths, committed as 79dfbc0
+
+Expected (labelled so; M2 and M3 each run their lines before recording them):
 
     # M2, from the repository root
     ./tools/checks/loop-runner        # expected: four scenario lines, ok summary, exit 0
@@ -264,6 +314,27 @@ Authoring preflight, observed 2026-09-21:
     omp/18.1.14
 
 The refusal catalogue grounding the halt design (each recorded as observed evidence in the named completed plan): Claude Code credits refusal — exit 0, no commit (`blueprint-live-trial.md`); Claude Code session limit — exit 1 (`decide-procedure-location.md`); Codex CLI flag conflict exit 2, model-version refusal exit 1, usage-limit exit 1, untrusted-directory exit 1, and the meaningless stdin banner (`blueprint-live-trial.md`). omp recorded no refusals across its runs.
+
+M1's hand-run transcripts, observed 2026-09-22, with the scratch root elided from the paths — the fragments that decide each acceptance clause:
+
+    loop-runner: 2 of 2 iterations advanced plans/active/fixture.md in …/A.
+      iteration 1: "(2026-09-22 02:36Z) M1: create one.txt containing one" — commit 132243f, log …/logsA/01-iteration.txt
+      iteration 2: "(2026-09-22 02:36Z) M2: create two.txt containing two" — commit ab1dce9, log …/logsA/02-iteration.txt
+    1 Progress entry remains unticked. Review the plan, then re-run to continue.
+
+    loop-runner: halted after iteration 2 of 3.
+    plans/active/fixture.md milestone "M2: acceptance unobservable — create nothing" did not complete: the session exited 1 and left 1 commit; no Progress entry became complete.
+    Read that entry and …/logsB/02-iteration.txt, fix the cause, and re-run; the loop resumes at the same milestone.
+
+    loop-runner: halted after iteration 1 of 2.
+    plans/active/fixture.md did not advance: the session exited 0 and produced no commit.
+    The last lines of …/logsD/01-iteration.txt say what the harness did instead; fix the cause and re-run.
+
+    loop-runner: refusing to start.
+    plans/active/fixture.md has a completed Progress entry with no timestamp at line 8 ("M1: create one.txt containing one").
+    A run cannot distinguish work it did from work it inherited unless the record is current. Update the plan, then re-run.
+
+The scratch directories are not kept. M2 rebuilds the same four fixtures and the same stub inside `tools/checks/loop-runner`, which is where they stop being disposable.
 
 ## Interfaces and Dependencies
 
@@ -359,3 +430,13 @@ What this plan deliberately leaves out: unattended or scheduled operation and an
   catalogue, was the one behavior no scenario produced; its drafted message
   had no observation scheduled. Milestone boundaries and all other
   contracts unchanged.
+
+- 2026-09-22 (M1 execution): recorded M1's observed evidence in Progress,
+  Surprises & Discoveries, Concrete Steps and Artifacts and Notes; added five
+  decisions taken while building (entry identity by normalised text, lazy log
+  directory creation, the two refusal vocabularies, the early `docs/specs/index.md`
+  covers edit, and the stub writing outside the target); wrote the first
+  Outcomes & Retrospective entry. Reason: the House Rules require each session
+  to leave the record current and the next session to be able to start from
+  this file alone. No contract under Interfaces and Dependencies changed, and
+  the milestone boundaries are as authored.
