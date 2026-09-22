@@ -50,7 +50,8 @@ exclusions are argued in the Decision Log.
   `docs/DEBT.md` is deliberately unchanged: `D4` and `D12` are retired by M5,
   after the trials say the pick survived contact. No trial has judged the new
   text yet.
-- [ ] M2 — Claude Code: the whole trial against the edited procedures. Not
+- [x] (2026-09-21 23:10Z) M2, first attempt — abandoned without driving
+  anything, and superseded by the entry below. Not
   started: on 2026-09-21 at 18:02 CDT the environment refused every
   non-interactive invocation with `You've hit your session limit · resets
   8:20pm (America/Chicago)`, exit 1, on three models, and the account has no
@@ -58,17 +59,21 @@ exclusions are argued in the Decision Log.
   by hand either — the limit is account-wide, not per-invocation. Evidence
   under Surprises; the substitution of M3 for this session is in the
   Decision Log.
-- [ ] M2, second attempt (2026-09-21, this session) — Claude Code: in
-  flight. The quota above cleared when the operator re-authenticated the
-  account at about 18:36 CDT, ahead of the 8:20pm reset, and the environment
-  has moved to `2.1.278 (Claude Code)` since this plan recorded `2.1.274`.
-  Trial at `claude-code-20260921-183718`. Done so far: briefs extracted at
-  62/21/6 lines, the fresh-copy probe, the bootstrap session exiting 0 in
-  373 seconds with `.claude/skills -> ../skills` committed and named in its
-  report, the bootstrapped-copy probe surfacing all six, and the driver's
-  three parts after the bootstrap. Remaining: the authoring session, the
-  execution session, the `tally` run, and the driver after the executed
-  milestone.
+- [x] (2026-09-22 00:15Z) M2 — Claude Code: the whole trial against the
+  edited procedures, at `claude-code-20260921-183718`, driven on the second
+  attempt after the operator re-authenticated the account at about 18:36 CDT
+  — ahead of the 8:20pm reset the refusal above named — with the environment
+  now at `2.1.278 (Claude Code)` rather than the `2.1.274` this plan
+  baselined. All seven acceptance items observed and both of this plan's own
+  additions with them: three driven sessions, each a separate process with
+  standard input closed, exiting 0 in 373, 506 and 343 seconds — 20.4
+  minutes of driven time against the 18 the previous run took; step 9's
+  outcome was a committed link `.claude/skills -> ../skills`, named in the
+  report; step 8's sentence produced two authoring-time probes in the
+  authored plan carrying their refusal points; and the copy reached `python3
+  -m tally report` printing counts with its own `./verify` passing 11 tests.
+  No carve-out: the post-execution references part exits 0 here, where M3's
+  run left one dangling reference of that copy's own making.
 - [x] (2026-09-21 23:29Z) M3 — omp: the whole trial against the edited
   procedures, at `omp-20260921-180411`. All seven acceptance items observed
   and both of this plan's own additions with them: three driven sessions,
@@ -1137,6 +1142,88 @@ Every one of the 20 is a reserved `tally/` path — `tally/cli.py`,
 reserves and its first milestone has not written yet. That is the
 composition this milestone's second acceptance item asks for; the judged
 reading is the one after the executed milestone.
+
+Session 2, authoring. Same invocation shape with `brief-author.md` to
+`<trial>/logs/02-author.txt`. Started 18:48:31 CDT, exited 0 after 506
+seconds, committing `9b65451` "Author the ExecPlan for the first working
+version of tally" — one file, `plans/active/first-working-tally.md`, 1045
+lines, four milestones.
+
+Step 8's new sentence had a visible effect, which is the second of the two
+observations this plan adds. The authored plan's Surprises section carries
+two authoring-time probes, each a command run before it was written down
+with the point it reached beside it: "`python3 -m unittest discover -s tests
+-t .` refuses to run unless the start directory is an importable package, so
+`tests/__init__.py` is not optional. Evidence: run in this repository, where
+`tests/` does not exist, it exited 1 with `ImportError: Start directory is
+not importable: 'tests'`", and "the `verify` script body given under
+Artifacts and Notes was run before being written down, so M1 is transcribing
+a script that works rather than composing one from plausible parts". As in
+M3's run, the session went past the letter of the sentence and continued the
+probe in a scratch directory until the command succeeded, which is how
+`tests/__init__.py` became a file the first milestone creates rather than a
+discovery the implementing session would have made by failing.
+
+Session 3, execution. Same invocation shape with `brief-execute.md` to
+`<trial>/logs/03-execute.txt`. Started 18:57:09 CDT, exited 0 after 343
+seconds, committing four times, `ca29689` "M1: add the pure counting layer
+with its tests" through `1d33a8c` "M1: record the scratch-store cleanup
+correction in the plan", tree clean after. The three sessions together took
+1222 seconds of driven time — 20.4 minutes against the 18 the previous run
+of this environment took.
+
+The copy carries a feature to a running command. In `<trial>/repo`:
+
+    $ python3 -m tally add build && python3 -m tally add build && python3 -m tally add ship && python3 -m tally report
+    build 1
+    build 2
+    ship 1
+    build 2
+    ship 1
+    exit=0
+
+    $ ./verify
+    == tests ==
+    ...........
+    Ran 11 tests in 0.158s
+    OK
+    fast-verify: 1 of 1 checks passed (tests) in 0s (budget 60s).
+    exit=0
+
+`./verify` is the verification command the copy's own `AGENTS.md` publishes,
+written by the executed milestone; before it, that file said there was none
+and the copy's `D1` said why.
+
+The driver after the executed milestone: `layout: ok — 6 procedures, each
+with SKILL.md and matching frontmatter name.`, `fill: ok — no authoring
+scaffolding in 23 markdown files of the copy.`, and `references: ok — 142 of
+144 references resolved inside the copy, 1 allowlist entry applied, 0
+stale.`, exit 0. The 20 reserved `tally/` paths resolved once the code
+existed, and nothing was left dangling — a clean pass where M3's run carried
+one forward reference of that copy's own making.
+
+The last two card observations. The copy's plan file gained 333 lines
+between the authoring commit `9b65451` and the execution commit `1d33a8c`,
+among them output the authoring version could not have held:
+`ModuleNotFoundError: No module named 'tally'` from the test observed
+failing before any source existed, `Ran 11 tests in 0.151s`, and
+`AssertionError: {'deploy': 3} != {'deploy': 2}` from the deliberately
+broken tree its acceptance required. And the session stopped after one
+milestone: the copy's `Progress` shows M1 ticked with eleven ticked
+sub-entries, all timestamped, and the first unticked box is `M2 — the store
+behaves under everything that is not the happy path`.
+
+Two things this run produced that are the copy's business rather than the
+payload's, recorded because a reader will see them in the transcripts. The
+bootstrap session deleted `docs/capabilities/prose-duplication.md` and its
+register row together, arguing in `GOALS.md` that this project would not
+spend a session building that check — a judgement the procedure invites and
+the driver's layout and fill parts do not measure. And the execution session
+found, at its own end-of-milestone tree check, that an interactive `rm` had
+prompted, gone unanswered, left the file and still exited 0, so a cleanup it
+had recorded as done had not happened; it appended the correction rather
+than rewriting the entry, which is the evidence habit the payload asks for
+working in a copy that has never read this repository.
 
 ## Interfaces and Dependencies
 
