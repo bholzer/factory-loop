@@ -187,8 +187,47 @@ inventing one.
   routes to M9's spec update, per the Decision Log.
   The post-evidence `./tools/verify` passed first try: exit 0 in 2.71s
   ending `fast-verify: 7 of 7 checks passed (2s).`
-- [ ] M8 — Codex CLI bootstrap re-run, provenance answer supplied, the
-  install-nothing report sentence observed.
+- [x] (2026-09-22 15:50Z) M8 — Codex CLI bootstrap re-run complete;
+  acceptance items 1, 2, 3 and 5 observed, item 4 met on its letter with a
+  phrasing divergence recorded rather than re-rolled. Baseline
+  `./tools/verify` exit 0 in 2.74s ending
+  `fast-verify: 7 of 7 checks passed (2s).` on a clean tree at the M7
+  commit; `codex --version` still prints codex-cli 0.150.1. Trial built by
+  `./tools/blueprint-eval new codex-rerun` at
+  blueprint-trials/codex-rerun-20260922-103458 (25 files — 19 payload
+  files and 6 procedures — committed as "Receive the payload"); brief
+  extracted by the recorded `awk` loop (62 lines, `grep -c
+  'harness-blueprint'` printed 0), provenance block appended and confirmed
+  byte-identical to the contract block (68 lines, block at lines 63-68).
+  One driven session, stdin closed, no resumption, the recorded invocation
+  shape (quoted under Artifacts and Notes): banner OpenAI Codex v0.150.1,
+  model gpt-5.6-sol, started 15:35:44Z, ended 15:46:20Z, 10m36.406s wall,
+  exit 0, the known meaningless "Reading additional input from stdin..."
+  line observed and disregarded per Concrete Steps; one commit 2d3031a
+  "Bootstrap tally agent harness" over "Receive the payload". Check:
+  layout ok — 6 procedures; fill ok — no authoring scaffolding in 20
+  markdown files; references exit 1 with 8 dangling in 112 examined
+  across 18 files — 6 reserved tally code paths, all cited by the copy's
+  architecture file, plus, for the first time in any round, 2
+  non-code-path entries: the provenance locations, backticked in the
+  copy's goals file — see Surprises. Item 3, the milestone's point, held:
+  both step 9 clauses answered in the report's closing sentence, the
+  install-nothing outcome in its own statement (transcript line 15772,
+  quoted under Artifacts and Notes) — the `D14` repair has now fired
+  three times in three. Item 4: the copy's goals file carries the pointer
+  as one sentence closing its Scope section (source lines 36-38, written
+  by 2d3031a), naming ~/blueprint-upstream and the guide inside it,
+  explicitly outside the repository and not repository-relative — but
+  backticked, the divergence the Decision Log scores. Item 5's inversion
+  held: the bootstrap commit's stat lists 11 files, no dotted entry and
+  no configuration, `ls -a` in the copy shows only .git, no probe owed.
+  The copy right-sized three cards out — doc-integrity, evidence-check,
+  prose-duplication — with reasons recorded in its own scope, which is
+  why its checked sets are smaller than M6's and M7's. No debt row
+  created; the backtick finding routes to M9's spec update and owner
+  question, per the Decision Log.
+  The post-evidence `./tools/verify` passed first try: exit 0 in 2.79s
+  ending `fast-verify: 7 of 7 checks passed (3s).`
 - [ ] M9 — Close out: `D14` deleted, `docs/specs/bootstrap-flow.md` current,
   decision 0028 graduated, retrospective written, file moved to
   `plans/completed/`.
@@ -340,6 +379,34 @@ command named in each entry.
   did; both shapes are now observed for M9's spec text.
   Evidence: transcript line 14, quoted under Artifacts and Notes, beside
   M6's surprise entry above.
+- Observation (M8 session, 2026-09-22 15:50Z): the provenance pointer
+  arrived backticked, and the driver's reference walk flagged it — the
+  first dangling composition in any round that is not purely reserved
+  code paths. The copy's scope records the right fact in the right
+  place, phrased as locations outside the repository, but both mentions
+  are backticked, and the check run reported the copy's goals file at
+  lines 37 and 38 among its 8 dangling references. The step 2 wording
+  binds the phrasing to a location outside the repository "so no
+  reference walk here is ever asked to resolve it" — but the
+  backticks-are-citations convention that makes that true is decision
+  0021's, recorded in this repository, and no text the client receives
+  states it; the session satisfied every clause it was handed and the
+  walk chased the pointer anyway. In this particular copy no in-repo
+  checker will ever follow it, because the session right-sized
+  doc-integrity out — incidental cover, not the defense the wording
+  intended.
+  Evidence: the driver's two remediation lines, quoted under Artifacts
+  and Notes, beside M6's unbackticked paragraph, whose walk flagged
+  code paths only.
+- Observation (M8 session): the third report shape for step 9 — both
+  clauses as one semicolon-joined sentence, the reachability reason
+  compressed into the modifier "machine-level" — where omp spelled the
+  reason as its own clause and Claude Code used one bulleted statement
+  per clause. All three answered both clauses; none left install-nothing
+  to be inferred. M9's spec text now has the full range of observed
+  shapes to describe.
+  Evidence: transcript line 15772, quoted under Artifacts and Notes,
+  beside the M6 and M7 quotes.
 
 ## Decision Log
 
@@ -562,6 +629,37 @@ command named in each entry.
   decide from inside its own startup set is a question for the owners at
   M9 — raised there rather than widened into this milestone.
   Date/Author: 2026-09-22, M7 session.
+- Decision: M8 scores acceptance item 3 as met — the reachability clause
+  stands in its own statement saying nothing was installed, with the
+  reason carried by the modifier "machine-level" rather than a spelled
+  subordinate clause.
+  Rationale: `D14`'s defect was a session that installed nothing and
+  reported nothing; this report states the outcome affirmatively in its
+  own statement, and "machine-level" names why — the locations this
+  environment reads belong to the machine, not this repository, which is
+  step 9's own condition for installing nothing. Requiring the reason as
+  a full clause would fail grammars that carry it in a modifier — the
+  same substance-over-shape ground M6 and M7 recorded.
+  Date/Author: 2026-09-22, M8 session.
+- Decision: M8 scores acceptance item 4 as met on its letter — one
+  scope-resident sentence naming the brief's upstream and its guide,
+  outside the repository, not repository-relative — with the backticked
+  form recorded as a divergence from the wording's intent, and the trial
+  not re-rolled.
+  Rationale: the acceptance letter bans a backticked repository-relative
+  path, which this is not, and the substance the interview question
+  exists to produce — a single provenance record where scope facts live,
+  phrased as a location outside the repository — is present. But the
+  step 2 wording's stated aim, that no reference walk is ever asked to
+  resolve the pointer, did not hold: the driver flagged both mentions.
+  Re-rolling until an unbackticked form appeared would select evidence
+  rather than record it — M7's ground. The finding routes to M9: the
+  spec's interview text describes the observed shapes, and whether step
+  2 needs an explicit unbackticked clause is an owner question raised
+  there, because editing the procedure inside this milestone would
+  re-arm the blueprint-eval gate mid-plan and invalidate the three
+  re-runs just recorded.
+  Date/Author: 2026-09-22, M8 session.
 
 ## Outcomes & Retrospective
 
@@ -1150,6 +1248,40 @@ existed for it to find:
     plan-execute, capability-build, doc-garden, retro per AGENTS.md) is
     **not** among the session's registered skills — none of those six
     were loaded at startup.
+
+What M8's observations rest on, quoted from the codex-rerun trial's
+transcript and tree on 2026-09-22; the trial sits at
+blueprint-trials/codex-rerun-20260922-103458, its transcript kept as
+01-bootstrap.txt in its logs directory — no probe is owed for this
+harness. The driven invocation, run with the shell's pipefail set so the
+recorded exit is the harness's rather than tee's:
+
+    codex exec -C <trial>/repo -m gpt-5.6-sol --approve-for-me "$(cat <trial>/logs/brief-bootstrap.md)" < /dev/null 2>&1 | tee <trial>/logs/01-bootstrap.txt
+
+The step 9 statements, the closing sentence of the report at transcript
+line 15772 — one answer per clause joined by a semicolon, the
+install-nothing outcome in its own statement:
+
+    No extra environment entry point was needed because this environment
+    reads `AGENTS.md`; no machine-level procedure integration was
+    installed.
+
+The provenance sentence in the copy's goals file, source lines 36-38, the
+last sentence of its Scope section, written by commit 2d3031a — the
+locations right, the backticks the divergence:
+
+    The artifact set and procedures came from the owners' external
+    blueprint checkout at `~/blueprint-upstream`; its adopter guide is
+    at `~/blueprint-upstream/docs/guide/`, also outside this repository.
+
+The driver's two non-code-path flags, from the check run's references
+part, re-wrapped here, words unchanged:
+
+    blueprint-eval references: the copy cites ~/blueprint-upstream,
+    which the copy does not contain (cited by GOALS.md:37).
+    blueprint-eval references: the copy cites
+    ~/blueprint-upstream/docs/guide/, which the copy does not contain
+    (cited by GOALS.md:38).
 
 ## Interfaces and Dependencies
 
