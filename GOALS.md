@@ -81,16 +81,17 @@ A project bootstrapped from this blueprint has:
 
 ## Known unknowns
 
-- Evaluation is no longer paper-only. A copy of the payload and the
-  procedures was driven through bootstrap, plan authoring and one executed
-  milestone in all three harnesses, and each copy ended with a working
-  command-line tool that its own published command tests;
-  `docs/specs/bootstrap-flow.md` carries the dates and what was measured.
-  What stays open is the other side of that card: no harness has been
-  observed failing when the arriving procedure set is broken, and nobody has
-  designed a breakage one could fail. `blueprint-eval` therefore holds at
-  `specced`, with `docs/DEBT.md` `D13` carrying what promoting it still
-  costs.
+- Evaluation is no longer paper-only, and it has now been repeated against
+  the payload as it currently ships. In each of the three harnesses, a copy
+  was driven through bootstrap, plan authoring and one executed milestone,
+  and each copy ended with a working command-line tool that its own
+  published command tests; `docs/specs/bootstrap-flow.md` carries the dates
+  and what was measured. One thing stays open, and it is the other side of
+  that card: nobody has designed a breakage of the arriving procedure set
+  that a harness could actually fail, and until a session is watched
+  depending on its harness to hand it a procedure, nobody can.
+  `blueprint-eval` therefore holds at `specced`, with `docs/DEBT.md` `D13`
+  carrying what promoting it still costs.
 - How `boundary-lint` retrofits onto a large existing codebase.
 - Whether `capability-build` eventually needs per-stack reference material or
   stays fully generic.

@@ -24,13 +24,15 @@ gates a rung two steps away. `prose-duplication` is enforced and appears in
 no row at all: its card gates no rung deliberately, because a shared window
 tells a reader where to look and not what to do about it.
 
-`blueprint-eval` has had the live trial it was waiting for — three harnesses,
-one small feature carried through each — and still reads `specced`. Of the
-five things that trial had to observe, one failed in two of the three
-harnesses, and the deliberate breakage that would show the procedure half
-catching anything came back clean: the harness bootstrapped a copy whose
-entry-point file had been renamed out from under it, by reading the file.
-`docs/DEBT.md` `D13` carries what those two shortfalls cost to clear.
+`blueprint-eval` has now had its live trial twice — three harnesses each
+time, one small feature carried through each — and still reads `specced`.
+The second round judged the payload as it stands today, and all five of the
+observations that trial has to make came back recorded for every harness.
+What is missing is the card's other condition: the deliberate breakage that
+would show the procedure half catching anything came back clean, because the
+harness bootstrapped a copy whose entry-point file had been renamed out from
+under it, by reading the file. `docs/DEBT.md` `D13` carries what designing a
+breakage that bites would require first.
 
 The same row carries a ceiling that collides with the promotion rule below.
 `docs/decisions/0024-blueprint-eval-can-never-read-enforced.md` fixes that
