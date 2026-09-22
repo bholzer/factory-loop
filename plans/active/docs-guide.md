@@ -118,8 +118,39 @@ inventing one.
   showed only the skill file modified before this plan update. The first
   post-write verify passed: the second draft in this plan to collide with
   nothing.
-- [ ] M6 — Claude Code bootstrap re-run against the edited procedure,
-  provenance answer supplied, all observations recorded.
+- [x] (2026-09-22 15:13Z) M6 — Claude Code bootstrap re-run complete, all
+  five acceptance items observed. Baseline `./tools/verify` exit 0 in 2.77s
+  ending `fast-verify: 7 of 7 checks passed (3s).` on a clean tree at the
+  M5 commit. Trial built by `./tools/blueprint-eval new claude-rerun` at
+  blueprint-trials/claude-rerun-20260922-100358 (25 files — 19 payload
+  files and 6 procedures — committed as "Receive the payload"); brief
+  extracted by the recorded `awk` loop (62 lines, `grep -c
+  'harness-blueprint'` printed 0), provenance block appended and confirmed
+  byte-for-byte (68 lines, block at lines 63-68). One driven session,
+  stdin closed, no resumption, the recorded invocation shape (quoted with
+  its wrapper under Artifacts and Notes): version `2.1.278 (Claude Code)`,
+  started 15:04:46Z, ended 15:10:40Z, 353s wall, exit 0, one commit
+  1dbd9e3 "Bootstrap the agent harness for tally" over "Receive the
+  payload". Check: layout ok — 6 procedures; fill ok — no authoring
+  scaffolding in 22 markdown files; references exit 1 with 23 dangling in
+  149 examined across 20 files, every one a reserved tally code path (15
+  cited by the copy's architecture file, 7 by its debt register, 1 by its
+  principles file) — the expected composition, recorded as such. Both
+  step 9 statements quoted from the transcript under Artifacts and Notes,
+  one per clause. The copy's goals file carries the provenance statement
+  under its Scope heading, naming ~/blueprint-upstream and the guide
+  location inside that checkout, written by commit 1dbd9e3, unbackticked
+  and not repository-relative; grep for blueprint-upstream matched
+  exactly one line (52), though the statement wraps as a two-sentence
+  paragraph over source lines 51-54 rather than one physical line — the
+  reading is logged in the Decision Log. The bootstrap commit's stat
+  shows a .claude/skills link (readlink prints ../skills, the unmoved
+  procedure directory) and the discovery probe reported all six
+  procedures loaded from the copy's own skills tree through it (probe
+  exit 0, 86s wall, transcript kept as 02-probe.txt beside the bootstrap
+  transcript). No debt row created; nothing deferred. The post-evidence
+  `./tools/verify` passed first try: exit 0 in 2.82s ending
+  `fast-verify: 7 of 7 checks passed (3s).`
 - [ ] M7 — omp bootstrap re-run, provenance answer withheld, the
   nothing-invented observation recorded.
 - [ ] M8 — Codex CLI bootstrap re-run, provenance answer supplied, the
@@ -217,6 +248,30 @@ command named in each entry.
   Evidence: the failing run's remediation line, window key quoted above
   verbatim; the re-run exited 0 in 2.48s ending
   `fast-verify: 7 of 7 checks passed (2s).`
+- Observation (M6 session, 2026-09-22 15:13Z): the bootstrapped session
+  recorded the provenance pointer but never said so — the report's
+  created-list and the commit message both describe the goals file with
+  no word about the pointer, and only the tree shows it. Reading the
+  result out of the tree, as the milestone instructs, is what caught it;
+  a report-only reading would have scored the optional question as
+  skipped. The pointer itself is exactly right, so this is a gap in what
+  the report volunteers, not in what the procedure writes — worth
+  remembering when M9 describes the interview in the spec.
+  Evidence: grep -n for blueprint-upstream in the copy's goals file
+  printed one line, 52, under its Scope heading; the transcript's
+  created-list names goals, register, link and entry-point decisions but
+  no provenance.
+- Observation (M6 session, 2026-09-22 15:13Z): the session's own
+  reference walk and the driver's disagree by design — the report claims
+  202 references walked with 26 unresolved (23 reserved code paths plus
+  3 prose self-references inside the copy's doc-integrity card), while
+  `./tools/blueprint-eval check` examined 149 and flagged 23, all of
+  them reserved code paths. The driver never flagged the three
+  self-references, so the two numbers describe different walkers, not a
+  transcription error.
+  Evidence: the check run's closing line — 23 dangling references in 149
+  examined across 20 markdown files — beside the transcript's
+  verification section claiming 202 examined, 26 unresolved.
 
 ## Decision Log
 
@@ -398,6 +453,19 @@ command named in each entry.
   contiguous, and the question's closing clause — write nothing when
   nobody answers — reads as that rule's echo for the optional case.
   Date/Author: 2026-09-22, M5 session.
+- Decision: M6 scores acceptance 4 as met, with the provenance answer
+  landing as one scope paragraph rather than one physical line — grep for
+  blueprint-upstream matched exactly one source line, the statement is a
+  single entry under the copy's Scope heading, the location is
+  unbackticked and outside the repository, and nothing else in the copy
+  names it.
+  Rationale: the contract's point is a single scope-resident record
+  phrased so no reference walk is asked to chase it, which the paragraph
+  satisfies; markdown prose wraps, and holding a session to physical-line
+  width would fail every wrapped sentence the procedure produces. The
+  observed shape is quoted under Artifacts and Notes so M9's spec update
+  describes what sessions actually write.
+  Date/Author: 2026-09-22, M6 session.
 
 ## Outcomes & Retrospective
 
@@ -919,6 +987,43 @@ observation rests on is quoted into this file when observed. The previous
 round's bootstrap-only wall times, for sizing the re-runs: 4m55s-8m and one
 457-second run for the first harness across its recorded bootstraps, 5m26s
 and 6m29s for the second, 10m50s for the third.
+
+What M6's observations rest on, quoted from the claude-rerun trial's
+transcripts and tree on 2026-09-22; long transcript lines are re-wrapped
+here, words unchanged. The driven invocation, run from the trial's repo
+directory with the shell's pipefail set so the recorded exit is the
+harness's rather than tee's:
+
+    claude -p --model opus --dangerously-skip-permissions "$(cat ../logs/brief-bootstrap.md)" < /dev/null 2>&1 | tee ../logs/01-bootstrap.txt
+
+The two step 9 statements, from the bootstrap report at transcript lines
+21-22, one per clause:
+
+    - **No second entry-point file.** This environment loads `AGENTS.md` as
+      project instructions directly (visible in this session's context), so
+      a `CLAUDE.md` would only be a second owner of every fact in the
+      first.
+    - **Procedures installed, not moved.** This environment loads skills
+      from `.claude/skills/`; I committed a link there pointing at
+      `skills/`. It resolves — all six procedure directories are readable
+      through it. I could not verify that the environment *loads* them
+      through the link in this session, since skills are discovered at
+      startup.
+
+The provenance statement in the copy's goals file, source lines 51-54
+under its Scope heading, written by the bootstrap commit:
+
+    This project's artifact set and the procedures under `skills/` were
+    installed from the owners' blueprint checkout at ~/blueprint-upstream,
+    which keeps its guide for adopters under docs/guide/ inside that
+    checkout. Both are locations outside this repository.
+
+The discovery probe's project-skills group, from its transcript, naming
+the copy's own tree as the load directory for all six procedures:
+
+    **<repo>/skills/ — /Users/brennanholzer/blueprint-trials/claude-rerun-20260922-100358/repo/skills/ (project skills, 6)**
+    capability-build, doc-garden, harness-init, plan-author, plan-execute,
+    retro
 
 ## Interfaces and Dependencies
 
