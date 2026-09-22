@@ -8,10 +8,12 @@ publishes it under Commands together with the time it is allowed to take, and
 `docs/capabilities/fast-verify.md` is the card that says what it owes whoever
 runs it: the executables under `tools/checks/` in an order written down rather
 than globbed, each one's own output passed through untouched, and a nonzero exit
-as soon as any of them reports a violation or declines to decide. Six run today.
-A clean pass ends in one line counting the checks and the seconds spent, and
-those seconds have stayed an order of magnitude inside the published figure
-since the first check landed.
+as soon as any of them reports a violation or declines to decide. Seven run
+today. A clean pass ends in one line counting the checks and the seconds
+spent, and those seconds have stayed inside the published figure since the
+first check landed — comfortably so until the seventh arrived, which drives a
+stub harness through five scratch repositories and costs more than reading
+markdown does.
 
 `./tools/blueprint-eval` is the second, and its subject is not this
 repository. It builds a throwaway git repository outside this tree from both
@@ -42,10 +44,9 @@ missing a living section or carries an undated finished entry, because a run
 without a trustworthy baseline cannot separate inherited work from its own.
 `docs/capabilities/loop-runner.md` is its card. The cheap command leaves this
 one alone too, for a plainer reason than the trial driver: one iteration lasts
-as long as an agent session lasts. What fits the budget is a self-test driving
-the loop over fixture repositories, and nothing fills that slot today, which
-is why `docs/capabilities/index.md` still carries this card as specified
-rather than built.
+as long as an agent session lasts. What fits the budget is the self-test
+described below, which drives the loop over fixtures rather than over anyone's
+real plan, and that is what this card's status now rests on.
 
 Beside those three is the one-time install line in that same section, which
 points git at the hook directory this repository keeps in version control.
@@ -97,6 +98,18 @@ layer map that states why each one exists; the check binds to those identifiers
 and stops with an undecided exit when they and the implementation disagree in
 either direction, which is what keeps a reworded paragraph from retiring a rule
 in silence.
+
+`docs/capabilities/loop-runner.md` owns the stop rule of the third command,
+which makes its check the only one here whose subject is another executable in
+the same directory. It builds five disposable repositories in scratch, each
+with a three-entry plan, and drives the loop over each of them with a stub
+standing in for a harness: two milestones landing under a limit of two, a
+session that splits its entry and fails, one that succeeds having committed
+nothing, one that commits without recording anything, and a record too stale
+to start from at all. Two of those five are the card's own failing cases. The
+other three are there because a halt nobody has watched print is a halt nobody
+has checked, and the fifth is the one that catches a runner which stops
+reading the record — every other scenario would let that one pass.
 
 ## What each check leaves to a human
 

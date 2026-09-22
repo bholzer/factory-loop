@@ -67,7 +67,7 @@ about the payload.
   runs and never in a commit here; the loop driver's is an agent session in
   a foreign repository, which lasts as long as that session lasts. What does
   fit the budget is a self-test that drives the loop over fixture
-  repositories, and nothing under `tools/checks/` is that yet.
+  repositories, and `tools/checks/loop-runner` is it.
 - Owns: the mechanical decisions this repository makes about itself. One
   check per card in `docs/capabilities/`, plus `scaffolding-markers`, whose
   invariant belongs to the marker definition rather than to a card.

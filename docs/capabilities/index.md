@@ -16,7 +16,7 @@ invariant holding here too.
 | --- | --- | --- |
 | `template-live-drift` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
 | `blueprint-eval` | specced | — |
-| `loop-runner` | specced | — |
+| `loop-runner` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
 | `fast-verify` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
 | `doc-integrity` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |
 | `prose-duplication` | enforced | `./tools/verify`, `tools/hooks/pre-commit` |

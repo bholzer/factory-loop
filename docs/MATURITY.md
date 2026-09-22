@@ -2,15 +2,17 @@
 
 ## Current rung
 
-L0 — human-gated. Six checks are now mechanical: `./tools/verify` decides the
+L0 — human-gated. Seven checks are now mechanical: `./tools/verify` decides the
 absence of authoring scaffolding in the live artifacts, the whole
 correspondence between `template/` and the live tree — counterpart existence,
 byte identity, and heading subsequence — the resolution of every path
 reference in the live artifacts, the absence of prose shared between any two
 artifacts in either half, the presence of the living sections and completion
-timestamps in every plan in flight, and the direction of every reference
-against the three decidable rules of the layer map in `ARCHITECTURE.md`; and
-the hook at `tools/hooks/pre-commit` refuses a commit it rejects. Everything
+timestamps in every plan in flight, the direction of every reference
+against the three decidable rules of the layer map in `ARCHITECTURE.md`, and
+whether the loop driver still halts the way its card says when scratch
+repositories built to break it are put in front of it; and the hook at
+`tools/hooks/pre-commit` refuses a commit it rejects. Everything
 else here is still enforced by a human reading, and a human reads every
 change before it lands.
 
@@ -20,9 +22,10 @@ missing on top of that status: the twenty consecutive green landed changes the
 promotion rule requires, and a gate the committer cannot switch off, which
 `docs/DEBT.md` `D8` records this one as not being. Of the L2 rows,
 `doc-integrity` and `boundary-lint` read `enforced` too, and `loop-runner`
-gates a rung two steps away. `prose-duplication` is enforced and appears in
-no row at all: its card gates no rung deliberately, because a shared window
-tells a reader where to look and not what to do about it.
+now does as well: its stop rule is decided on every commit here, which is a
+smaller claim than the rung that card gates. `prose-duplication` is enforced
+and appears in no row at all: its card gates no rung deliberately, because a
+shared window tells a reader where to look and not what to do about it.
 
 `blueprint-eval` has now had its live trial twice — three harnesses each
 time, one small feature carried through each — and still reads `specced`.

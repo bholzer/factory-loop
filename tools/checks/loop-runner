@@ -1,0 +1,424 @@
+#!/bin/sh
+# loop-runner — the stop rule ./tools/loop-runner applies, exercised against
+# fixture repositories on every edit.
+#
+# docs/capabilities/loop-runner.md is the card. Nothing but the runner can
+# observe its own stop rule, so the card names a self-test over a fixture plan
+# as the enforcement point, and this is it: five scratch repositories, each
+# holding a three-entry plan, each driven by a stub session that stands in for
+# a harness and does exactly what the plan's next unticked entry says.
+#
+# The scenarios, one assertion set each:
+#
+#   advance     two milestones land — the run reaches its limit and reports
+#               each entry, its commit and its transcript
+#   split       a session splits its entry and exits 1 — halt there
+#   silent      a session exits 0 having committed nothing — halt on the
+#               absent commit rather than on the status
+#   unrecorded  a session commits to the plan and ticks nothing — halt on the
+#               record, which is the clause the other four do not isolate
+#   refusal     the plan carries an undated completed entry — refuse, and run
+#               no session at all
+#
+# Each is judged from outside the run and never from its own account of
+# itself: the exit status, the message fragments the card's contract fixes,
+# the commits the fixture gained, how many of them touched the plan, the
+# checkbox and timestamp shapes the plan ended with, the files the sessions
+# did or did not create, and the transcripts they streamed into.
+#
+# What these fixtures do not pin, each being one more guard in the same
+# judging block as the ones they do: an iteration that completes two entries
+# at once, one that completes an entry without a timestamp, one whose extra
+# commit touches nothing in the plan, and one that un-completes an entry.
+#
+# Every fixture is built under mktemp -d and removed on every exit path, which
+# the card requires: a failure here must not be able to leave half-advanced
+# commits in real history.
+#
+# Exit 0 holds, exit 1 is a violation, exit 2 means undecidable.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+LC_ALL=C
+export LC_ALL
+
+# git's environment is neutralised before a fixture is touched. Under
+# tools/hooks/pre-commit this check runs with GIT_DIR and GIT_INDEX_FILE
+# pointing at this repository, and a fixture commit that inherited them would
+# write into the commit being judged. The identity is then supplied here so
+# that the fixtures commit whatever the machine's own git config says.
+for var in $(env | sed -n 's/^\(GIT_[A-Z_]*\)=.*/\1/p'); do
+	unset "$var"
+done
+GIT_AUTHOR_NAME='loop-runner self-test'
+GIT_AUTHOR_EMAIL='self-test@invalid'
+GIT_COMMITTER_NAME=$GIT_AUTHOR_NAME
+GIT_COMMITTER_EMAIL=$GIT_AUTHOR_EMAIL
+export GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+
+RUNNER=./tools/loop-runner
+PLAN=plans/active/fixture.md
+STAMP='\([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}Z\)'
+
+if [ ! -x "$RUNNER" ]; then
+	echo "loop-runner: cannot run — $RUNNER is missing or not executable, and it is the subject of this check."
+	echo "Restore it with chmod +x, or remove loop-runner from the check list in ./tools/verify if this repository no longer drives plans elsewhere."
+	exit 2
+fi
+
+# The remediation texts. In a self-test the offender is a behavior of
+# tools/loop-runner rather than a line of a file, so each one names the clause
+# of the invariant that stopped holding and where that clause is written down.
+ADVANCE="A clean iteration leaves at least one commit touching the plan and exactly one Progress entry newly complete with a timestamp, and the summary names what advanced. Fix tools/loop-runner, or the fixture above in tools/checks/loop-runner if that is what drifted."
+HALT="The run stops at the first iteration whose milestone did not complete, naming the plan, the entry, and the transcript to read. A halt that is late, silent, or vague costs a person the reconstruction the plan file exists to prevent."
+REFUSE="A record that cannot be trusted is refused before any session runs, because a run cannot then separate work it did from work it inherited. tools/loop-runner holds that precondition and docs/capabilities/evidence-check.md specifies the shapes it reads."
+TARGET="What the run left in the target is part of the behavior: tools/loop-runner never edits the target itself, and never lets iteration continue past a session that did not advance the plan."
+
+scratch=$(mktemp -d) || {
+	echo "loop-runner: cannot run — no scratch directory could be made."
+	echo "The five fixtures are built under mktemp -d; free space in \$TMPDIR, then re-run ./tools/checks/loop-runner."
+	exit 2
+}
+scratch=$(cd "$scratch" && pwd -P) || exit 2
+trap 'rm -rf "$scratch"' EXIT
+trap 'rm -rf "$scratch"; exit 2' HUP INT TERM
+
+root=$(pwd -P)
+case "$scratch" in
+"$root" | "$root"/*)
+	echo "loop-runner: cannot run — the scratch directory $scratch is inside this repository's worktree."
+	echo "The runner refuses a target in this worktree by design, so no scenario could run. Point \$TMPDIR outside this checkout, then re-run ./tools/checks/loop-runner."
+	exit 2
+	;;
+esac
+
+# The stub session, with the scratch root baked in: its own bookkeeping has to
+# land outside the checkout it drives, or the scenario whose session must
+# leave no trace would leave one.
+{
+	echo '#!/bin/sh'
+	echo "SCRATCH=$scratch"
+	cat <<'STUB'
+# stub-session — the harness the loop-runner self-test drives its fixtures
+# with. It reads the plan's first unticked entry and does exactly what that
+# entry says, so that one fixture exercises one behavior of the runner.
+
+PLAN=plans/active/fixture.md
+
+: >>"$SCRATCH/sentinel"
+for arg in "$@"; do
+	brief=$arg
+done
+printf '%s\n' "$(printf '%s' "$brief" | tr '\n' ' ')" >>"$SCRATCH/brief-received.txt"
+
+entry=$(sed -n 's/^- \[ \] //p' "$PLAN" | sed -n 1p)
+if [ -z "$entry" ]; then
+	echo "stub-session: no unticked entry left"
+	exit 0
+fi
+
+commit() {
+	git add -A && git commit -q --no-verify -m "$1"
+}
+
+# Replace the entry's line with $1, matching the line as a whole string so
+# that punctuation in an entry is never read as a pattern.
+rewrite() {
+	awk -v e="$entry" -v r="$1" '
+		!seen && $0 == "- [ ] " e { print r; seen = 1; next }
+		{ print }
+	' "$PLAN" >"$PLAN.next" && mv "$PLAN.next" "$PLAN"
+}
+
+case $entry in
+*silent*)
+	echo "stub-session: refused \"$entry\" and committed nothing"
+	exit 0
+	;;
+*unrecorded*)
+	printf '%s\n' "A session wrote this line and ticked nothing." >>"$PLAN"
+	commit 'session: prose' || exit 3
+	echo "stub-session: committed prose for \"$entry\" without ticking it"
+	exit 0
+	;;
+*unobservable*)
+	rewrite "- [ ] $entry (completed: nothing; remaining: all of it)" || exit 3
+	commit 'session: split' || exit 3
+	echo "stub-session: split \"$entry\""
+	exit 1
+	;;
+esac
+
+file=$(printf '%s\n' "$entry" | sed -n 's/.*create \([^ ]*\) containing.*/\1/p')
+word=$(printf '%s\n' "$entry" | sed -n 's/.*containing \([^ ]*\).*/\1/p')
+if [ -z "$file" ] || [ -z "$word" ]; then
+	echo "stub-session: no file and word to read out of \"$entry\""
+	exit 3
+fi
+printf '%s\n' "$word" >"$file"
+rewrite "- [x] ($(date -u +'%Y-%m-%d %H:%MZ')) $entry" || exit 3
+commit 'session: advance' || exit 3
+echo "stub-session: advanced \"$entry\""
+exit 0
+STUB
+} >"$scratch/stub-session" || exit 2
+chmod +x "$scratch/stub-session" || exit 2
+
+# One fixture repository: a plan with the four living sections non-empty and
+# the three Progress entries passed as arguments, committed as the baseline
+# every iteration is judged against. Prints that baseline commit.
+fixture() {
+	fname=$1
+	shift
+	fdir=$scratch/$fname
+	mkdir -p "$fdir/${PLAN%/*}" || return 1
+	{
+		echo "# Fixture plan for the loop-runner self-test"
+		echo
+		echo "## Progress"
+		echo
+		for fentry in "$@"; do
+			printf '%s\n' "$fentry"
+		done
+		echo
+		echo "## Surprises & Discoveries"
+		echo
+		echo "- Observation: what advances this plan is a stub, not a harness."
+		echo
+		echo "## Decision Log"
+		echo
+		echo "- Decision: one milestone is one file creation, so acceptance is one file read."
+		echo
+		echo "## Outcomes & Retrospective"
+		echo
+		echo "Written by whichever iteration finishes the last milestone."
+	} >"$fdir/$PLAN" || return 1
+	git -C "$fdir" -c init.defaultBranch=main init -q >/dev/null 2>&1 || return 1
+	git -C "$fdir" add -A >/dev/null 2>&1 || return 1
+	git -C "$fdir" commit -q --no-verify -m 'Fixture plan in flight' >/dev/null 2>&1 || return 1
+	git -C "$fdir" rev-parse HEAD
+}
+
+cannot_build() {
+	echo "loop-runner: cannot run — the $1 fixture repository could not be built under $scratch."
+	echo "This check decides nothing without git being able to init and commit in a scratch directory: run git init in one by hand to see what it refuses, then re-run ./tools/checks/loop-runner."
+	exit 2
+}
+
+ONE='- [ ] M1: create one.txt containing one'
+TWO='- [ ] M2: create two.txt containing two'
+THREE='- [ ] M3: create three.txt containing three'
+
+base_advance=$(fixture advance "$ONE" "$TWO" "$THREE") || cannot_build advance
+base_split=$(fixture split "$ONE" '- [ ] M2: acceptance unobservable — create nothing' "$THREE") || cannot_build split
+base_silent=$(fixture silent '- [x] (2026-01-05 09:00Z) M1: create one.txt containing one' '- [ ] M2: silent refusal — the session will do nothing' "$THREE") || cannot_build silent
+base_unrecorded=$(fixture unrecorded '- [ ] M1: unrecorded advance — commit prose without ticking' "$TWO" "$THREE") || cannot_build unrecorded
+base_refusal=$(fixture refusal '- [x] M1: create one.txt containing one' "$TWO" "$THREE") || cannot_build refusal
+
+violations=0
+faults=0
+scenario=
+said=
+
+# One violation. The remediation is printed once per run of consecutive
+# violations sharing it, the way tools/blueprint-eval reports a file with
+# several marker lines: a scenario that breaks in seven places breaks for one
+# reason, and seven copies of the reason bury the seven facts.
+fault() {
+	faults=$((faults + 1))
+	violations=$((violations + 1))
+	echo "loop-runner: $scenario — $1"
+	if [ "$2" != "$said" ]; then
+		echo "  $2"
+		said=$2
+	fi
+}
+
+# How many sessions the stub has been asked for so far: one line per
+# invocation, written outside every fixture.
+sessions() {
+	if [ -f "$scratch/brief-received.txt" ]; then
+		wc -l <"$scratch/brief-received.txt" | tr -d ' '
+	else
+		echo 0
+	fi
+}
+
+drive() {
+	scenario=$1
+	faults=0
+	said=
+	shift
+	before=$(sessions)
+	"$RUNNER" run "$scratch/$scenario" "$@" -- "$scratch/stub-session" >"$scratch/out" 2>&1
+	status=$?
+	ran=$(($(sessions) - before))
+}
+
+report() {
+	if [ "$faults" -eq 0 ]; then
+		echo "loop-runner: $scenario — $1"
+		return
+	fi
+	echo "  what that run printed:"
+	sed 's/^/    /' "$scratch/out"
+}
+
+exits() {
+	[ "$status" -eq "$1" ] && return 0
+	fault "the run exited $status where $1 is the only correct answer." "$2"
+}
+
+says() {
+	grep -qF -- "$1" "$scratch/out" && return 0
+	fault "the run never printed \"$1\"." "$2"
+}
+
+matches() {
+	grep -qE -- "$1" "$scratch/out" && return 0
+	fault "no line the run printed matches /$1/." "$2"
+}
+
+equal() {
+	[ "$3" = "$2" ] && return 0
+	fault "$1: expected $2, observed $3." "$4"
+}
+
+plan_has() {
+	grep -qE -- "$1" "$scratch/$scenario/$PLAN" && return 0
+	fault "no line of the fixture's plan matches /$1/." "$2"
+}
+
+holds() {
+	[ -f "$scratch/$scenario/$1" ] && [ "$(cat "$scratch/$scenario/$1")" = "$2" ] && return 0
+	fault "$1 in the fixture does not hold \"$2\"." "$3"
+}
+
+absent() {
+	[ ! -e "$1" ] && return 0
+	fault "$1 exists, and nothing in this scenario should have created it." "$2"
+}
+
+logged() {
+	[ -f "$1" ] && grep -qF -- "$2" "$1" && return 0
+	fault "$1 does not carry \"$2\", so what the session printed never reached its transcript." "$3"
+}
+
+untouched() {
+	equal "commits above the baseline" 0 "$(git -C "$scratch/$scenario" rev-list --count "$1..HEAD")" "$2"
+	[ -z "$(git -C "$scratch/$scenario" status --porcelain)" ] ||
+		fault "the fixture's worktree is dirty after the run." "$2"
+}
+
+commits_since() {
+	git -C "$scratch/$scenario" rev-list --count "$1..HEAD"
+}
+
+touching_since() {
+	git -C "$scratch/$scenario" log --name-only --pretty=format: "$1..HEAD" | grep -c "^$PLAN\$"
+}
+
+ticked() {
+	grep -c '^- \[x\]' "$scratch/$scenario/$PLAN"
+}
+
+stamped() {
+	grep -cE '^- \[x\] \([0-9]{4}-[0-9]{2}-[0-9]{2} ' "$scratch/$scenario/$PLAN"
+}
+
+# The passing case the card names: three milestones, a limit of two, and every
+# clause of the invariant satisfied twice over. This scenario runs first, so
+# the briefs counted here are its own.
+drive advance --limit 2 --logs "$scratch/logs-advance"
+exits 0 "$ADVANCE"
+says "loop-runner: 2 of 2 iterations advanced $PLAN in $scratch/advance." "$ADVANCE"
+matches "^  iteration 1: \"$STAMP M1: create one\.txt containing one\" — commit [0-9a-f]+, log .*/logs-advance/01-iteration\.txt\$" "$ADVANCE"
+matches "^  iteration 2: \"$STAMP M2: create two\.txt containing two\" — commit [0-9a-f]+, log .*/logs-advance/02-iteration\.txt\$" "$ADVANCE"
+says "1 Progress entry remains unticked. Review the plan, then re-run to continue." "$ADVANCE"
+equal "sessions invoked" 2 "$ran" "$ADVANCE"
+equal "briefs naming the resolved plan" 2 "$(grep -cF "plan in flight at $PLAN" "$scratch/brief-received.txt")" "$ADVANCE"
+equal "commits above the baseline" 2 "$(commits_since "$base_advance")" "$ADVANCE"
+equal "commits touching the plan" 2 "$(touching_since "$base_advance")" "$ADVANCE"
+equal "entries ticked" 2 "$(ticked)" "$ADVANCE"
+equal "ticked entries carrying a timestamp" 2 "$(stamped)" "$ADVANCE"
+plan_has '^- \[ \] M3: create three\.txt containing three$' "$TARGET"
+holds one.txt one "$TARGET"
+holds two.txt two "$TARGET"
+absent "$scratch/advance/three.txt" "$TARGET"
+logged "$scratch/logs-advance/01-iteration.txt" 'stub-session: advanced "M1: create one.txt containing one"' "$ADVANCE"
+report "limit 2 over three entries: exit 0, 2 commits both touching the plan, 2 entries ticked with timestamps, the third and its file untouched, both briefs naming the plan."
+
+# The first failing case the card requires: the second milestone cannot be
+# observed, its session splits the entry in place and exits 1, and the run
+# must stop there rather than starting the third.
+drive split --limit 3 --logs "$scratch/logs-split"
+exits 1 "$HALT"
+says "loop-runner: halted after iteration 2 of 3." "$HALT"
+says "$PLAN milestone \"M2: acceptance unobservable — create nothing\" did not complete: the session exited 1 and left 1 commit; no Progress entry became complete." "$HALT"
+says "/logs-split/02-iteration.txt, fix the cause, and re-run; the loop resumes at the same milestone." "$HALT"
+equal "sessions invoked" 2 "$ran" "$HALT"
+equal "commits above the baseline" 2 "$(commits_since "$base_split")" "$HALT"
+equal "commits touching the plan" 2 "$(touching_since "$base_split")" "$HALT"
+equal "entries ticked" 1 "$(ticked)" "$HALT"
+plan_has '^- \[ \] M2: acceptance unobservable — create nothing \(completed: nothing; remaining: all of it\)$' "$HALT"
+plan_has '^- \[ \] M3: create three\.txt containing three$' "$TARGET"
+absent "$scratch/split/three.txt" "$TARGET"
+absent "$scratch/logs-split/03-iteration.txt" "$TARGET"
+logged "$scratch/logs-split/02-iteration.txt" 'stub-session: split "M2: acceptance unobservable — create nothing"' "$HALT"
+report "limit 3 with an unobservable second milestone: exit 1 after iteration 2, the halt naming the entry and its transcript, the third milestone never started."
+
+# The halt this design exists for: a session that refuses, prints why, and
+# exits 0 having committed nothing. Judged on the absent commit, never on the
+# status — and the transcript proves a session really ran.
+drive silent --limit 2 --logs "$scratch/logs-silent"
+exits 1 "$HALT"
+says "loop-runner: halted after iteration 1 of 2." "$HALT"
+says "$PLAN did not advance: the session exited 0 and produced no commit." "$HALT"
+says "/logs-silent/01-iteration.txt say what the harness did instead; fix the cause and re-run." "$HALT"
+equal "sessions invoked" 1 "$ran" "$HALT"
+untouched "$base_silent" "$TARGET"
+equal "entries ticked" 1 "$(ticked)" "$TARGET"
+absent "$scratch/logs-silent/02-iteration.txt" "$TARGET"
+logged "$scratch/logs-silent/01-iteration.txt" 'stub-session: refused "M2: silent refusal — the session will do nothing"' "$HALT"
+report "a session that exited 0 having committed nothing: exit 1 after iteration 1, the fixture still at its baseline commit, the refusal captured in the transcript."
+
+# The clause no other scenario isolates: a session that commits to the plan,
+# exits 0, and ticks nothing. Every other fact is clean, so only the record
+# rule can halt this one.
+drive unrecorded --limit 2 --logs "$scratch/logs-unrecorded"
+exits 1 "$HALT"
+says "loop-runner: halted after iteration 1 of 2." "$HALT"
+says "$PLAN milestone \"M1: unrecorded advance — commit prose without ticking\" did not complete: the session exited 0 and left 1 commit; no Progress entry became complete." "$HALT"
+equal "sessions invoked" 1 "$ran" "$HALT"
+equal "commits above the baseline" 1 "$(commits_since "$base_unrecorded")" "$HALT"
+equal "commits touching the plan" 1 "$(touching_since "$base_unrecorded")" "$HALT"
+equal "entries ticked" 0 "$(ticked)" "$HALT"
+absent "$scratch/unrecorded/two.txt" "$TARGET"
+absent "$scratch/logs-unrecorded/02-iteration.txt" "$TARGET"
+report "a session that committed to the plan without ticking an entry: exit 1 after iteration 1, no entry complete, iteration 2 never started."
+
+# The second failing case the card requires: a stale record refused before any
+# session runs. The sentinel the stub touches on every invocation is what
+# proves none was.
+rm -f "$scratch/sentinel"
+drive refusal --limit 1 --logs "$scratch/logs-refusal"
+exits 2 "$REFUSE"
+says "loop-runner: refusing to start." "$REFUSE"
+line=$(grep -n '^- \[x\] M1: create one.txt containing one$' "$scratch/refusal/$PLAN" | sed 's/:.*//')
+says "$PLAN has a completed Progress entry with no timestamp at line $line (\"M1: create one.txt containing one\")." "$REFUSE"
+says "A run cannot distinguish work it did from work it inherited unless the record is current. Update the plan, then re-run." "$REFUSE"
+equal "sessions invoked" 0 "$ran" "$REFUSE"
+absent "$scratch/sentinel" "$REFUSE"
+absent "$scratch/logs-refusal" "$REFUSE"
+untouched "$base_refusal" "$TARGET"
+report "a plan carrying an undated completed entry: exit 2 before any session, no log directory left behind, the stub never invoked."
+
+if [ "$violations" -eq 0 ]; then
+	echo "loop-runner: ok — 5 scenarios driven through $RUNNER, $(sessions) stub sessions invoked, every assertion held."
+	exit 0
+fi
+
+noun="violations"
+[ "$violations" -eq 1 ] && noun="violation"
+echo "loop-runner: $violations $noun across 5 scenarios driven through $RUNNER."
+exit 1
