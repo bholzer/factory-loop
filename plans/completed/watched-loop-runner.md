@@ -22,7 +22,7 @@ This is the watched runner, not unattended autonomy. A human still chooses the l
 - [x] (2026-09-22 02:40Z) M1 — `tools/loop-runner` written and exercised by hand against four scratch fixtures: the passing case (exit 0, two commits each touching the plan, two timestamped ticks, third entry untouched), the split halt (exit 1 after iteration 2), the committed-nothing halt (exit 1 after iteration 1, session exit 0), the stale-record refusal and the dirty-tree refusal (exit 2, stub never invoked), and the inside-this-worktree refusal (exit 2); `AGENTS.md`, `ARCHITECTURE.md`, `docs/specs/mechanical-checks.md` and the covers row in `docs/specs/index.md` name the new command; `./tools/verify` green at 6 of 6; committed as `79dfbc0`.
 - [x] (2026-09-22 03:05Z) M2 — `tools/checks/loop-runner` encodes five scenarios (the four hand-run ones plus the unrecorded-advance fixture the sabotage step turned out to require), is last in `tools/verify`'s CHECKS list, and was seen red against the sabotaged runner and green after restoring it; `./tools/verify` reports `7 of 7 checks passed` in 2.13–2.23s against the five-second budget, so the index row reads `enforced` and the budget branch closed on the measurement; the check counts in `docs/specs/mechanical-checks.md`, `docs/specs/index.md`, `docs/MATURITY.md` and the `fast-verify` card's example transcript, the self-test sentence in `ARCHITECTURE.md`, and the status clause in `docs/MATURITY.md` all name the seventh check; committed as `0d379dd`, whose own pre-commit hook ran the new check in the environment that hook supplies and passed.
 - [x] (2026-09-22 03:15Z) M3 — Claude Code `2.1.278` drove two milestones of a hand-built smoke checkout under `--limit 2`, watched: exit 0, `2 of 2 iterations advanced`, iterations of 101s and 72s, one commit each touching `plans/active/smoke.md`, both entries ticked and stamped, the third untouched, `one.txt` and `two.txt` holding their words and `three.txt` absent, and no refusal or halt on the way; the smoke checkout had to carry the runner's commit-shape rule in its own `AGENTS.md` for the passing case to be reachable, and both sessions recorded an acceptance carve-out rather than invent a transcript.
-- [ ] M4 — close-out: `D5` deleted, `GOALS.md` non-goal reworded, `docs/MATURITY.md` narrative updated, card's Enforcement point rewritten, decision graduated, plan moved to `plans/completed/`.
+- [x] (2026-09-22 03:35Z) M4 — close-out: `D5` deleted from `docs/DEBT.md` and `D15` opened in its place for the commit-shape gap M3 found; the `GOALS.md` non-goal reworded from "specced and parked" to the watched boundary; the `docs/MATURITY.md` rung narrative given that boundary's wording, with its Gating capabilities table `cmp`-identical over fifteen lines to the copy at `25eb301`, the commit before this plan was authored; the card's Enforcement point rewritten onto `tools/checks/loop-runner`, `./tools/verify` and the hook, losing the continuous-integration claim as well as "Nothing enforces it today"; `docs/decisions/0027-the-loop-runner-is-watched-and-judges-by-commit-shape.md` written; `./tools/verify` green at 7 of 7 in 2.30s; the document edits committed as `599f361` and this file moved to `plans/completed/` in the commit carrying this entry.
 
 ## Surprises & Discoveries
 
@@ -159,6 +159,14 @@ This is the watched runner, not unattended autonomy. A human still chooses the l
   Rationale: they are what the evidence below points at, and the same place `tools/blueprint-eval` leaves its trial repositories, so an operator inspecting either knows one location. M2's scratch was deleted because a check that leaves directories behind fails its own hygiene assertion; a hand-run rehearsal has no such constraint and its artifact is worth more kept than tidy.
   Date/Author: 2026-09-22 / M3 session.
 
+- Decision: deleting `D5` is paired with opening `D15` for the commit-shape gap M3 recorded, rather than letting that finding ride out on a file about to become an archive.
+  Rationale: M3's revision note leaves the gap to M4 or to a later plan, and the two answers available are to edit `skills/plan-execute/SKILL.md` now or to register the debt. Editing an arriving procedure is what `docs/decisions/0025-a-payload-fix-mid-trial-invalidates-the-harness-results-before-it.md` prices in retired trial evidence, and it is scope this milestone was never given; the register is where `docs/specs/mechanical-checks.md` already says a gap belongs so that nobody has to rediscover it. `D14` is the precedent — the same cost, deferred the same way, with a trigger naming the pass that would be paying it anyway.
+  Date/Author: 2026-09-22 / M4 session.
+
+- Decision: the card's Enforcement point lost its continuous-integration clause as well as the "Nothing enforces it today" sentence this plan's draft named.
+  Rationale: the sentence before the drafted one said the self-test runs in continuous integration alongside the other checks. `docs/decisions/0017-enforcement-point-is-the-cheap-command-and-the-hook.md` forbids any card here from naming such a job, and nothing runs on this repository's remote, so replacing only the drafted sentence would have left a live card asserting a gate that does not exist one line above the one that names the gate that does. The Invariant section is untouched, as this log decided at authoring.
+  Date/Author: 2026-09-22 / M4 session.
+
 ## Outcomes & Retrospective
 
 M1, 2026-09-22. The runner exists and does the thing the card describes: pointed at a scratch checkout with a three-milestone plan and a stub harness, it advanced two milestones, left one commit per iteration touching the plan, ticked each entry with a timestamp, left the third alone, and printed a summary naming all of it. The three failure classes the card requires were each produced rather than argued: a milestone that could not complete halted the run with the entry text and the log path, a session that exited 0 having committed nothing halted it on the absent commit, and a plan carrying an undated completed entry was refused before any session started — proven by a sentinel the stub touches on every invocation, which stayed absent. Two behaviors the card does not name were settled by running them: the loop stops early when the plan runs out of unticked entries, and a refusal now leaves no log directory behind, so the operator's retry can reuse the same path.
@@ -176,6 +184,16 @@ M3, 2026-09-22. The runner drove a real harness through two milestones of a real
 Two things the rehearsal taught that the fixtures could not. The first is a gap in what this repository ships: the runner requires every commit of an iteration to touch the plan, while the execution procedure tells a session to commit at each coherent step, and a session doing the obvious thing — work first, record second — halts a run on its second commit. The smoke checkout was written with the rule in its `AGENTS.md`, which is what made the passing case reachable, and that rule now exists only in a scratch repository outside this tree. The second is reassurance rather than a gap: handed an acceptance clause that cannot be satisfied inside the commit it describes, both sessions named the shortfall in the plan and reported the command out of band, which is exactly the honesty the commit-shape judgement assumes and cannot itself verify.
 
 What remains is M4 alone: `docs/DEBT.md` row `D5`, the `GOALS.md` non-goal, the card's Enforcement point, the rung narrative's watched-boundary wording, decision 0027, and moving this file to `plans/completed/`.
+
+M4, 2026-09-22. Every document that described the world before the runner now describes the one that has it. `docs/DEBT.md` has no `D5`: the row deferred an unattended outer loop until the halt conditions were known, and what replaced it is built, gated on every commit, and rehearsed against a real harness. In its place the register gained `D15`, because the one thing M3 found that no fixture could — a driven project has to reconcile the runner's commit-shape rule with the execution procedure's commit cadence, and this repository says so nowhere — would otherwise have survived only inside a completed plan. `GOALS.md` states the v1 boundary where the parking notice was, `docs/MATURITY.md` says the same thing from the ladder's side, and the Gating capabilities table it sits above is unchanged to the byte since before this plan existed. The card's Enforcement point now names the self-test, the cheap command and the hook. `docs/decisions/0027-the-loop-runner-is-watched-and-judges-by-commit-shape.md` carries the two decisions that outlive the work: that a person starts, bounds and reads every run, and that an iteration is judged from its commits rather than from the session's account of itself.
+
+Against the purpose this plan opened with, all four clauses are now observations. Pointing one command at a checkout with a plan in flight and watching milestones advance one at a time was watched, twice over, with a real harness and with five fixtures. The refusal on a stale record was seen before any session was invoked, proven by a sentinel that stayed absent. The halt with a named reason was produced three different ways — a milestone that split, a session that committed nothing, a session that committed without recording — and each message names the plan, the entry or defect, and the transcript to read. The stop at the limit printed the summary the contract specifies. What a person cannot do any more is the thing the runner exists to prevent: start a second milestone on top of an unrecorded first one.
+
+The reflection rule is already satisfied and M4 added nothing to it. `docs/specs/mechanical-checks.md` describes the third command a reader can run, what it settles out of git, what it refuses before starting, and the self-test that gates it; M1 and M2 wrote that text as they built the thing it describes, which is the right time. Close-out changed no behavior, so it had no behavior to reflect.
+
+Three lessons, one per building milestone, and they are not the same lesson. M1: write the fixtures before the tool, because each halt message got its wording from watching the fixture that produces it, and writing them alongside cost more than writing them first. M2: a promotion bar is worth paying rather than asserting — the sabotage this plan specified turned out to be invisible to the four scenarios this plan specified, so the demonstration found a hole in the demonstration and a fifth fixture exists because of it. M3: a rehearsal against a real harness buys what no fixture can, and what it bought here was not reassurance about the runner but the discovery that a driven project needs a rule this repository does not ship. The first two are cheap and repeatable; the third costs about ninety times what the self-test costs, which is why it happens once per plan and not once per commit.
+
+What this plan does not leave finished: `D15` is open with a trigger, and the L2 rung is exactly where `docs/MATURITY.md` had it — the runner enforces its own stop rule, which is a smaller thing than the rung that card gates, and no row of the gating table moved.
 
 ## Context and Orientation
 
@@ -402,6 +420,26 @@ below; it and its log directory are still there:
     # observed: fast-verify: 7 of 7 checks passed (3s), wall 2.41s; the one
     # modified path is plans/active/watched-loop-runner.md, this file
 
+Observed during M4, 2026-09-22, from the repository root:
+
+    grep -n 'D5' docs/DEBT.md
+    # observed: no output, exit 1; grep -c '^| D' prints 9 rows, D2 through
+    # D15, and the register still renders
+
+    grep -rn 'Nothing enforces it today' docs/capabilities/loop-runner.md
+    grep -n 'specced and parked' GOALS.md
+    # observed: no output and exit 1 from both
+
+    git show 25eb301:docs/MATURITY.md | awk '/^## Gating capabilities/,0' > /tmp/gate-before.txt
+    awk '/^## Gating capabilities/,0' docs/MATURITY.md > /tmp/gate-now.txt
+    cmp /tmp/gate-before.txt /tmp/gate-now.txt
+    # observed: no output — the table is byte-identical over 15 lines to the
+    # commit before this plan was authored
+
+    ./tools/verify
+    # observed: fast-verify: 7 of 7 checks passed (2s), wall 2.30s, exit 0;
+    # the hook re-ran it on commit 599f361 and reported 7 of 7 in 1s
+
 ## Validation and Acceptance
 
 The plan is done when a person who has never seen it can, in this order: run `./tools/verify` and watch seven checks pass, the seventh being the loop-runner self-test exercising the stop rule against fixtures (or six plus a recorded `built`-branch measurement); read `docs/capabilities/index.md` and find `loop-runner` off `specced` with an honest enforcement column; run the M3 invocation shape against their own checkout-with-a-plan and watch milestones advance one commit-visible step at a time until the limit; find no `D5` in `docs/DEBT.md`; and find `GOALS.md`, `docs/MATURITY.md`, and the card agreeing that this is the watched runner and that no rung was claimed. Each milestone's own acceptance clauses above are the per-session checks; every one is a command plus what it must print, and every recorded result must be observed output, never expectation.
@@ -626,3 +664,14 @@ What this plan deliberately leaves out: unattended or scheduled operation and an
   this repository ships that M4 or a later plan has to answer rather than
   rediscover. No contract under Interfaces and Dependencies changed, the
   runner and its check were not edited, and M4 is as authored.
+
+- 2026-09-22 (M4 execution): recorded M4's observed evidence in Progress,
+  Concrete Steps and Outcomes & Retrospective; added two decisions taken
+  while closing out (the `D15` row paired with `D5`'s deletion, and the card
+  losing its continuous-integration clause alongside the sentence the draft
+  named); wrote the plan-level retrospective against the Purpose. Reason: the
+  House Rules require the record to be current at the stopping point, and the
+  lifecycle rule requires a completed plan to say what it reflected and what
+  it left open before it moves. No contract under Interfaces and Dependencies
+  changed; the runner, its check and the specs were not edited in this
+  milestone.
