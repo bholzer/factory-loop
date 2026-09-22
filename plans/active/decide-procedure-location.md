@@ -1225,6 +1225,95 @@ had recorded as done had not happened; it appended the correction rather
 than rewriting the entry, which is the evidence habit the payload asks for
 working in a copy that has never read this repository.
 
+### M4 record — Codex CLI, 2026-09-21
+
+Environment `codex-cli 0.150.1`, trial at
+`/Users/<you>/blueprint-trials/codex-cli-20260921-190652`, built by
+`./tools/blueprint-eval new codex-cli`: "copied 25 files — 19 payload files
+and 6 procedures — committed as \"Receive the payload\"." The three briefs
+were extracted by the `awk` line under Concrete Steps into `<trial>/logs/`
+and came to 62, 21 and 6 lines with `grep -c 'harness-blueprint'` printing 0
+for each, which is the extraction check. The copy arrived with no
+environment configuration directory: `ls -a <trial>/repo` listed `.git`,
+`AGENTS.md`, `ARCHITECTURE.md`, `GOALS.md`, `docs`, `plans`, `skills` and
+nothing else.
+
+Session 1, bootstrap. Invocation, one process, standard input closed, no
+resumption:
+
+    codex exec -C <trial>/repo -m gpt-5.6-sol --approve-for-me "$(cat <trial>/logs/brief-bootstrap.md)" < /dev/null 2>&1 | tee <trial>/logs/01-bootstrap.txt
+
+Started 19:07:39 CDT, exited 0 after 564 seconds, committing `f54822c`
+"Bootstrap tally agent harness" over eleven files — eight filled artifacts,
+the register index, and three card files deleted by its own right-sizing.
+It printed "Reading additional input from stdin..." with standard input
+closed, which the Concrete Steps say means nothing, and it printed no other
+refusal: none of this environment's three known refusals fired, because the
+invocation already carries the model and the approval flag and the driver
+had committed the copy.
+
+Discovery, judged under `0023`. The session was handed none of the copy's
+six procedures at startup and found the right one by reading the tree. Its
+first words were "I'll bootstrap only the harness artifacts, using the
+committed procedures and the owner answers you provided. I'll first
+inventory the repository and read the governing plan/bootstrap
+instructions", its first tool call was `rg --files` over the copy, and its
+next message named what it had found: "The repository includes a dedicated
+`harness-init` procedure, so I'm using that as the bootstrap authority." The
+read of `skills/harness-init/SKILL.md` was the first artifact it opened. The
+brief named no procedure, no filename and no path.
+
+Step 9's outcome: nothing installed, which is the third outcome and the
+right one here — and this is the environment the edited clause's third
+branch exists for. Nothing was created: `ls -a <trial>/repo` after the
+bootstrap lists the same seven entries it listed before, with no `.codex`
+directory and no pointer file, and the bootstrap commit touches eleven
+markdown artifacts and nothing else.
+
+The shortfall, against this milestone's own addition — whether the session
+took the third outcome deliberately or arrived at it by omission. It arrived
+at it by omission, on the evidence available. The only sentence in its
+report bearing on step 9 is "Added no environment-specific entry point
+because this environment already reads `AGENTS.md`.", which answers the
+step's first clause with that clause's own reason and says nothing about the
+second. `grep -niE 'reachab|\.codex|install nothing|machine it runs on'
+<trial>/logs/01-bootstrap.txt` matches only at lines 241-247, which are the
+procedure text the session echoed when it read the file, and never in
+anything the session itself wrote. So the clause produced the correct
+action and did not produce the report sentence it requires, where both other
+environments produced both. This is a finding about the wording, recorded
+against M4's acceptance rather than absorbed: the clause's reporting
+obligation reads as one obligation covering both clauses, and a session that
+has nothing to install for the second reads the first clause's answer as
+having discharged it.
+
+The probe pair, run in Codex CLI either side of the bootstrap. In a fresh
+copy built for the purpose (`codex-probe-20260921-190652`) the session named
+14 skills, every one of them from the machine owner's own roots —
+`/Users/<you>/.codex/skills/.system/` and
+`/Users/<you>/.codex/plugins/cache/...` — and none of the copy's six. In the
+bootstrapped copy the same prompt named 24, from the same two root families
+and again not one of the six. The difference between 14 and 24 is the
+machine's plugin cache rather than anything the bootstrap did — the ten
+extra names are `notion:*`, `openai-developers:*` and
+`plugin-management:*`, none of which exists in either copy — which is why
+the judged fact here is the absence of the six and not the total. Neither
+probe said "none were given" of the copy's own procedures in so many words,
+as omp's did; both answered by listing roots, and every root is outside the
+copy. Stored at `<probe-trial>/logs/probe-fresh.txt` and
+`<trial>/logs/probe-bootstrapped.txt`.
+
+The driver after the bootstrap: `layout: ok — 6 procedures, each with
+SKILL.md and matching frontmatter name.`, `fill: ok — no authoring
+scaffolding in 20 markdown files of the copy.`, and `references: 12 dangling
+references in 115 examined across 18 markdown files of the copy.`, exit 1.
+Every one of the 12 is a reserved `tally/` path — `tally/core/`,
+`tally/store.py`, `tally/cli.py`, cited from `ARCHITECTURE.md`,
+`docs/DEBT.md` and `docs/PRINCIPLES.md` — which is the composition this
+milestone's second acceptance item asks for. The file counts run below M3's
+22 and 20 because this session right-sized three cards away, which the
+procedure invites and the driver does not measure.
+
 ## Interfaces and Dependencies
 
 The text contract for `skills/harness-init/SKILL.md` step 9. The step keeps
