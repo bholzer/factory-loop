@@ -88,7 +88,23 @@ exclusions are argued in the Decision Log.
   reference the copy's own later milestone creates, where M2's item 2 asks
   for the composition rather than a clean exit. The M3 addition about
   reproducibility came back half-true and is written up as such.
-- [ ] M4 — Codex CLI: the whole trial against the edited procedures.
+- [x] (2026-09-22 00:39Z) M4 — Codex CLI: the whole trial against the edited
+  procedures, at `codex-cli-20260921-190652`. Six of the seven acceptance
+  items observed clean and both of this plan's own additions with them:
+  three driven sessions, each a separate process with standard input closed,
+  exiting 0 in 564, 757 and 443 seconds — 29.4 minutes of driven time
+  against the 30 the previous run took; step 9's outcome was the third one,
+  nothing installed, which is correct in the one environment whose procedure
+  roots all lie outside the repository; step 8's sentence produced three
+  command lines in the authored plan carrying their refusal points; and the
+  copy reached `python3 -m tally report` printing counts with its own
+  `python3 tools/verify.py` passing. One shortfall, named against item 5's
+  M4 addition rather than absorbed: the session took the install-nothing
+  outcome by omission, not deliberately — its report answers step 9's first
+  clause and never mentions the second — so the edited clause produced the
+  right action here without producing the report sentence it requires.
+  Whether that is a wording defect to fix is M5's question, and this
+  milestone deliberately does not answer it.
 - [ ] M5 — Close out: retire `D4` and `D12`, halve `D13`, graduate the
   decision, reflect the behavior.
 
@@ -291,6 +307,46 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   paths, both named in their reports — which is what the edit asked for and
   the most it can ask for without naming a directory the layer map forbids.
 
+- Observation (M4, 2026-09-21): in the one environment where the honest
+  action is to install nothing, the clause's reporting obligation goes
+  unanswered, because the step's first clause supplies a sentence that reads
+  as though it had covered both.
+  Evidence: the bootstrap report's only step 9 sentence is "Added no
+  environment-specific entry point because this environment already reads
+  `AGENTS.md`." — the first clause's question and the first clause's reason.
+  `grep -niE 'reachab|\.codex|install nothing|machine it runs on'
+  <trial>/logs/01-bootstrap.txt` matches only inside the procedure text the
+  session echoed while reading the file, never in anything it wrote. The
+  action was still right: `ls -a <trial>/repo` after the bootstrap shows no
+  `.codex` directory and the bootstrap commit touches eleven markdown
+  artifacts and nothing else. So the edit's two halves came apart here — the
+  rule decided the action, the reporting obligation did not fire — where in
+  both other environments they arrived together.
+
+- Observation (M4): the probe in this environment is stable in the only
+  thing it is asked to decide and unstable in its total, so the judged fact
+  is the absence of the six rather than the count.
+  Evidence: the fresh copy `codex-probe-20260921-190652` named 14 skills at
+  19:07 and the bootstrapped copy named 24 at 19:17, every one of both lists
+  rooted at `/Users/<you>/.codex/skills/.system/` or
+  `/Users/<you>/.codex/plugins/cache/...`, and not one of the copy's six in
+  either. The ten extra names are `notion:*`, `openai-developers:*` and
+  `plugin-management:*`, which exist in neither copy — the machine's plugin
+  cache moved between the two probes, ten minutes apart.
+
+- Observation (M4): a trial copy that right-sizes a card away retires one of
+  this repository's own `blueprint-eval` allowlist keys, and the driver says
+  so without failing.
+  Evidence: `./tools/blueprint-eval check <trial>/repo` after the executed
+  milestone printed `references: ok — 109 of 109 references resolved inside
+  the copy, 0 allowlist entries applied, 1 stale.` and exited 0. The stale
+  key is `docs/capabilities/doc-integrity.md:docs/NOPE.md`, which cannot
+  match in a copy whose bootstrap deleted that card. `tools/allow/blueprint-eval.txt`
+  says an entry matching nothing is counted stale so a retired exception
+  decays visibly, so this is the mechanism working on a case its header
+  anticipated — a copy's right-sizing, not a payload defect and not
+  something to allowlist away.
+
 ## Decision Log
 
 - Decision: the procedures keep their canonical location at
@@ -460,6 +516,22 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   repointed. The one-milestone-per-session rule is kept: no session of the
   Codex CLI trial was driven, so exactly one milestone was executed here.
   Date/Author: 2026-09-21, M2 execution session.
+
+- Decision: the report sentence M4 did not get is recorded as a shortfall
+  against item 5 and the clause's wording is left exactly as M1 landed it,
+  with the question of whether to amend it handed to M5.
+  Rationale: three trials judge one text, and amending that text after the
+  third would leave the first two records describing wording that no longer
+  exists — the evidence would stop being comparable, which is the only
+  reason to run three trials rather than one. The shortfall is also narrow
+  and might not be a defect: the action the clause asks for was taken
+  correctly, and what went missing is a sentence about an absence. M5 has
+  the whole set in front of it, so it can weigh a wording change — splitting
+  the reporting obligation so each clause carries its own, say — against
+  leaving a rule that fires two times in three and costs an omitted sentence
+  the third. Amending here would also widen this milestone past the trial it
+  exists to run.
+  Date/Author: 2026-09-21, M4 execution session.
 
 ## Outcomes & Retrospective
 
@@ -1332,6 +1404,63 @@ current refusal state", each with `[exit 1]` beside it. The sentence asks
 for the refusal point recorded beside the command, and this session recorded
 it twice, in the section that owns observations and in the section that owns
 transcripts.
+
+Session 3, execution. Same invocation shape with `brief-execute.md` to
+`<trial>/logs/03-execute.txt`. Started 19:31:10 CDT, exited 0 after 443
+seconds, committing three times, `757f131` "Add failing tally end-to-end
+test" through `c872bbb` "Record Milestone 1 outcome", tree clean after. The
+three sessions together took 1764 seconds — 29.4 minutes, against the 30
+this environment's previous run took.
+
+The copy carries a feature to a running command. In `<trial>/repo`:
+
+    $ python3 -m tally add build && python3 -m tally add build && python3 -m tally add ship && python3 -m tally report
+    build	2
+    ship	1
+    exit=0
+
+    $ python3 tools/verify.py
+    test_add_then_report_counts_most_frequent_first (tests.test_cli.CliEndToEndTests) ... ok
+    Ran 1 test in 0.091s
+    OK
+    fast-verify: PASS (unittest)
+    exit=0
+
+`python3 tools/verify.py` is the verification command the copy's own
+`AGENTS.md` publishes under Commands with a 60-second budget, written by the
+executed milestone; it did not exist when the milestone started. This
+environment's `add` prints nothing and its `report` prints one tab-separated
+line per label, where omp's copy echoed a running count on every `add` — two
+projects reading the same owner answers, both satisfying them. Recording
+four labels left `git status --porcelain` empty, so the store this copy
+writes is outside what the checkout tracks.
+
+The driver after the executed milestone: `layout: ok — 6 procedures, each
+with SKILL.md and matching frontmatter name.`, `fill: ok — no authoring
+scaffolding in 21 markdown files of the copy.`, and `references: ok — 109 of
+109 references resolved inside the copy, 0 allowlist entries applied, 1
+stale.`, exit 0. The 12 reserved `tally/` paths resolved once the code
+existed and nothing was left dangling, as in M2's run. The one stale entry
+is this repository's own allowlist key
+`docs/capabilities/doc-integrity.md:docs/NOPE.md`, which cannot apply in a
+copy whose bootstrap right-sized that card away — the allowlist header says
+an entry matching nothing is counted stale so that a retired exception
+decays visibly, and this is that mechanism reporting a copy's right-sizing
+rather than a defect in either half. It does not change the part's verdict:
+the references part exits 0.
+
+The last two card observations. The copy's plan file gained 44 lines
+between the authoring commit `663a7d8` and the execution commit `c872bbb`,
+among them output the authoring version could not have held:
+`FileNotFoundError: [Errno 2] No such file or directory: '.../repo/tally'`
+with `Ran 1 test in 0.002s` and `FAILED (errors=1)` from the test observed
+failing before any source existed, then `Ran 1 test in 0.093s` green, and
+`real 0.30` for the timed verifier against that plan's published 60-second
+budget. And the session stopped after one milestone: the copy's `Progress`
+shows one ticked entry, timestamped `2026-09-22 00:37Z`, and the first
+unticked box is `Milestone 2: complete and test TALLY_STORE, checkout
+isolation, label validation, deterministic ties, missing and malformed store
+behavior, and pure counting behavior.`
 
 ## Interfaces and Dependencies
 
