@@ -1,0 +1,516 @@
+#!/bin/sh
+# loop-runner — drive the milestone sessions of a plan in another checkout, one
+# at a time, and stop the moment one of them did not land.
+#
+# docs/capabilities/loop-runner.md is the card. Its invariant is a stop rule:
+# an iteration advances exactly one milestone, leaves at least one commit
+# touching the plan it advanced, records that completion with a timestamp, and
+# the run halts on the first iteration that did not do those things instead of
+# starting the next one. Everything below is that rule applied to a target
+# repository the operator names, with the harness invocation supplied after --
+# so that no harness is named in here.
+#
+# Judgement is made of commits and of the plan file at two revisions, never of
+# the session's own account of itself: a harness that refuses can exit 0 having
+# committed nothing, and one that did the work can exit nonzero. A nonzero exit
+# still halts the run — a session that advanced a milestone and then died is a
+# session a person should read before the next one starts.
+#
+# This is deliberately not one of the executables under tools/checks/, and
+# tools/verify does not run it. Those decide a property of this repository on
+# every edit inside a five-second budget; a run here invokes an agent harness
+# against a foreign checkout for as long as that harness takes. What belongs in
+# that budget is a self-test driving this file against fixture repositories,
+# which is the enforcement point the card names.
+#
+# The record precondition below reimplements the structural contract that
+# docs/capabilities/evidence-check.md specifies rather than invoking
+# tools/checks/evidence-check. That executable decides a directory of this
+# repository's own plans; the subject here is one named file inside a
+# repository that has never heard of this one.
+#
+# Usage:
+#   ./tools/loop-runner run <repo-dir> [--plan <repo-relative-path>] --limit <n>
+#       [--logs <dir>] -- <session command...>
+#
+# The session command runs with the target directory as its working directory,
+# with stdin closed, and with the per-iteration brief appended as one final
+# argument.
+#
+# Exit 0 ran to the limit or to plan completion, exit 1 halted on the stop
+# rule, exit 2 refused to start or cannot decide.
+
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+LC_ALL=C
+export LC_ALL
+
+ROOT=$PWD
+CURRENT="A run cannot distinguish work it did from work it inherited unless the record is current. Update the plan, then re-run."
+
+usage() {
+	echo "usage: ./tools/loop-runner run <repo-dir> [--plan <repo-relative-path>] --limit <n> [--logs <dir>] -- <session command...>"
+}
+
+abs_dir() {
+	(cd "$1" 2>/dev/null && pwd -P)
+}
+
+inside_worktree() {
+	case "$1" in
+	"$ROOT" | "$ROOT"/*) return 0 ;;
+	esac
+	return 1
+}
+
+# One awk pass over a plan file, emitting tab-separated records: the four
+# living sections plans/PLANS.md requires, when one is absent or empty, and one
+# record per Progress checkbox line — OPEN, DONE (ticked and timestamped) or
+# NOSTAMP (ticked without one). Each entry record carries its line number, its
+# text shortened for messages, and a key: the text lowercased, stripped of any
+# parenthesised date and of punctuation, which is what lets the same entry be
+# recognised across two revisions after a session ticked it and reworded it.
+#
+# Fenced and indented blocks are quoted material — a plan reproduces the
+# convention's skeleton and its own transcripts — so neither contributes
+# headings or entries, which is the same reading tools/checks/evidence-check
+# makes of a plan in this repository.
+read_plan() {
+	awk '
+	function trim(t) {
+		sub(/^[ \t]+/, "", t)
+		sub(/[ \t]+$/, "", t)
+		return t
+	}
+	function key(t,   k) {
+		k = tolower(t)
+		gsub(/\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][^)]*\)/, " ", k)
+		gsub(/[^a-z0-9]+/, " ", k)
+		return trim(k)
+	}
+	function shorten(t) {
+		if (length(t) > 72) { return substr(t, 1, 72) "…" }
+		return t
+	}
+	BEGIN {
+		n = split("Progress|Surprises & Discoveries|Decision Log|Outcomes & Retrospective", req, "|")
+	}
+	{
+		if ($0 ~ /^[ \t]*```/) { fence = !fence; next }
+		if (fence) { next }
+		if ($0 ~ /^## /) { cur = substr($0, 4); seen[cur] = 1; next }
+		if ($0 ~ /^[ \t]*$/) { next }
+		if (cur != "") { content[cur] = 1 }
+		if (cur != "Progress") { next }
+		if ($0 ~ /^(    |\t)/) { next }
+		if ($0 ~ /^[ \t]*- \[[ ]\]/) {
+			t = $0
+			sub(/^[ \t]*- \[[ ]\][ \t]*/, "", t)
+			print "OPEN\t" FNR "\t" shorten(t) "\t" key(t)
+			next
+		}
+		if ($0 ~ /^[ \t]*- \[[xX]\]/) {
+			t = $0
+			sub(/^[ \t]*- \[[xX]\][ \t]*/, "", t)
+			kind = ($0 ~ /\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/) ? "DONE" : "NOSTAMP"
+			print kind "\t" FNR "\t" shorten(t) "\t" key(t)
+			next
+		}
+	}
+	END {
+		for (i = 1; i <= n; i++) {
+			if (!(req[i] in seen)) { print "MISSING\t0\t" req[i] "\t" }
+			else if (!(req[i] in content)) { print "EMPTY\t0\t" req[i] "\t" }
+		}
+	}
+	' "$1"
+}
+
+# The first structural defect in a record file, as a phrase completing the
+# sentence "<plan> …". Empty output means the record holds.
+plan_defect() {
+	awk -F'\t' '
+	$1 == "NOSTAMP" { print "has a completed Progress entry with no timestamp at line " $2 " (\"" $3 "\")"; exit }
+	$1 == "MISSING" { print "is missing the required section `## " $3 "`"; exit }
+	$1 == "EMPTY" { print "carries the required section `## " $3 "` with nothing under it"; exit }
+	' "$1"
+}
+
+# Two record files, start then end: which entries became complete over the
+# iteration, and which completed entry stopped being one.
+compare_records() {
+	awk -F'\t' '
+	FNR == NR {
+		if ($1 == "DONE" || $1 == "NOSTAMP") { before[$4] = $3 }
+		next
+	}
+	{
+		if ($1 != "DONE" && $1 != "NOSTAMP") { next }
+		after[$4] = 1
+		if (!($4 in before)) { print "NEWDONE\t" $3 "\t" ($1 == "DONE" ? "stamped" : "unstamped") }
+	}
+	END {
+		for (k in before) { if (!(k in after)) { print "REVERTED\t" before[k] "\t" } }
+	}
+	' "$1" "$2"
+}
+
+# Every commit in the range that changed nothing in the plan file.
+untouching_commits() {
+	git -C "$targetdir" log --name-only --format='C%x09%H' "$1..$2" | awk -v plan="$plan" '
+	$1 == "C" && NF == 2 { c = $2; order[++k] = c; next }
+	$0 == plan { touched[c] = 1 }
+	END { for (i = 1; i <= k; i++) { if (!(order[i] in touched)) { print order[i] } } }
+	'
+}
+
+plural_commits() {
+	if [ "$1" -eq 1 ]; then
+		echo "1 commit"
+	else
+		echo "$1 commits"
+	fi
+}
+
+summarise() {
+	read_plan "$targetdir/$plan" >"$work/final"
+	remaining=$(awk -F'\t' '$1 == "OPEN" { n++ } END { print n + 0 }' "$work/final")
+	echo "loop-runner: $advanced of $limit iterations advanced $plan in $targetdir."
+	[ -n "$lines" ] && printf '%s' "$lines"
+	if [ "$remaining" -eq 0 ]; then
+		echo "The plan has no unticked entries left."
+	elif [ "$remaining" -eq 1 ]; then
+		echo "1 Progress entry remains unticked. Review the plan, then re-run to continue."
+	else
+		echo "$remaining Progress entries remain unticked. Review the plan, then re-run to continue."
+	fi
+	echo "Logs: $logs"
+}
+
+# A precondition that failed. Before any session ran it is a refusal to start;
+# after one ran it is that iteration's halt, because the state was made by a
+# session a person should read.
+refuse_or_halt() {
+	if [ "$iteration" -eq 0 ]; then
+		echo "loop-runner: refusing to start."
+		echo "$1"
+		echo "$2"
+		exit 2
+	fi
+	echo "loop-runner: halted after iteration $iteration of $limit."
+	echo "$1"
+	echo "$2 Read $log for what the last session did; the loop resumes at the same milestone."
+	exit 1
+}
+
+cmd_run() {
+	target=
+	planarg=
+	limit=
+	logsarg=
+	sawsep=no
+
+	while [ "$#" -gt 0 ]; do
+		case $1 in
+		--)
+			shift
+			sawsep=yes
+			break
+			;;
+		--plan | --limit | --logs)
+			if [ "$#" -lt 2 ]; then
+				echo "loop-runner: cannot run — $1 takes a value."
+				usage
+				exit 2
+			fi
+			case $1 in
+			--plan) planarg=$2 ;;
+			--limit) limit=$2 ;;
+			--logs) logsarg=$2 ;;
+			esac
+			shift 2
+			;;
+		-*)
+			echo "loop-runner: cannot run — \"$1\" is not an option of run."
+			usage
+			exit 2
+			;;
+		*)
+			if [ -n "$target" ]; then
+				echo "loop-runner: cannot run — run drives one checkout, and \"$1\" is a second directory."
+				echo "The harness invocation goes after --, so that its own arguments are never read as this tool's."
+				exit 2
+			fi
+			target=$1
+			shift
+			;;
+		esac
+	done
+
+	if [ -z "$target" ]; then
+		echo "loop-runner: cannot run — run takes the directory of the checkout to drive."
+		usage
+		exit 2
+	fi
+	if [ -z "$limit" ]; then
+		echo "loop-runner: cannot run — --limit is missing, and it has no default."
+		echo "A watched run stops after a number of iterations its operator chose; name that number."
+		usage
+		exit 2
+	fi
+	case $limit in
+	'' | *[!0-9]*)
+		echo "loop-runner: cannot run — --limit takes a positive whole number, not \"$limit\"."
+		exit 2
+		;;
+	esac
+	if [ "$limit" -lt 1 ]; then
+		echo "loop-runner: cannot run — --limit takes a positive whole number, not \"$limit\"."
+		exit 2
+	fi
+	if [ "$sawsep" = no ] || [ "$#" -eq 0 ]; then
+		echo "loop-runner: cannot run — no session command: everything after -- is the harness invocation each iteration runs."
+		echo "For example: ./tools/loop-runner run <repo-dir> --limit 2 -- claude -p --model opus --dangerously-skip-permissions"
+		exit 2
+	fi
+
+	targetdir=$(abs_dir "$target")
+	if [ -z "$targetdir" ]; then
+		echo "loop-runner: cannot run — $target is not a directory this tool can enter."
+		echo "Name a git checkout that has a plan in flight."
+		exit 2
+	fi
+	if inside_worktree "$targetdir"; then
+		echo "loop-runner: cannot run — $targetdir is inside this repository's worktree."
+		echo "A driven session commits, and one driving this checkout would edit the runner while it runs and leave half-advanced commits in real history. Point it at another project."
+		exit 2
+	fi
+	top=$(git -C "$targetdir" rev-parse --show-toplevel 2>/dev/null)
+	if [ -z "$top" ]; then
+		echo "loop-runner: cannot run — $targetdir is not a git worktree."
+		echo "Every judgement here is made of commits, so the target has to be a repository: run git init and commit its plan first."
+		exit 2
+	fi
+	targetdir=$top
+	if inside_worktree "$targetdir"; then
+		echo "loop-runner: cannot run — $targetdir is inside this repository's worktree."
+		echo "A driven session commits, and one driving this checkout would edit the runner while it runs and leave half-advanced commits in real history. Point it at another project."
+		exit 2
+	fi
+	if ! git -C "$targetdir" rev-parse HEAD >/dev/null 2>&1; then
+		echo "loop-runner: cannot run — $targetdir has no commits yet."
+		echo "The first commit is the baseline every iteration is judged against: commit the plan, then re-run."
+		exit 2
+	fi
+
+	if [ -n "$planarg" ]; then
+		plan=$planarg
+		if [ ! -f "$targetdir/$plan" ]; then
+			echo "loop-runner: refusing to start."
+			echo "$targetdir has no file at $plan, which is the plan this run was told to advance."
+			echo "Name the plan with --plan, relative to the checkout's root."
+			exit 2
+		fi
+	else
+		found=$(cd "$targetdir" && find plans/active -type f -name '*.md' 2>/dev/null | sort)
+		count=0
+		for f in $found; do
+			count=$((count + 1))
+		done
+		if [ "$count" -eq 0 ]; then
+			echo "loop-runner: refusing to start."
+			echo "$targetdir has no plan in flight: plans/active/ holds no markdown file."
+			echo "Author one first, or name a plan elsewhere in the checkout with --plan."
+			exit 2
+		fi
+		if [ "$count" -gt 1 ]; then
+			echo "loop-runner: refusing to start."
+			echo "$targetdir has $count plans in flight, and a run advances exactly one:"
+			for f in $found; do
+				echo "  $f"
+			done
+			echo "Name the one to advance with --plan."
+			exit 2
+		fi
+		plan=$found
+	fi
+
+	if [ -n "$logsarg" ]; then
+		logsparent=$(abs_dir "$(dirname "$logsarg")")
+		if [ -z "$logsparent" ]; then
+			echo "loop-runner: cannot run — the parent directory of $logsarg does not exist."
+			echo "Create it, or leave --logs out and take the default beside the target."
+			exit 2
+		fi
+		logs=${logsparent%/}/$(basename "$logsarg")
+	else
+		logs=$targetdir-loop-logs-$(date +%Y%m%d-%H%M%S)
+	fi
+	case "$logs" in
+	"$targetdir" | "$targetdir"/*)
+		echo "loop-runner: cannot run — the log directory $logs is inside the target checkout."
+		echo "Transcripts written into the target would dirty the tree the next iteration is judged against: put them beside it."
+		exit 2
+		;;
+	esac
+	if [ -e "$logs" ]; then
+		echo "loop-runner: cannot run — $logs already exists."
+		echo "A log directory is never reused: its transcripts are the evidence of where a run halted. Name another with --logs."
+		exit 2
+	fi
+
+	work=$(mktemp -d) || {
+		echo "loop-runner: cannot run — no scratch directory could be made."
+		exit 2
+	}
+	trap 'rm -rf "$work"' EXIT
+	trap 'rm -rf "$work"; exit 2' HUP INT TERM
+
+	brief="You are working in a git repository whose agent harness is already
+installed, and which has a plan in flight at $plan. Nothing outside
+this repository is available to you, and you must not go looking for it.
+
+Task: execute the first unfinished milestone of that plan, following the
+repository's own execution procedure, and then stop."
+
+	# The log directory is made when the first session is about to run, not
+	# here: a refusal leaves nothing behind, and the operator who fixes what
+	# was refused can re-run with the same --logs path.
+
+	echo "loop-runner: driving $plan in $targetdir, limit $limit."
+	echo "loop-runner:   logs $logs"
+	echo "loop-runner:   session $*"
+
+	iteration=0
+	advanced=0
+	lines=
+	log=
+
+	while [ "$iteration" -lt "$limit" ]; do
+		if [ ! -f "$targetdir/$plan" ]; then
+			refuse_or_halt "$plan does not exist in $targetdir." "A run advances one plan file, and this one is gone."
+		fi
+		if [ -n "$(git -C "$targetdir" status --porcelain)" ]; then
+			refuse_or_halt "$targetdir has uncommitted changes." "An iteration is judged by the commits it leaves, so it starts from a clean tree: commit or discard them, then re-run."
+		fi
+		read_plan "$targetdir/$plan" >"$work/now"
+		defect=$(plan_defect "$work/now")
+		if [ -n "$defect" ]; then
+			refuse_or_halt "$plan $defect." "$CURRENT"
+		fi
+		entry=$(awk -F'\t' '$1 == "OPEN" { print $3; exit }' "$work/now")
+		if [ -z "$entry" ]; then
+			summarise
+			exit 0
+		fi
+
+		iteration=$((iteration + 1))
+		log=$logs/$(printf '%02d' "$iteration")-iteration.txt
+		start=$(git -C "$targetdir" rev-parse HEAD)
+
+		if [ ! -d "$logs" ] && ! mkdir -p "$logs"; then
+			echo "loop-runner: cannot run — $logs could not be created."
+			exit 2
+		fi
+
+		echo "loop-runner: iteration $iteration of $limit — \"$entry\""
+		echo "loop-runner:   log $log"
+		rm -f "$work/status"
+		(
+			cd "$targetdir" || exit 127
+			"$@" "$brief" </dev/null 2>&1
+			echo $? >"$work/status"
+		) | tee "$log"
+		status=$(cat "$work/status" 2>/dev/null)
+		[ -n "$status" ] || status=127
+
+		end=$(git -C "$targetdir" rev-parse HEAD)
+		commits=$(git -C "$targetdir" rev-list "$start..$end")
+		ncommits=0
+		for c in $commits; do
+			ncommits=$((ncommits + 1))
+		done
+
+		if [ "$ncommits" -eq 0 ]; then
+			echo "loop-runner: halted after iteration $iteration of $limit."
+			echo "$plan did not advance: the session exited $status and produced no commit."
+			echo "The last lines of $log say what the harness did instead; fix the cause and re-run."
+			exit 1
+		fi
+
+		facts="the session exited $status and left $(plural_commits "$ncommits")"
+		faults=0
+
+		[ "$status" -eq 0 ] || faults=$((faults + 1))
+
+		untouched=$(untouching_commits "$start" "$end")
+		if [ -n "$untouched" ]; then
+			faults=$((faults + 1))
+			for c in $untouched; do
+				facts="$facts; commit $(git -C "$targetdir" rev-parse --short "$c") changed nothing in $plan"
+			done
+		fi
+
+		if ! git -C "$targetdir" show "$end:$plan" >"$work/end.md" 2>/dev/null; then
+			echo "loop-runner: halted after iteration $iteration of $limit."
+			echo "$plan milestone \"$entry\" did not complete: $facts; the plan file is not in the commit the session left."
+			echo "Read $log, fix the cause, and re-run; the loop resumes at the same milestone."
+			exit 1
+		fi
+		git -C "$targetdir" show "$start:$plan" >"$work/start.md" 2>/dev/null || : >"$work/start.md"
+		read_plan "$work/start.md" >"$work/start-records"
+		read_plan "$work/end.md" >"$work/end-records"
+		compare_records "$work/start-records" "$work/end-records" >"$work/compare"
+
+		newdone=$(awk -F'\t' '$1 == "NEWDONE" { n++ } END { print n + 0 }' "$work/compare")
+		reverted=$(awk -F'\t' '$1 == "REVERTED" { n++ } END { print n + 0 }' "$work/compare")
+		newtext=$(awk -F'\t' '$1 == "NEWDONE" { print $2; exit }' "$work/compare")
+		unstamped=$(awk -F'\t' '$1 == "NEWDONE" && $3 == "unstamped" { print $2; exit }' "$work/compare")
+
+		if [ "$newdone" -eq 0 ]; then
+			faults=$((faults + 1))
+			facts="$facts; no Progress entry became complete"
+		elif [ "$newdone" -gt 1 ]; then
+			faults=$((faults + 1))
+			facts="$facts; $newdone Progress entries became complete, and an iteration advances one milestone"
+		elif [ -n "$unstamped" ]; then
+			faults=$((faults + 1))
+			facts="$facts; the entry \"$unstamped\" was completed with no timestamp"
+		else
+			facts="$facts; the entry \"$newtext\" became complete"
+		fi
+
+		if [ "$reverted" -ne 0 ]; then
+			faults=$((faults + 1))
+			facts="$facts; the completed entry \"$(awk -F'\t' '$1 == "REVERTED" { print $2; exit }' "$work/compare")\" is no longer complete"
+		fi
+
+		if [ "$faults" -ne 0 ]; then
+			echo "loop-runner: halted after iteration $iteration of $limit."
+			echo "$plan milestone \"$entry\" did not complete: $facts."
+			echo "Read that entry and $log, fix the cause, and re-run; the loop resumes at the same milestone."
+			exit 1
+		fi
+
+		advanced=$((advanced + 1))
+		lines="$lines  iteration $iteration: \"$newtext\" — commit $(git -C "$targetdir" rev-parse --short "$end"), log $log
+"
+	done
+
+	summarise
+	exit 0
+}
+
+case $1 in
+run)
+	shift
+	cmd_run "$@"
+	;;
+*)
+	if [ -n "$1" ]; then
+		echo "loop-runner: cannot run — \"$1\" is not a subcommand."
+	fi
+	usage
+	exit 2
+	;;
+esac

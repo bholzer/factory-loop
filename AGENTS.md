@@ -34,10 +34,11 @@ edits to both halves.
 ## Commands
 
 There is no build, test, or lint toolchain: the artifacts are markdown, so
-there is nothing to compile and no suite to run. Two commands exist. One
-decides what a machine can decide about this repository; the other builds a
+there is nothing to compile and no suite to run. Three commands exist. One
+decides what a machine can decide about this repository; the second builds a
 throwaway repository elsewhere and reads the payload the way a target project
-receives it.
+receives it; the third drives one milestone session at a time against a plan
+in another checkout.
 
 - `./tools/verify` — the cheap verification command. Budget: 5 seconds. It
   runs each executable under `tools/checks/` in a fixed order, streams what
@@ -48,6 +49,12 @@ receives it.
   and prints where, and `check <repo-dir>` reads such a copy and decides
   procedure layout, leftover scaffolding, and whether its paths resolve with
   no access to this tree. `docs/capabilities/blueprint-eval.md` is its card.
+- `./tools/loop-runner` — the watched loop driver, and not a check:
+  `run <repo-dir> --limit <n> -- <harness invocation>` runs that invocation
+  once per milestone, judges each iteration by the commits it left rather
+  than by what the session claimed, and halts on the first one that did not
+  advance the plan. It refuses this checkout as a target.
+  `docs/capabilities/loop-runner.md` is its card.
 - `git config core.hooksPath tools/hooks` — once per clone. After it,
   `tools/hooks/pre-commit` refuses any commit that `./tools/verify` rejects.
 

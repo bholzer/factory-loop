@@ -2,7 +2,7 @@
 
 ## What a reader can run
 
-Two commands, and only the first of them runs on every edit. `./tools/verify`
+Three commands, and only the first of them runs on every edit. `./tools/verify`
 decides everything a machine decides about this repository itself. `AGENTS.md`
 publishes it under Commands together with the time it is allowed to take, and
 `docs/capabilities/fast-verify.md` is the card that says what it owes whoever
@@ -13,7 +13,7 @@ A clean pass ends in one line counting the checks and the seconds spent, and
 those seconds have stayed an order of magnitude inside the published figure
 since the first check landed.
 
-`./tools/blueprint-eval` is the other one, and its subject is not this
+`./tools/blueprint-eval` is the second, and its subject is not this
 repository. It builds a throwaway git repository outside this tree from both
 halves and then reads that copy back: whether the procedures arrived in the
 shape every supported harness expects, whether any authoring scaffolding
@@ -26,7 +26,28 @@ while a trial is under way — a project's own answers written over the
 skeletons, in a directory that never appears in a commit here — so wiring it
 into the budget would spend that budget on a subject that is usually missing.
 
-Beside those two is the one-time install line in that same section, which
+`./tools/loop-runner` is the third, and its subject is a plan in somebody
+else's checkout. Handed that directory, an iteration limit, and a harness
+invocation after a bare `--`, it runs that invocation once per milestone from
+inside the target, with stdin closed and a brief that names the plan, then
+settles what happened out of git instead of out of what the session said about
+itself: the commits the iteration left behind, whether each one touched the
+plan, and which Progress entry changed state between the revisions either
+side. Anything unexpected ends the run — nothing committed at all, more than
+one entry finished, an entry finished without a date, a nonzero exit — with a
+message naming the plan, the milestone, and the transcript to read. Before the
+first iteration it reads the target's record the way
+`docs/capabilities/evidence-check.md` specifies and refuses a plan that is
+missing a living section or carries an undated finished entry, because a run
+without a trustworthy baseline cannot separate inherited work from its own.
+`docs/capabilities/loop-runner.md` is its card. The cheap command leaves this
+one alone too, for a plainer reason than the trial driver: one iteration lasts
+as long as an agent session lasts. What fits the budget is a self-test driving
+the loop over fixture repositories, and nothing fills that slot today, which
+is why `docs/capabilities/index.md` still carries this card as specified
+rather than built.
+
+Beside those three is the one-time install line in that same section, which
 points git at the hook directory this repository keeps in version control.
 After it, a commit the command rejects is refused before it is written. That
 refusal is the whole gate: nothing runs after a push, so what a committer can

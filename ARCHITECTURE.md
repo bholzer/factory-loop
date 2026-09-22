@@ -56,12 +56,18 @@ about the payload.
 - Lives in: `tools/` — the aggregator `tools/verify`, one executable per
   check under `tools/checks/`, allowlists under `tools/allow/`,
   `tools/hooks/pre-commit`, the hook this repository keeps in version
-  control rather than in each clone, and `tools/blueprint-eval`, the driver
-  of the live trial: it builds a trial repository from both halves outside
-  this tree and decides the trial's scriptable parts. That one is not a
-  check, sits beside the aggregator rather than under `tools/checks/`, and
-  the cheap command does not run it — its subject is a filled copy of the
-  payload, which exists only while a trial runs and never in a commit here.
+  control rather than in each clone, and two drivers. `tools/blueprint-eval`
+  builds a trial repository from both halves outside this tree and decides
+  the trial's scriptable parts; `tools/loop-runner` advances a plan that
+  lives in a checkout this repository does not own, one session per
+  milestone, halting on the first session that left no advance behind.
+  Neither is a check, both sit beside the aggregator rather than under
+  `tools/checks/`, and the cheap command runs neither. The trial driver's
+  subject is a filled copy of the payload, which exists only while a trial
+  runs and never in a commit here; the loop driver's is an agent session in
+  a foreign repository, which lasts as long as that session lasts. What does
+  fit the budget is a self-test that drives the loop over fixture
+  repositories, and nothing under `tools/checks/` is that yet.
 - Owns: the mechanical decisions this repository makes about itself. One
   check per card in `docs/capabilities/`, plus `scaffolding-markers`, whose
   invariant belongs to the marker definition rather than to a card.
