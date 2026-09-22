@@ -52,8 +52,17 @@ inventing one.
   the operator's constant prompts captured verbatim under Interfaces and
   Dependencies; authoring-time baselines observed and recorded under
   Concrete Steps.
-- [ ] M1 — `docs/specs/check-protocol.md` exists, owns the check and
-  aggregator contract as it stands today (seven checks), and is indexed.
+- [x] (2026-09-22 04:35Z) M1 — `docs/specs/check-protocol.md` written (123
+  lines) and verified clause by clause against `tools/verify` (43 lines by
+  `wc -l`) and the seven executables under `tools/checks/`; one row added
+  to `docs/specs/index.md`; one routing sentence added to
+  `docs/specs/mechanical-checks.md`. Observed: `./tools/verify` exit 0 in
+  2.25s wall ending `fast-verify: 7 of 7 checks passed (2s).`, with the new
+  file in every checked set (doc-integrity 435 of 435 in 54 artifacts,
+  prose-duplication 46 artifacts, boundary-lint 72 files); `grep -n 'six'`
+  on the spec prints only line 120's "sixty", so no sentence describes the
+  retired check state; no allowlist entries were added. The first
+  post-write verify failed 1 of 7 — see Surprises.
 - [ ] M2 — `docs/guide/overview.md` exists: the narrative essay.
 - [ ] M3 — `docs/guide/adopting.md` and `docs/guide/operating.md` exist.
 - [ ] M4 — `docs/guide/implementing.md` and `docs/guide/index.md` exist;
@@ -119,6 +128,18 @@ command named in each entry.
   baseline, so M5 inherits a meaningful before/after check.
   Evidence: `grep -niE '\b(claude|codex|omp)\b|\.[a-z]+/skills'
   skills/harness-init/SKILL.md` printed nothing, exit 1.
+- Observation (M1 session, 2026-09-22 04:34Z): the graduated spec's first
+  draft collided with a procedure, not with a card or the archive. The
+  first post-write `./tools/verify` failed 1 of 7: prose-duplication named
+  `docs/specs/check-protocol.md` and `skills/capability-build/SKILL.md`
+  sharing the window "card s remediation text with the real offender"
+  (9 words) — the skill's step 4 and the spec's exit-1 clause state the
+  same fact. Rewording the spec's sentence to "built by substituting the
+  real offender ... into the remediation text its card publishes" cleared
+  it.
+  Evidence: the failing run's remediation line, quoted above verbatim in
+  the window key; the re-run exited 0 in 2.25s ending
+  `fast-verify: 7 of 7 checks passed (2s).`
 
 ## Decision Log
 
@@ -240,6 +261,26 @@ command named in each entry.
   is forced to defer real work, in which case numbering continues from
   `D16`. Debt identifiers are never reused.
   Date/Author: 2026-09-22, authoring session.
+- Decision: the spec names `docs/capabilities/template-live-drift.md` and
+  `docs/capabilities/evidence-check.md` as the two checks whose cards
+  require per-unit reporting, and describes the five scenario lines from
+  `tools/checks/loop-runner` as that script's own report shape rather than
+  a card clause.
+  Rationale: M1 requires the spec to describe the present, and the present
+  streams unit lines from three checks — but
+  `docs/capabilities/loop-runner.md`'s acceptance binds the runner's stop
+  rule, not the self-test's output shape. Writing the scenario lines in as
+  a card requirement would invent a clause no card states; omitting them
+  would describe the archive.
+  Date/Author: 2026-09-22, M1 session.
+- Decision: the duplication collision with the capability-build procedure
+  was resolved by rewording the spec, not by allowlisting and not by
+  editing the procedure.
+  Rationale: `docs/capabilities/prose-duplication.md` reserves the
+  allowlist for proper-noun runs, path lists and section-name lists, which
+  this window is not; and `skills/capability-build/SKILL.md` is outside
+  M1's boundary.
+  Date/Author: 2026-09-22, M1 session.
 
 ## Outcomes & Retrospective
 

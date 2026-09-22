@@ -13,7 +13,9 @@ today. A clean pass ends in one line counting the checks and the seconds
 spent, and those seconds have stayed inside the published figure since the
 first check landed — comfortably so until the seventh arrived, which drives a
 stub harness through five scratch repositories and costs more than reading
-markdown does.
+markdown does. The contract every one of those executables conforms to —
+invocation, exit meanings, output shapes, allowlists, and the aggregator's
+own behavior — is `docs/specs/check-protocol.md`'s subject.
 
 `./tools/blueprint-eval` is the second, and its subject is not this
 repository. It builds a throwaway git repository outside this tree from both
