@@ -63,7 +63,17 @@ inventing one.
   on the spec prints only line 120's "sixty", so no sentence describes the
   retired check state; no allowlist entries were added. The first
   post-write verify failed 1 of 7 — see Surprises.
-- [ ] M2 — `docs/guide/overview.md` exists: the narrative essay.
+- [x] (2026-09-22 04:45Z) M2 — `docs/guide/overview.md` written (156
+  lines): an intro plus five sections mapping one-to-one onto the five
+  narrative beats, every section citing the files it leans on. Observed:
+  `./tools/verify` exit 0 in 2.32s ending
+  `fast-verify: 7 of 7 checks passed (2s).`, with the page in every
+  checked set (doc-integrity 466 of 466 references in 55 artifacts,
+  prose-duplication 47 artifacts with 20 allowlist entries applied and
+  none added, boundary-lint 73 files); the acceptance grep printed two
+  lines from the page, both naming `plans/active/` and `plans/completed/`
+  as directories. The first post-write verify failed 1 of 7 — see
+  Surprises.
 - [ ] M3 — `docs/guide/adopting.md` and `docs/guide/operating.md` exist.
 - [ ] M4 — `docs/guide/implementing.md` and `docs/guide/index.md` exist;
   `AGENTS.md` maps `docs/guide/`.
@@ -139,6 +149,20 @@ command named in each entry.
   it.
   Evidence: the failing run's remediation line, quoted above verbatim in
   the window key; the re-run exited 0 in 2.25s ending
+  `fast-verify: 7 of 7 checks passed (2s).`
+- Observation (M2 session, 2026-09-22 04:40Z): the essay's first draft
+  collided on two windows at once, one of them against five files.
+  `./tools/verify` failed 1 of 7: prose-duplication reported six pairs —
+  "every artifact is markdown operated on with shell" shared with
+  `ARCHITECTURE.md` and, as "is markdown operated on with shell and git",
+  with four card files restating that same fact, plus "because the
+  failure message is the only documentation" shared with
+  `skills/capability-build/SKILL.md`. Attribution could not repair the
+  first: the excusing citation must name the other file of each pair, so
+  citing `ARCHITECTURE.md` would have excused one pair and left four
+  standing. Rewording cleared both windows.
+  Evidence: the six remediation lines of the failing run, window keys
+  quoted above verbatim; the re-run exited 0 in 2.32s ending
   `fast-verify: 7 of 7 checks passed (2s).`
 
 ## Decision Log
@@ -281,6 +305,14 @@ command named in each entry.
   this window is not; and `skills/capability-build/SKILL.md` is outside
   M1's boundary.
   Date/Author: 2026-09-22, M1 session.
+- Decision: M2's duplication collisions were resolved by rewording the
+  essay, not by allowlisting and not by adding citations.
+  Rationale: neither window is a proper-noun run, a path list or a
+  section-name list, so `docs/capabilities/prose-duplication.md` reserves
+  no allowlist class for them — the same ground M1's resolution stood on
+  — and a citation excuses only the cited pair, which leaves every window
+  shared with an uncited third file standing.
+  Date/Author: 2026-09-22, M2 session.
 
 ## Outcomes & Retrospective
 
