@@ -26,6 +26,17 @@ quotations rather than prose. Each one hands the session a file to
 follow, so the procedures and the convention stay the entry points and
 the prompt itself carries no instruction a file does not own.
 
+They name files rather than invoking the procedures through a harness's
+own skill mechanism, and that is deliberate: the live trials found no
+invocation mechanism the harnesses share — every observed session reached
+a procedure by reading the file at its path, the finding
+`docs/decisions/0023-skill-discovery-holds-when-a-session-finds-the-procedure-itself.md`
+records — so following a path is the one dispatch that behaves
+identically in all of them. A skill fired by description-matching can
+also decline silently, leaving the session to improvise the procedure it
+never loaded, and an improvised procedure is a second convention — the
+failure `docs/PRINCIPLES.md` exists to prevent.
+
 To execute the next milestone of a plan in flight:
 
     Execute the next unfinished milestone of plans/active/<plan>.md,
