@@ -89,8 +89,21 @@ inventing one.
   spec's twenty-to-twenty-nine-minutes-per-harness three-session figure,
   not the per-session five-to-eleven range — see Decision Log. The first
   post-write verify failed 1 of 7 — see Surprises.
-- [ ] M4 — `docs/guide/implementing.md` and `docs/guide/index.md` exist;
-  `AGENTS.md` maps `docs/guide/`.
+- [x] (2026-09-22 14:42Z) M4 — `docs/guide/implementing.md` (85 lines)
+  and `docs/guide/index.md` (36 lines) written; `AGENTS.md` gained the
+  `docs/guide/` map entry, 75 → 78 lines by `wc -l`, using the wording
+  fixed under Interfaces and Dependencies unchanged. Observed:
+  `./tools/verify` exit 0 in 2.49s wall ending
+  `fast-verify: 7 of 7 checks passed (3s).`, both pages in every checked
+  set (doc-integrity 528 of 528 references in 59 artifacts,
+  prose-duplication 51 artifacts with 20 allowlist entries applied and
+  none added, boundary-lint 627 references in 77 files); the acceptance
+  grep over the two new files printed nothing, exit 1; the index names
+  all four pages under both of its headings plus `AGENTS.md`, and grep
+  found the card format cited at implementing lines 21, 58, 70 and 81,
+  the build procedure at lines 7, 27, 53 and 71, and the protocol spec
+  at line 38. The first post-write verify passed: the only draft of
+  this plan so far that collided with nothing.
 - [ ] M5 — Both `skills/harness-init/SKILL.md` edits landed in one commit:
   the per-clause step 9 reporting rule and the optional provenance question.
 - [ ] M6 — Claude Code bootstrap re-run against the edited procedure,

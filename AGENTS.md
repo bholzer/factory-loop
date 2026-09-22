@@ -22,6 +22,9 @@ edits to both halves.
 - `docs/specs/` — living descriptions of how the system currently behaves.
 - `docs/capabilities/` — spec cards for mechanical enforcers, with status;
   format in `docs/capabilities/CARD_FORMAT.md`.
+- `docs/guide/` — the role-and-task guide to this system for humans and
+  client projects: what it is, adopting it, operating it, building an
+  enforcer. Start at `docs/guide/index.md`.
 - `plans/PLANS.md` — the plan convention. All multi-file or multi-session
   work follows it.
 - `plans/active/` — work in flight. `plans/completed/` — done.
