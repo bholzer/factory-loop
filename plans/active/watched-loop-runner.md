@@ -21,7 +21,7 @@ This is the watched runner, not unattended autonomy. A human still chooses the l
 - [x] (2026-09-22 01:59Z) Plan authored: preflight recorded under Artifacts and Notes (verify green in 0.60s, harness version banners), interface and message contracts settled, milestones cut.
 - [x] (2026-09-22 02:40Z) M1 — `tools/loop-runner` written and exercised by hand against four scratch fixtures: the passing case (exit 0, two commits each touching the plan, two timestamped ticks, third entry untouched), the split halt (exit 1 after iteration 2), the committed-nothing halt (exit 1 after iteration 1, session exit 0), the stale-record refusal and the dirty-tree refusal (exit 2, stub never invoked), and the inside-this-worktree refusal (exit 2); `AGENTS.md`, `ARCHITECTURE.md`, `docs/specs/mechanical-checks.md` and the covers row in `docs/specs/index.md` name the new command; `./tools/verify` green at 6 of 6; committed as `79dfbc0`.
 - [x] (2026-09-22 03:05Z) M2 — `tools/checks/loop-runner` encodes five scenarios (the four hand-run ones plus the unrecorded-advance fixture the sabotage step turned out to require), is last in `tools/verify`'s CHECKS list, and was seen red against the sabotaged runner and green after restoring it; `./tools/verify` reports `7 of 7 checks passed` in 2.13–2.23s against the five-second budget, so the index row reads `enforced` and the budget branch closed on the measurement; the check counts in `docs/specs/mechanical-checks.md`, `docs/specs/index.md`, `docs/MATURITY.md` and the `fast-verify` card's example transcript, the self-test sentence in `ARCHITECTURE.md`, and the status clause in `docs/MATURITY.md` all name the seventh check; committed as `0d379dd`, whose own pre-commit hook ran the new check in the environment that hook supplies and passed.
-- [ ] M3 — a real harness drives two milestones of a real plan in a smoke checkout outside this tree, watched, with the transcript and commit shapes recorded here.
+- [x] (2026-09-22 03:15Z) M3 — Claude Code `2.1.278` drove two milestones of a hand-built smoke checkout under `--limit 2`, watched: exit 0, `2 of 2 iterations advanced`, iterations of 101s and 72s, one commit each touching `plans/active/smoke.md`, both entries ticked and stamped, the third untouched, `one.txt` and `two.txt` holding their words and `three.txt` absent, and no refusal or halt on the way; the smoke checkout had to carry the runner's commit-shape rule in its own `AGENTS.md` for the passing case to be reachable, and both sessions recorded an acceptance carve-out rather than invent a transcript.
 - [ ] M4 — close-out: `D5` deleted, `GOALS.md` non-goal reworded, `docs/MATURITY.md` narrative updated, card's Enforcement point rewritten, decision graduated, plan moved to `plans/completed/`.
 
 ## Surprises & Discoveries
@@ -44,6 +44,14 @@ This is the watched runner, not unattended autonomy. A human still chooses the l
   Evidence: `./tools/verify` timed three times at 2.23s, 2.13s and 2.16s against 0.55s before, with `tools/checks/loop-runner` alone at 1.74–1.90s; the five-second figure in `docs/capabilities/fast-verify.md` is unchanged and unthreatened, but the order-of-magnitude margin that spec claimed is gone and the sentence claiming it was rewritten.
 - Observation: one broken scenario produces seven violations that share one cause, and seven copies of the remediation bury the seven facts.
   Evidence: the first sabotage run printed the same four-line remediation paragraph after every fault; `fault` now prints a remediation only when it differs from the previous one, which is the rule `tools/blueprint-eval`'s fill part already applies per file.
+- Observation: the runner's commit-shape rule and the commit cadence `skills/plan-execute/SKILL.md` asks for pull in opposite directions, and a driven project has to settle that in its own record before a run can pass.
+  Evidence: a session that commits its work and then its plan update leaves one commit touching nothing in the plan, which is the `commit <sha> changed nothing in <plan>` fault. The smoke checkout's `AGENTS.md` therefore carries a working rule fixing one commit per milestone that holds both, and the smoke plan's first decision gives the reason; both driven sessions obeyed it without remark, and the second cited it when declining to amend. Nothing this repository ships says it yet.
+- Observation: a real harness handed an acceptance clause it cannot satisfy reports the shortfall instead of inventing the output — the behavior the whole judging design assumes, observed rather than hoped.
+  Evidence: the smoke plan asks each milestone for `git show --stat HEAD` of the very commit carrying its record, which cannot be transcribed into that commit. Both sessions ran the command, reported it in their closing message, and wrote the carve-out into the smoke plan's Surprises and Decision Log. The runner's judgement was untouched: a carve-out is prose, and the entry each session ticked was still one, stamped, and inside a commit that changed the plan.
+- Observation: what a halt message calls a transcript is, for this harness, one closing report.
+  Evidence: the two iteration logs are 1267 and 1933 bytes for sessions that ran 101 and 72 seconds, because `claude -p` streams nothing until its final message. The committed-nothing halt tells an operator that the last lines of the log say what the harness did instead; here the last lines are the whole file, which is enough to read but is not a record of the session's work.
+- Observation: a watched run of two trivial milestones costs about ninety times what the self-test gating it costs.
+  Evidence: 173 seconds wall for `--limit 2`, iterations of 101s and 72s, against 1.74–1.90s for `tools/checks/loop-runner` over five fixtures. The gap is the whole reason the runner is not one of the checks.
 
 ## Decision Log
 
@@ -139,6 +147,17 @@ This is the watched runner, not unattended autonomy. A human still chooses the l
 - Decision: the status clause in `docs/MATURITY.md`'s Current rung, and the check counts in `docs/specs/mechanical-checks.md`, `docs/specs/index.md`, `docs/MATURITY.md` and the `fast-verify` card's example transcript, were all corrected in M2 although M4 owns the maturity narrative.
   Rationale: the same reason M1 touched the covers row early — the sentence "Of the L2 rows … `loop-runner` gates a rung two steps away" reads as a contrast with the enforced rows, which the index row landing in this commit makes false. M4 keeps that sentence for the watched-boundary wording that arrives with the `GOALS.md` rewrite; what M2 corrected is only the status contradiction and the arithmetic. The spec's claim that the checks stay "an order of magnitude inside the published figure" was rewritten for the same reason: at 2.2 seconds against five it is no longer true.
   Date/Author: 2026-09-22 / M2 session.
+- Decision: the smoke checkout states the commit shape the runner judges, in its own `AGENTS.md` working rules, and its plan records why.
+  Rationale: recorded above as an observation. The alternative was to let the first session split work and record across two commits, watch the run halt on the untouching commit, and offer that as the milestone's evidence — but an environment-shaped halt is not the passing observation M3 requires, and this one would have been caused by the fixture rather than found by it. A bootstrapped project driven by this runner has to carry the rule anyway; learning that it must is part of what a rehearsal is for.
+  Date/Author: 2026-09-22 / M3 session.
+
+- Decision: per-iteration wall times are derived from the run's start epoch and each iteration log's modification time rather than measured inside the runner.
+  Rationale: the runner prints no timings, and adding them is a contract change this milestone has no mandate for. `tee` writes the log as the session streams, so its mtime is that iteration's end to within a second, which is the precision a "how long does a watched run take" claim needs.
+  Date/Author: 2026-09-22 / M3 session.
+
+- Decision: the smoke checkout and its log directory are left in place under `$HOME/blueprint-trials/` rather than deleted at the end of the milestone.
+  Rationale: they are what the evidence below points at, and the same place `tools/blueprint-eval` leaves its trial repositories, so an operator inspecting either knows one location. M2's scratch was deleted because a check that leaves directories behind fails its own hygiene assertion; a hand-run rehearsal has no such constraint and its artifact is worth more kept than tidy.
+  Date/Author: 2026-09-22 / M3 session.
 
 ## Outcomes & Retrospective
 
@@ -151,6 +170,12 @@ M2, 2026-09-22. The stop rule is now decided by a machine on every commit to thi
 Two things came out of the session that the plan did not anticipate. The sabotage the plan specified could not be caught by the scenarios the plan specified, which is why a fifth fixture exists and why the promotion bar is worth paying rather than asserting: the demonstration found a hole in the demonstration. And the check's own hazard — a self-test that builds git repositories while running inside a pre-commit hook — bit this session for real when it was deliberately exercised against this checkout, clobbering the index and landing three fixture commits on the branch before `git reset --mixed` put it back. Both are recorded above with their evidence.
 
 What remains: no real harness has been driven through the runner yet (M3), and every document that still describes a world without one — `GOALS.md`, the card's Enforcement point, the rung narrative's watched-boundary wording, `docs/DEBT.md` row `D5` — is M4's.
+
+M3, 2026-09-22. The runner drove a real harness through two milestones of a real plan in a checkout that has never heard of this repository, and the claim at the head of this plan — point one command at a checkout with a plan in flight and watch it advance one milestone at a time — is now an observation. The smoke checkout was built by hand as the milestone specified: `git init`, this repository's `plans/PLANS.md` and `skills/` copied in, a nine-line `AGENTS.md` that names the convention, the plan and the procedure and says outright that no verification command exists here, and a three-milestone plan whose milestones each create one named file. Claude Code `2.1.278` executed M1 and M2 of it under `--limit 2`, exit 0, 173 seconds, one commit per iteration, each touching the plan, each ticking exactly one entry with a stamp, leaving the third alone. Nothing about the runner needed changing to make that happen.
+
+Two things the rehearsal taught that the fixtures could not. The first is a gap in what this repository ships: the runner requires every commit of an iteration to touch the plan, while the execution procedure tells a session to commit at each coherent step, and a session doing the obvious thing — work first, record second — halts a run on its second commit. The smoke checkout was written with the rule in its `AGENTS.md`, which is what made the passing case reachable, and that rule now exists only in a scratch repository outside this tree. The second is reassurance rather than a gap: handed an acceptance clause that cannot be satisfied inside the commit it describes, both sessions named the shortfall in the plan and reported the command out of band, which is exactly the honesty the commit-shape judgement assumes and cannot itself verify.
+
+What remains is M4 alone: `docs/DEBT.md` row `D5`, the `GOALS.md` non-goal, the card's Enforcement point, the rung narrative's watched-boundary wording, decision 0027, and moving this file to `plans/completed/`.
 
 ## Context and Orientation
 
@@ -344,13 +369,38 @@ Observed during M2, 2026-09-22, from the repository root:
     # observed: HEAD and index restored, the working tree's seven intended
     # paths intact, the three stray fixture commits unreachable
 
-Expected (labelled so; M3 runs its lines before recording them):
+Observed during M3, 2026-09-22, from the repository root. The smoke checkout
+is `$HOME/blueprint-trials/loop-smoke-20260921-220833/repo`, written `<smoke>`
+below; it and its log directory are still there:
 
-    # M3, from the repository root, smoke repo built as the milestone describes
-    ./tools/loop-runner run $HOME/blueprint-trials/loop-smoke-<stamp>/repo --limit 2 -- claude -p --model opus --dangerously-skip-permissions
-    # expected: exit 0, two milestones advanced by real sessions; on an
-    # environment refusal, the omp then codex lines from Context, each
-    # refusal transcript recorded
+    claude --version ; codex --version ; omp --version
+    # observed: 2.1.278 (Claude Code) / codex-cli 0.150.1 / omp/18.1.14 — the
+    # same three banners this plan recorded at authoring
+
+    git -C <smoke> log --oneline --name-only
+    # observed: one baseline commit carrying AGENTS.md, CLAUDE.md,
+    # plans/PLANS.md, plans/active/smoke.md and the six skills files
+
+    ./tools/loop-runner run <smoke> --limit 2 -- claude -p --model opus --dangerously-skip-permissions
+    # observed: exit 0, 173s wall; two iterations, "2 of 2 iterations
+    # advanced plans/active/smoke.md", commits 7ebc00f and 2a7156f, "1
+    # Progress entry remains unticked."; no refusal and no halt en route
+
+    git -C <smoke> log --name-only --format='%h %s'
+    # observed: 2a7156f listing two.txt and plans/active/smoke.md, 7ebc00f
+    # listing one.txt and plans/active/smoke.md, then the baseline
+
+    cat <smoke>/one.txt <smoke>/two.txt ; ls <smoke>/three.txt
+    # observed: one, two; and "No such file or directory" for three.txt,
+    # with the third Progress entry still "- [ ] M3 — create three.txt …"
+
+    stat -f '%N %m' <logs>/01-iteration.txt <logs>/02-iteration.txt
+    # observed: 1790046727 and 1790046799 against the run's start epoch
+    # 1790046626 — iterations of 101s and 72s
+
+    ./tools/verify ; git status --porcelain
+    # observed: fast-verify: 7 of 7 checks passed (3s), wall 2.41s; the one
+    # modified path is plans/active/watched-loop-runner.md, this file
 
 ## Validation and Acceptance
 
@@ -418,6 +468,29 @@ What `./tools/verify` then reported, abridged to the deciding lines — note tha
 After `git checkout -- tools/loop-runner`, `./tools/verify` printed `fast-verify: 7 of 7 checks passed (2s)` again. The sabotage was never committed.
 
 The scratch directories are not kept. M2 rebuilt the same four fixtures and the same stub inside `tools/checks/loop-runner`, added the fifth, and that is where they stopped being disposable.
+
+M3's watched run, observed 2026-09-22, with the trial root elided. The runner's
+own summary, which is the acceptance:
+
+    loop-runner: 2 of 2 iterations advanced plans/active/smoke.md in …/repo.
+      iteration 1: "(2026-09-22 03:10Z) M1 — create one.txt holding the word one." — commit 7ebc00f, log …/01-iteration.txt
+      iteration 2: "(2026-09-22 03:12Z) M2 — create two.txt holding the word two." — commit 2a7156f, log …/02-iteration.txt
+    1 Progress entry remains unticked. Review the plan, then re-run to continue.
+
+The smoke plan's Progress after the run, which is the same judgement read from
+the target rather than from the runner:
+
+    - [x] (2026-09-22 03:10Z) M1 — create one.txt holding the word one.
+    - [x] (2026-09-22 03:12Z) M2 — create two.txt holding the word two.
+    - [ ] M3 — create three.txt holding the word three.
+
+The working rule the smoke checkout's `AGENTS.md` carries, which is what a
+project driven by this runner has to say somewhere and what this repository
+does not yet say anywhere:
+
+    - One commit per milestone, carrying both that milestone's work and the
+      plan edit recording it. A commit that leaves plans/active/smoke.md
+      untouched is not part of this project's history.
 
 ## Interfaces and Dependencies
 
@@ -542,3 +615,14 @@ What this plan deliberately leaves out: unattended or scheduled operation and an
   the record to be current at the stopping point. Milestone boundaries are as
   authored; M3 and M4 are untouched except for the one sentence of M4's
   maturity draft that M2 already satisfied.
+
+- 2026-09-22 (M3 execution): recorded M3's observed evidence in Progress,
+  Surprises & Discoveries, Concrete Steps, Artifacts and Notes and Outcomes &
+  Retrospective; replaced the Expected block under Concrete Steps with the
+  observed one; added three decisions taken while rehearsing (the smoke
+  checkout stating the commit shape, timings derived from log mtimes, and the
+  trial artifacts kept). Reason: the House Rules require the record to be
+  current at the stopping point, and the commit-shape finding is a gap in what
+  this repository ships that M4 or a later plan has to answer rather than
+  rediscover. No contract under Interfaces and Dependencies changed, the
+  runner and its check were not edited, and M4 is as authored.
