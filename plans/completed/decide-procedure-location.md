@@ -105,8 +105,17 @@ exclusions are argued in the Decision Log.
   right action here without producing the report sentence it requires.
   Whether that is a wording defect to fix is M5's question, and this
   milestone deliberately does not answer it.
-- [ ] M5 — Close out: retire `D4` and `D12`, halve `D13`, graduate the
-  decision, reflect the behavior.
+- [x] (2026-09-22 01:20Z) M5 — Close out: `D4` and `D12` are gone from
+  `docs/DEBT.md` with their Details sections, `D13` keeps only its undesigned
+  failing case and carries a narrower trigger than before, the pick is
+  graduated as
+  `docs/decisions/0026-installed-procedures-stay-put-and-reachability-is-installed-per-harness.md`,
+  `docs/specs/bootstrap-flow.md` states the decided behavior with the outcome
+  each harness produced, and `GOALS.md` and `docs/MATURITY.md` now rest on
+  the three runs this plan drove rather than on the trial before it. All six
+  acceptance items observed, no carve-out. One addition the milestone's text
+  did not anticipate: the M4 wording question is answered by leaving step 9
+  alone and opening `D14`, argued in the Decision Log.
 
 Use timestamps to measure rates of progress.
 
@@ -347,6 +356,30 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   anticipated — a copy's right-sizing, not a payload defect and not
   something to allowlist away.
 
+- Observation (M5): naming the two dotted directories in a behavior spec
+  makes the reference checker read them as citations, because neither exists
+  in this repository. The rule that resolves it is
+  `docs/decisions/0021-a-path-that-must-not-resolve-is-not-backticked.md`,
+  and the repair is typographic rather than a retreat from naming them.
+  Evidence: `./tools/verify` after the first spec edit printed
+  "doc-integrity: docs/specs/bootstrap-flow.md:42 references `.claude/skills`,
+  which does not exist." and the same for `.omp/skills`, and exited 1. The
+  same two names written without backticks pass: "doc-integrity: ok — 397 of
+  397 references resolved in 52 artifacts".
+
+- Observation (M5): a close-out that reflects one fact into two artifacts
+  trips the duplication check on phrasing rather than on the fact, and the
+  second of the two pairs was against the procedure this plan edited — a spec
+  describing a rule drifts into restating it.
+  Evidence: the same run reported the window "docs debt md d13 carries what
+  designing a" shared by `docs/MATURITY.md` and `docs/specs/bootstrap-flow.md`,
+  and "s own configuration where it reads one from" shared by
+  `docs/specs/bootstrap-flow.md` and `skills/harness-init/SKILL.md`. Both were
+  resolved by rewording rather than by deleting a sentence or filing an
+  allowlist entry, because each file owes its own reader the statement; after
+  the rewording, "prose-duplication: ok — 45 artifacts compared, 34857
+  eight-word windows examined, 20 allowlist entries applied, 0 stale."
+
 ## Decision Log
 
 - Decision: the procedures keep their canonical location at
@@ -533,11 +566,87 @@ plan on 2026-09-21; an entry added by a later pass names that pass.
   exists to run.
   Date/Author: 2026-09-21, M4 execution session.
 
+- Decision: step 9's wording stands exactly as M1 landed it, and the report
+  sentence M4 did not get becomes a new debt row, `D14`, rather than an edit
+  in this milestone.
+  Rationale: `0025` retires every recorded result describing a session that
+  followed a procedure that then changes, and the three records this plan
+  produced are hours old — rewording now spends all three and owes roughly
+  ninety minutes of driven sessions to buy them back, for a defect whose
+  entire cost so far is one absent sentence in one harness. `D12` is the
+  precedent and it worked: a one-sentence procedure repair waited for a pass
+  that was already driving trials, and waiting cost nothing. The alternatives
+  were amending here, which would also leave the M2 and M3 records describing
+  wording that no longer exists and make the three runs incomparable; and
+  recording nothing, which loses a finding that three trials were run to
+  produce. The row states the candidate repair — a reporting requirement per
+  clause — so the next pass does not have to rediscover it.
+  Date/Author: 2026-09-22, M5 execution session.
+
+- Decision: `docs/capabilities/index.md` is left reading `specced` for
+  `blueprint-eval`, as the authoring session said it would be.
+  Rationale: the three runs are the passing half of that card's acceptance
+  and nothing more. `docs/capabilities/CARD_FORMAT.md` gates `built` on a
+  demonstrated failing case, the one the card names came back clean, and
+  `0024` caps the card at `built` in any event. Editing the status because
+  the trials went well would claim a gate nobody has seen close, which is
+  precisely the substitution this plan's evidence rules exist to prevent.
+  Date/Author: 2026-09-22, M5 execution session.
+
+- Decision: `0027` is left unspent and `D14` is the only identifier this
+  milestone consumes.
+  Rationale: the plan reserved `0027` for a second decision that binds future
+  work on its own. The wording finding does not qualify: it is an open defect
+  with a trigger, which is what the debt register is for, and promoting it to
+  a decision record would claim a durable rule where the honest content is
+  "this is still wrong and here is what fixing it costs".
+  Date/Author: 2026-09-22, M5 execution session.
+
 ## Outcomes & Retrospective
 
-Nothing has been executed. This section is written at M5, comparing what the
-three trials observed against the purpose stated at the top of this file, and
-naming what the plan left open.
+The plan set out to replace one sentence and an ellipsis with a rule covering
+three cases, to make a bootstrapped repository record which case it hit, and
+to leave `docs/DEBT.md` without `D4` or `D12`. All three happened, and the
+three live trials that were the gate on the first two produced every outcome
+the rule names: a committed link in two harnesses under two different dotted
+directories, and nothing installed in the third, which is the harness whose
+procedure roots all lie outside any repository. The probe pairs are what turn
+the link from a plausible action into a measured one — six procedures offered
+at startup in a bootstrapped copy, none in the same copy before the link.
+
+Against the purpose sentence by sentence. A person reading
+`skills/harness-init/SKILL.md` step 9 now finds three outcomes and a
+reporting obligation. A person reading a bootstrap report finds the outcome
+named — in two harnesses of three, which is the plan's one honest shortfall
+and now `D14`. `docs/DEBT.md` carries neither `D4` nor `D12`. The card's gate
+was paid in full: five observations in each of three harnesses against the
+post-M1 text, with two residues named rather than absorbed — one forward
+reference of a copy's own making in the omp run, and the missing report
+sentence in the Codex CLI run. `D13`'s bookkeeping half is discharged by the
+same three runs and its design half stands, with a trigger that this plan's
+evidence made narrower: two harnesses now demonstrably hand procedures to a
+session from a loader, so the missing observation is a session that depended
+on one rather than a harness that has one.
+
+What the work cost, for anyone sizing a repeat: five sessions over about
+three hours of wall time, of which 72 minutes were unattended driven sessions
+in the trial repositories — 20.4, 22.2 and 29.4 minutes per harness, against
+18, 29 and 30 for the same three sessions in the previous trial. The edit
+itself was two sentences.
+
+Three lessons worth carrying. The first is that ordering the procedure edit
+before every trial, rather than after, was the difference between three
+driven trials and six: `0025`'s rule has a shape, and a plan that edits an
+arriving procedure should land the edit in its first milestone. The second is
+that the three trial milestones turned out to be independent of each other,
+which is what let a session substitute one for another when a harness refused
+to authenticate; milestones that build separate throwaway repositories and
+share no state can be declared order-independent at authoring time, and this
+plan should have said so before it had to. The third is about evidence
+strength: the only claim here anyone can check without trusting a session's
+report is the probe pair, because it is the same prompt in the same harness
+with one variable changed. A trial that records what a session said it did is
+worth less than one that measures the state the session left.
 
 ## Context and Orientation
 
@@ -1461,6 +1570,50 @@ shows one ticked entry, timestamped `2026-09-22 00:37Z`, and the first
 unticked box is `Milestone 2: complete and test TALLY_STORE, checkout
 isolation, label validation, deterministic ties, missing and malformed store
 behavior, and pure counting behavior.`
+
+### M5 record — close-out, 2026-09-22
+
+No trial and no driven session: this milestone is edits to this repository,
+judged by its own cheap command. The starting state was observed before any
+edit — `./tools/verify` exit 0 in 0.61s, ending `fast-verify: 6 of 6 checks
+passed (1s).` — so nothing here absorbs a failure that was already present.
+
+The register: `grep -n 'D4\|D12' docs/DEBT.md` exits 1 with no output, and
+`grep -n '^| D\|^### D' docs/DEBT.md` lists rows `D2`, `D5`, `D6`, `D8`,
+`D9`, `D10`, `D11`, `D13`, `D14` with Details for all but `D5`, which never
+had one. No surviving identifier moved. `D13`'s row and Details carry the
+failing case alone; the bookkeeping sentence about one harness having carried
+a feature end to end is gone, because three now have.
+
+The decision record is
+`docs/decisions/0026-installed-procedures-stay-put-and-reachability-is-installed-per-harness.md`,
+four fields in the order `DECISION_FORMAT.md` fixes, naming both rejected
+candidates with what each would have cost and closing `0023`'s parked item
+from the other end. `0023` is unedited: `git status --porcelain` never listed
+it.
+
+The final state, after the reference and duplication repairs described under
+Surprises:
+
+    ./tools/verify
+    # observed: exit 0, 0.53s wall, with
+    # doc-integrity: ok — 397 of 397 references resolved in 52 artifacts, 2
+    #   format documents skipped, 0 allowlist entries applied, 0 stale.
+    # prose-duplication: ok — 45 artifacts compared, 34857 eight-word windows
+    #   examined, 20 allowlist entries applied, 0 stale.
+    # boundary-lint: ok — 496 references examined in 70 files, 3 rules applied
+    #   from ARCHITECTURE.md, no banned mention in 17 payload files or 6
+    #   procedures.
+    # fast-verify: 6 of 6 checks passed (1s).
+
+The commit carrying the five artifact edits is `5bcee74`, made through
+`tools/hooks/pre-commit`, which ran the same command again and let it through.
+
+This file then moved to `plans/completed/` with `git mv`, and the command was
+run once more from the moved tree: exit 0 in 0.54s, `fast-verify: 6 of 6
+checks passed (0s).`, with the plan check now reading `evidence-check: ok — no
+active plans under plans/active/, 4 sections required of each.` — the only
+line the move changed.
 
 ## Interfaces and Dependencies
 
