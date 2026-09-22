@@ -1314,6 +1314,25 @@ milestone's second acceptance item asks for. The file counts run below M3's
 22 and 20 because this session right-sized three cards away, which the
 procedure invites and the driver does not measure.
 
+Session 2, authoring. Same invocation shape with `brief-author.md` to
+`<trial>/logs/02-author.txt`. Started 19:18:27 CDT, exited 0 after 757
+seconds, committing `663a7d8` "Plan first working tally feature" — one file,
+`plans/active/first-working-tally.md`, 237 lines, three milestones.
+
+Step 8's new sentence had a visible effect here too, and a plainer one than
+in either other environment: the authored plan carries all three of the
+command lines it depends on, each run to the refusal it can reach before the
+work exists. Two are under Surprises & Discoveries — "on 2026-09-22, both
+`python3 -m tally add plan-author-probe` and `python3 -m tally report`
+exited 1 with `No module named tally`" and "`python3 -m unittest discover -s
+tests -v` exited 1 with `ImportError: Start directory is not importable:
+'tests'`" — and all three are reproduced as a transcript under Artifacts and
+Notes, introduced by "The only authoring-time command evidence is the
+current refusal state", each with `[exit 1]` beside it. The sentence asks
+for the refusal point recorded beside the command, and this session recorded
+it twice, in the section that owns observations and in the section that owns
+transcripts.
+
 ## Interfaces and Dependencies
 
 The text contract for `skills/harness-init/SKILL.md` step 9. The step keeps
