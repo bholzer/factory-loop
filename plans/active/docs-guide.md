@@ -151,8 +151,42 @@ inventing one.
   transcript). No debt row created; nothing deferred. The post-evidence
   `./tools/verify` passed first try: exit 0 in 2.82s ending
   `fast-verify: 7 of 7 checks passed (3s).`
-- [ ] M7 — omp bootstrap re-run, provenance answer withheld, the
-  nothing-invented observation recorded.
+- [x] (2026-09-22 15:31Z) M7 — omp bootstrap re-run complete; acceptance
+  items 1-4 observed, item 5 diverged, the divergence recorded rather than
+  re-rolled. Baseline `./tools/verify` exit 0 in 2.75s ending
+  `fast-verify: 7 of 7 checks passed (3s).` on a clean tree at the M6
+  commit; `omp --version` still prints omp/18.1.14. Trial built by
+  `./tools/blueprint-eval new omp-rerun` at
+  blueprint-trials/omp-rerun-20260922-101905 (25 files — 19 payload files
+  and 6 procedures — committed as "Receive the payload"); brief extracted
+  by the recorded `awk` loop and left untouched: 62 lines, `grep -c
+  'harness-blueprint'` printed 0, no provenance block appended. One driven
+  session, stdin closed, no resumption, the recorded invocation shape
+  (quoted under Artifacts and Notes): version omp/18.1.14, started
+  15:19:23Z, ended 15:25:14Z, 5m50.780s wall, exit 0, one commit ac9cd55
+  "Bootstrap agent harness for tally" over "Receive the payload". Check:
+  layout ok — 6 procedures; fill ok — no authoring scaffolding in 22
+  markdown files; references exit 1 with 22 dangling in 144 examined
+  across 20 files, every one a reserved tally code path (15 cited by the
+  copy's architecture file, 5 by its debt register, 1 each by its map and
+  its principles file) — the expected composition, recorded as such. Both
+  step 9 statements quoted from transcript line 20 under Artifacts and
+  Notes, the install-nothing outcome in its own statement. Item 4's
+  inversion held: `grep -n 'blueprint-upstream'` on the copy's goals file
+  printed nothing, exit 1, and `git grep blueprint-upstream` across the
+  copy printed nothing, exit 1 — the unanswered optional question wrote
+  nothing and invented nothing, and the report said so unprompted
+  (transcript line 14, quoted under Artifacts and Notes). Item 5 diverged:
+  the bootstrap commit's stat lists nine files and no dotted entry,
+  `ls -a` in the copy shows only .git for dotted names, and the discovery
+  probe (90.1s wall, exit 0, kept as 02-probe.txt beside the bootstrap
+  transcript) reported 20 skills at startup, all from three machine-level
+  directories outside the repository, and named none of the six
+  procedures — where this acceptance item expected a committed .omp/skills
+  link with all six offered through it. No debt row created; the finding
+  routes to M9's spec update, per the Decision Log.
+  The post-evidence `./tools/verify` passed first try: exit 0 in 2.71s
+  ending `fast-verify: 7 of 7 checks passed (2s).`
 - [ ] M8 — Codex CLI bootstrap re-run, provenance answer supplied, the
   install-nothing report sentence observed.
 - [ ] M9 — Close out: `D14` deleted, `docs/specs/bootstrap-flow.md` current,
@@ -272,6 +306,40 @@ command named in each entry.
   Evidence: the check run's closing line — 23 dangling references in 149
   examined across 20 markdown files — beside the transcript's
   verification section claiming 202 examined, 26 unresolved.
+
+- Observation (M7 session, 2026-09-22 15:31Z): the same harness, same
+  version, same procedure text produced a third reachability outcome —
+  install nothing — where the two recorded omp bootstraps each committed a
+  dotted-directory link, and the probe shows the practical cost: with no
+  link, none of the copy's six procedures is in the session's startup set,
+  so the map's path line really is the only remaining route into them.
+  Step 9's install-nothing branch is conditional on every location the
+  environment reads sitting outside the repository, and that condition is
+  exactly what a session cannot decide from its own startup evidence:
+  every skill this one was handed came from machine-level directories, and
+  the in-repo location the harness would also read is invisible when
+  nothing is there to load. The session read absence of evidence as
+  evidence of absence.
+  Evidence: the bootstrap commit's nine-file stat with no dotted entry;
+  the probe's closing note, quoted under Artifacts and Notes, against the
+  previous round's controlled pair in
+  `plans/completed/blueprint-live-trial.md`, where the same prompt in a
+  linked copy named all six procedures and in an unlinked copy named none.
+- Observation (M7 session): the machine's omp discovery reads
+  Claude-compatible locations — the probe grouped its 20 startup skills
+  under ~/.claude/skills/ and two plugin caches under ~/.claude/ — which
+  retroactively explains the previous round's oddity of an omp session
+  committing a .claude/skills link and its probe confirming all six
+  procedures loaded through it.
+  Evidence: the probe's three group headers — 8 personal skills, 6 from an
+  Atlassian plugin cache, 6 from a marketplace plugin — in 02-probe.txt.
+- Observation (M7 session): the report volunteered the null it produced —
+  the owners named no upstream, and the report said so in its own sentence
+  — where M6's session wrote the provenance pointer and never mentioned
+  it. The decline path reported itself more readily than the record path
+  did; both shapes are now observed for M9's spec text.
+  Evidence: transcript line 14, quoted under Artifacts and Notes, beside
+  M6's surprise entry above.
 
 ## Decision Log
 
@@ -466,6 +534,34 @@ command named in each entry.
   observed shape is quoted under Artifacts and Notes so M9's spec update
   describes what sessions actually write.
   Date/Author: 2026-09-22, M6 session.
+
+- Decision: M7 scores acceptance item 3 as met, with the two clause
+  answers standing as separate statements joined by a semicolon inside the
+  report's verification paragraph, the same pair repeated in the commit
+  message.
+  Rationale: the procedure's obligation is one answer per clause with
+  installing nothing stated rather than left inferable, which the quoted
+  text satisfies; requiring typographic sentence breaks would fail reports
+  whose grammar answers each clause explicitly — the same
+  substance-over-shape reading M6 applied to the wrapped provenance
+  paragraph.
+  Date/Author: 2026-09-22, M7 session.
+- Decision: M7 records item 5's divergence — no dotted link committed, the
+  probe reporting none of the six procedures offered — and does not
+  rebuild the trial to drive the session again.
+  Rationale: the trial exists to observe what the procedure produces, and
+  rebuilding until the expected link appears would select evidence rather
+  than record it; judgement is by the commit, which exists and is
+  coherent; the completed trial round already logged this harness
+  resolving the reachability clause differently across runs and declined
+  to rule between outcomes; and no payload edit occurred in this
+  milestone, so decision 0025 invalidates nothing. The finding routes
+  forward rather than sideways: M9's spec update owes the reachability
+  outcome each harness produced and now records install-nothing for this
+  one, and whether step 9's condition needs wording a session can actually
+  decide from inside its own startup set is a question for the owners at
+  M9 — raised there rather than widened into this milestone.
+  Date/Author: 2026-09-22, M7 session.
 
 ## Outcomes & Retrospective
 
@@ -1024,6 +1120,36 @@ the copy's own tree as the load directory for all six procedures:
     **<repo>/skills/ — /Users/brennanholzer/blueprint-trials/claude-rerun-20260922-100358/repo/skills/ (project skills, 6)**
     capability-build, doc-garden, harness-init, plan-author, plan-execute,
     retro
+
+What M7's observations rest on, quoted from the omp-rerun trial's
+transcripts and tree on 2026-09-22; the trial sits at
+blueprint-trials/omp-rerun-20260922-101905, its transcripts kept as
+01-bootstrap.txt and 02-probe.txt in its logs directory. The driven
+invocation, run from the trial's repo directory with the shell's pipefail
+set so the recorded exit is the harness's rather than tee's:
+
+    omp -p --auto-approve --cwd <trial>/repo "$(cat ../logs/brief-bootstrap.md)" < /dev/null 2>&1 | tee ../logs/01-bootstrap.txt
+
+The step 9 statements, from the bootstrap report at transcript line 20 —
+one answer per clause, the install-nothing outcome in its own statement:
+
+    Entry points: this environment reads `AGENTS.md` natively, so no
+    pointer file was added; its procedure registry lives outside this
+    repository, so nothing was installed for procedure discovery — the
+    map's `skills/` path line is the route.
+
+The provenance decline, reported unprompted at transcript line 14:
+
+    No upstream provenance recorded: the owners named none.
+
+The probe's closing note, from 02-probe.txt, after it grouped all 20
+startup skills under three machine-level directories and before any link
+existed for it to find:
+
+    Note: the repo's own `skills/` directory (harness-init, plan-author,
+    plan-execute, capability-build, doc-garden, retro per AGENTS.md) is
+    **not** among the session's registered skills — none of those six
+    were loaded at startup.
 
 ## Interfaces and Dependencies
 
