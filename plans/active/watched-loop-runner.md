@@ -77,6 +77,19 @@ This is the watched runner, not unattended autonomy. A human still chooses the l
   Rationale: a fresh trial copy is an unfilled payload with no plan in flight; making it drivable costs a driven bootstrap and a driven authoring session (about twenty minutes of harness time) and would test the payload again rather than the runner. The hand-built checkout carries exactly what a bootstrapped project has that the runner and its sessions touch: the convention, the procedures, and a conforming plan.
   Date/Author: 2026-09-21 / plan-author session.
 
+- Decision: (pre-execution review) a fourth fixture, D, exercises the
+  zero-commit halt — the stub is invoked, appends the brief, creates
+  nothing, commits nothing, and exits 0 — and M1's hand-runs and M2's
+  self-test both carry it.
+  Rationale: the halt on "no new commits regardless of exit status" is the
+  design's motivating case — the exit-zero credits refusal heads this plan's
+  own halt catalogue — and its message shape is drafted under Interfaces and
+  Dependencies, yet none of the three scenarios produces it: A passes, B
+  splits with exit 1, C never invokes a session. A published message nobody
+  has seen print is a message that has never been checked, and this one
+  guards the failure most likely in real use.
+  Date/Author: 2026-09-22, reviewer.
+
 ## Outcomes & Retrospective
 
 Nothing yet. Authored 2026-09-21; no milestone has been executed.
@@ -118,15 +131,16 @@ Acceptance, each run and its output recorded here:
 1. `./tools/loop-runner` with no arguments prints usage and exits 2; `./tools/loop-runner run <fixture-A> --limit 2` with no `--` session command refuses with a message naming what is missing and exits 2.
 2. Passing case: against fixture A with the stub, `--limit 2` exits 0; the summary names both advanced entries, their commits, and the log directory; `git -C <fixture-A> log --name-only` shows exactly two new commits, each touching `plans/active/fixture.md`; both newly ticked entries carry timestamps; the third entry is untouched.
 3. Halting case: against fixture B with the stub, `--limit 3` exits 1 after the second iteration; the message names the plan, the milestone entry text, what was not observed, and the resume path; the third entry was never started; Progress shows the split.
-4. Refusing case: against fixture C, the runner exits 2 naming the plan and the defect (a completed entry with no timestamp), and the stub's sentinel file proves no session was invoked. Then make fixture A dirty with an untracked `stray` file, re-run the passing invocation, observe the dirty-tree refusal, and delete the stray file.
-5. A target inside this worktree is refused: `./tools/loop-runner run . --limit 1 -- true` exits 2 with the inside-worktree message.
-6. `./tools/verify` prints `6 of 6 checks passed` and `git status --porcelain` shows only intended files.
+4. Silent-refusal case: against fixture D with the stub, `--limit 2` exits 1 after the first iteration with the committed-nothing message — the session exited 0 and produced no commit — pointing at the iteration log; no Progress entry changed and no commit was made.
+5. Refusing case: against fixture C, the runner exits 2 naming the plan and the defect (a completed entry with no timestamp), and the stub's sentinel file proves no session was invoked. Then make fixture A dirty with an untracked `stray` file, re-run the passing invocation, observe the dirty-tree refusal, and delete the stray file.
+6. A target inside this worktree is refused: `./tools/loop-runner run . --limit 1 -- true` exits 2 with the inside-worktree message.
+7. `./tools/verify` prints `6 of 6 checks passed` and `git status --porcelain` shows only intended files.
 
 ### M2 — The self-test, the wiring, and the status
 
-Scope: encode M1's three hand-run scenarios as `tools/checks/loop-runner`, wire it into `./tools/verify`, measure the budget, demonstrate the check failing against a sabotaged runner — the promotion bar in `docs/capabilities/CARD_FORMAT.md` — and move the index row. At the end of this milestone the stop rule is checked on every commit to this repository, or the plan records the measured reason it is not.
+Scope: encode M1's four hand-run scenarios as `tools/checks/loop-runner`, wire it into `./tools/verify`, measure the budget, demonstrate the check failing against a sabotaged runner — the promotion bar in `docs/capabilities/CARD_FORMAT.md` — and move the index row. At the end of this milestone the stop rule is checked on every commit to this repository, or the plan records the measured reason it is not.
 
-The work: the check builds fixtures A, B, and C and the stub in `mktemp -d` scratch (never inside the worktree), runs `./tools/loop-runner` against each, and asserts the observable facts from M1's acceptance: exit codes, the required message fragments, commit counts and touched paths, flip and timestamp shapes, the untouched third entry, and the uninvoked-stub sentinel in the refusing case. One report line per scenario, a summary line, exit 0/1/2, scratch removed on every path. Append `loop-runner` to the CHECKS list in `tools/verify`. Update the check counts in `docs/specs/mechanical-checks.md` (six become seven, plus a paragraph on what this check decides) and the covers column of `docs/specs/index.md`. Move the `loop-runner` row in `docs/capabilities/index.md` to `enforced` at `./tools/verify`, `tools/hooks/pre-commit`.
+The work: the check builds fixtures A, B, C, and D and the stub in `mktemp -d` scratch (never inside the worktree), runs `./tools/loop-runner` against each, and asserts the observable facts from M1's acceptance: exit codes, the required message fragments, commit counts and touched paths, flip and timestamp shapes, the untouched third entry, the zero-commit halt on the silent fixture, and the uninvoked-stub sentinel in the refusing case. One report line per scenario, a summary line, exit 0/1/2, scratch removed on every path. Append `loop-runner` to the CHECKS list in `tools/verify`. Update the check counts in `docs/specs/mechanical-checks.md` (six become seven, plus a paragraph on what this check decides) and the covers column of `docs/specs/index.md`. Move the `loop-runner` row in `docs/capabilities/index.md` to `enforced` at `./tools/verify`, `tools/hooks/pre-commit`.
 
 The sabotage demonstration, in this order, committing none of it: edit `tools/loop-runner` to continue iterating when no Progress entry flipped (the exact edit and diff go in this plan); run `./tools/verify`; observe the loop-runner check fail naming the violated behavior; restore the runner; observe verify green. A self-test never seen red proves nothing, which is the same bar every other card here paid.
 
@@ -134,7 +148,7 @@ Budget branch: record the observed wall time of `./tools/verify` with the check 
 
 Acceptance:
 
-1. `./tools/checks/loop-runner` alone on a clean tree prints three scenario lines and an ok summary, exits 0, and leaves nothing behind in `$TMPDIR`.
+1. `./tools/checks/loop-runner` alone on a clean tree prints four scenario lines and an ok summary, exits 0, and leaves nothing behind in `$TMPDIR`.
 2. `./tools/verify` prints `7 of 7 checks passed (Ns)` with the observed N recorded here and judged against the budget (or the `built` branch is recorded with its measurement).
 3. The sabotaged-runner run: verify exits 1 with the check's message visible; the restore run: verify green. Both transcripts in this plan.
 4. `docs/capabilities/index.md` shows the new status; the L0 human approves it at review.
@@ -215,8 +229,13 @@ Expected (labelled so; nothing below has been run, and M1 runs each line before 
     # expected: exit 2; refusal naming the unstamped completed entry;
     # $S/sentinel absent
 
+    ./tools/loop-runner run "$S/D" --limit 2 --logs "$S/logsD" -- "$S/stub-session"
+    # expected: exit 1 after iteration 1; the committed-nothing message —
+    # session exited 0, no commit — naming <logs>/01-iteration.txt;
+    # fixture D's Progress unchanged
+
     # M2, from the repository root
-    ./tools/checks/loop-runner        # expected: three scenario lines, ok summary, exit 0
+    ./tools/checks/loop-runner        # expected: four scenario lines, ok summary, exit 0
     ./tools/verify                    # expected: fast-verify: 7 of 7 checks passed (Ns), N recorded
     # sabotage: edit tools/loop-runner per M2, run ./tools/verify, expect exit 1
     # with the check's message; git checkout -- tools/loop-runner; verify green
@@ -311,6 +330,8 @@ Fixtures, used by M1 by hand and by `tools/checks/loop-runner` forever. Each is 
 
 Fixture B is A with the second entry reading `M2: acceptance unobservable — create nothing`; the word `unobservable` is the stub's trigger. Fixture C is A with the first entry pre-ticked and carrying no timestamp. The stub session, `stub-session`, one POSIX script: it appends its final argument (the brief) to `brief-received.txt` so the check can assert the brief plumbing; finds the first unticked entry of `plans/active/fixture.md`; if that entry contains `unobservable`, it rewrites the entry as a split (completed: nothing; remaining: the original text), commits `session: split`, and exits 1; otherwise it creates the named file with the named word, ticks the entry with `(date -u +"%Y-%m-%d %H:%MZ")`, commits `session: advance`, and exits 0. In the refusing scenario the stub would `touch` a sentinel file; the check asserts the sentinel absent.
 
+Fixture D, the silent-refusal shape, added by the pre-execution review: A with the second entry reading `M2: silent refusal — the session will do nothing`; the word `silent` is the stub's trigger for it. On a `silent` entry the stub appends the brief to `brief-received.txt` as always — proving the session was genuinely invoked — then creates nothing, commits nothing, and exits 0, which is the exit-zero credits refusal reproduced in miniature. The runner must halt on the absent commit, not the exit status, and its message is the committed-nothing shape from the message contract above. Fixture D's first entry is pre-ticked with a timestamp so the silent entry is the first the runner attempts.
+
 The check. `tools/checks/loop-runner`, same output conventions as its siblings: one report line per scenario stating what was exercised and what held, a final summary line, exit 0 all held / 1 violation / 2 cannot decide, scratch removed on every exit path. Wired as the last word of the CHECKS list in `tools/verify`.
 
 Close-out drafts, so M4 edits rather than composes. `GOALS.md` non-goal replacement for the current "No background automation in v1…" bullet:
@@ -328,3 +349,13 @@ Close-out drafts, so M4 edits rather than composes. `GOALS.md` non-goal replacem
 Decision record: `docs/decisions/0027-the-loop-runner-is-watched-and-judges-by-commit-shape.md`, graduating the watched-scope and commit-shape-judgement decisions from this log, in the format `docs/decisions/DECISION_FORMAT.md` defines.
 
 What this plan deliberately leaves out: unattended or scheduled operation and any change to the Gating capabilities table or rung claim (the L2 question stays exactly where `docs/MATURITY.md` left it); session resumption or retry inside an iteration (a halt is a human's to read — one session, one judgement); driving plans in this repository's own checkout (refused by design, revisitable by its own decision); harness-specific flags inside the runner (they live in the invocation the human supplies); and any `template/` change (the payload ships no loop-runner card, and `tools/` is live-only by the layer map — a target project that wants a runner writes its own card, which is the blueprint's contract for every enforcer).
+
+## Revision Notes
+
+- 2026-09-22 (pre-execution review): added fixture D — the zero-commit,
+  exit-0 session — to the stub contract, M1's acceptance (now seven items),
+  M2's scope and scenario counts, and Concrete Steps. Reason: the halt this
+  design exists for, the exit-zero refusal that heads the plan's own
+  catalogue, was the one behavior no scenario produced; its drafted message
+  had no observation scheduled. Milestone boundaries and all other
+  contracts unchanged.
