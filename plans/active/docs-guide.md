@@ -74,7 +74,21 @@ inventing one.
   lines from the page, both naming `plans/active/` and `plans/completed/`
   as directories. The first post-write verify failed 1 of 7 — see
   Surprises.
-- [ ] M3 — `docs/guide/adopting.md` and `docs/guide/operating.md` exist.
+- [x] (2026-09-22 05:03Z) M3 — `docs/guide/adopting.md` (116 lines) and
+  `docs/guide/operating.md` (138 lines) written. Observed: `./tools/verify`
+  exit 0 in 2.48s ending `fast-verify: 7 of 7 checks passed (2s).`, both
+  pages in every checked set (doc-integrity 502 of 502 references in 57
+  artifacts, prose-duplication 49 artifacts with 20 allowlist entries
+  applied and none added, boundary-lint 75 files); the three prompt
+  blocks extracted from `docs/guide/operating.md` are byte-identical to
+  the blocks under Interfaces and Dependencies (empty diff over 8
+  indented lines each side, no backtick anywhere in them); the
+  acceptance grep printed, from the two new files, only the unbackticked
+  prompt-block line and one backticked directory-as-directory mention.
+  One deviation against acceptance 1's coverage: sizing appears as the
+  spec's twenty-to-twenty-nine-minutes-per-harness three-session figure,
+  not the per-session five-to-eleven range — see Decision Log. The first
+  post-write verify failed 1 of 7 — see Surprises.
 - [ ] M4 — `docs/guide/implementing.md` and `docs/guide/index.md` exist;
   `AGENTS.md` maps `docs/guide/`.
 - [ ] M5 — Both `skills/harness-init/SKILL.md` edits landed in one commit:
@@ -163,6 +177,20 @@ command named in each entry.
   standing. Rewording cleared both windows.
   Evidence: the six remediation lines of the failing run, window keys
   quoted above verbatim; the re-run exited 0 in 2.32s ending
+  `fast-verify: 7 of 7 checks passed (2s).`
+- Observation (M3 session, 2026-09-22 05:03Z): the first post-write
+  `./tools/verify` failed 1 of 7 — the third page draft in three
+  milestones to collide, this time with the debt register.
+  prose-duplication named `docs/DEBT.md` and `docs/guide/adopting.md`
+  sharing the window "where every location that harness reads lies
+  outside" (10 words shared in total): `D14`'s Details section
+  paraphrases step 9's install-nothing branch in the same words the
+  page's reachability passage used, and that section of the page cites
+  the decision record and the spec but not `docs/DEBT.md`, so the
+  attribution class could not carry it. Rewording the page's clause to
+  "when the locations that harness reads all sit outside" cleared it.
+  Evidence: the failing run's remediation line, window key quoted above
+  verbatim; the re-run exited 0 in 2.48s ending
   `fast-verify: 7 of 7 checks passed (2s).`
 
 ## Decision Log
@@ -313,6 +341,29 @@ command named in each entry.
   — and a citation excuses only the cited pair, which leaves every window
   shared with an uncited third file standing.
   Date/Author: 2026-09-22, M2 session.
+- Decision: M3's duplication collision was resolved by rewording the
+  page, not by allowlisting and not by adding a citation.
+  Rationale: the window is none of the classes
+  `docs/capabilities/prose-duplication.md` reserves the allowlist for —
+  the same ground M1 and M2 stood on — and citing `docs/DEBT.md` from
+  adopting's expectations section would attribute a reachability fact to
+  the debt register when the section already names the two files that
+  own it, the decision record and the spec.
+  Date/Author: 2026-09-22, M3 session.
+- Decision: `docs/guide/adopting.md` states the trials' cost as the
+  spec's figure — twenty to twenty-nine minutes of driven time per
+  harness for the full three-session sequence — rather than the
+  five-to-eleven minutes per bootstrap session M3's milestone text asked
+  for.
+  Rationale: the page-ownership contract under Interfaces and
+  Dependencies binds adopting to no claim `docs/specs/bootstrap-flow.md`
+  does not back, and the spec records only three-session totals; the
+  per-session range exists only in plan records, which no guide page may
+  reference. The two instructions collide and the narrower one wins. If
+  a per-session figure is worth publishing, M9's spec update — which
+  carries the re-runs' bootstrap wall times anyway — is where it gains a
+  live owner, and adopting can point at it then.
+  Date/Author: 2026-09-22, M3 session.
 
 ## Outcomes & Retrospective
 
