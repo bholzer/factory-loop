@@ -33,6 +33,9 @@ edits to both halves.
 - `template/` — the payload copied into a target project and filled in there.
 - `CLAUDE.md` — one-line entry-point shim for harnesses that do not read
   `AGENTS.md` natively. Owns nothing; contains only a reference to this file.
+- `README.md` — the front page for people meeting the repository cold: core
+  concepts, a quickstart, a glossary. A tour that owns nothing; each passage
+  names the file that owns its fact.
 
 ## Commands
 
